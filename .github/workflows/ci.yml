@@ -1,21 +1,53 @@
-name: Build & Lint
-on: [push, pull_request]
+name: Wails Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=4096"
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        go: ['1.23']
-    runs-on: ${{ matrix.os }}
+        build:
+          - name: 'Linux'
+            platform: 'linux/amd64'
+            os: 'ubuntu-latest'
+          - name: 'Windows'
+            platform: 'windows/amd64'
+            os: 'windows-latest'
+          - name: 'macOS'
+            platform: 'darwin/universal'
+            os: 'macos-latest'
+
+    runs-on: ${{ matrix.build.os }}
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          go-version: ${{ matrix.go }}
-      - name: Install Wails
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-      - name: Install Linux Deps
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev
-      - name: Build
-        run: wails build
+          submodules: recursive
+
+      - name: Build Wails App
+        uses: dAppServer/wails-build-action@v2.2
+        id: build
+        with:
+          build-name: 'AgentManager'
+          build-platform: ${{ matrix.build.platform }}
+          wails-version: 'v2.9.2'
+          go-version: '1.23'
+          node-version: '18.x'
+          package: true
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.build.name }}-build
+          path: build/bin/*
