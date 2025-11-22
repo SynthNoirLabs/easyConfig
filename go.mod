@@ -1,4 +1,4 @@
-module AgentManager
+module easyConfig
 
 go 1.23
 

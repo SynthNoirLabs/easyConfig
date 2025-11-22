@@ -1,19 +1,52 @@
-# README
+# EasyConfig
 
-## About
+EasyConfig is a centralized dashboard for managing configuration files for various AI agents (Claude Code, Gemini CLI, Codex, etc.). It simplifies the process of finding, editing, and extending these agents with new capabilities like MCP servers.
 
-This is the official Wails React-TS template.
+## 🚀 Getting Started
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+### Prerequisites
+- **Go** (v1.23+)
+- **Node.js** (v18+)
+- **Wails** (v2.11.0)
 
-## Live Development
+### Installation
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/yourusername/easyConfig.git
+    cd easyConfig
+    ```
 
-## Building
+2.  **Install dependencies**
+    ```bash
+    go mod tidy
+    cd frontend && npm install
+    ```
 
-To build a redistributable, production mode package, use `wails build`.
+3.  **Run in Development Mode**
+    ```bash
+    wails dev
+    ```
+
+4.  **Build for Production**
+    ```bash
+    wails build
+    ```
+
+## 🛠 Project Structure
+
+- **`main.go`**: Application entry point.
+- **`app.go`**: Main application logic and backend methods bound to the frontend.
+- **`frontend/`**: React + TypeScript + Vite frontend.
+- **`pkg/`**: Backend packages (Configuration, Discovery, etc.).
+- **`build/`**: Build artifacts and metadata.
+
+## ✅ Features (Planned)
+
+- **Multi-Agent Support**: Config editing for Claude, Gemini, Codex.
+- **Smart Discovery**: Automatically finds config files on your system.
+- **MCP Injection**: Easily add MCP servers to your agents.
+
+## 🤝 Contributing
+
+See `TASKS.md` for the current backlog and project status.
