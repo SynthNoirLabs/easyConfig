@@ -15,7 +15,9 @@ func NewDiscoveryService() *DiscoveryService {
 	ds := &DiscoveryService{
 		providers: []Provider{},
 	}
-	// Providers will be registered here or via a Register method
+	ds.RegisterProvider(&ClaudeProvider{})
+	ds.RegisterProvider(&JulesProvider{})
+	ds.RegisterProvider(&GeminiProvider{})
 	return ds
 }
 
