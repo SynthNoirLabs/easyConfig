@@ -1,8 +1,11 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 // DiscoveryService manages the discovery of configurations across multiple providers
@@ -58,4 +61,41 @@ func FileExists(path string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+// ReadConfig reads the content of a configuration file at the given path
+func (s *DiscoveryService) ReadConfig(path string) (string, error) {
+	// Check if file exists
+	if !FileExists(path) {
+		return "", fmt.Errorf("file not found: %s", path)
+	}
+
+	// Read the file content
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to read file: %w", err)
+	}
+
+	return string(content), nil
+}
+
+// SaveConfig writes content to a configuration file at the given path
+// If the file has a .json extension, it validates the JSON structure first
+func (s *DiscoveryService) SaveConfig(path string, content string) error {
+	// Validate JSON if the file is a .json file
+	ext := strings.ToLower(filepath.Ext(path))
+	if ext == ".json" {
+		var js json.RawMessage
+		if err := json.Unmarshal([]byte(content), &js); err != nil {
+			return fmt.Errorf("invalid JSON content: %w", err)
+		}
+	}
+
+	// Write the content to the file
+	err := os.WriteFile(path, []byte(content), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	return nil
 }
