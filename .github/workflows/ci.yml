@@ -30,6 +30,11 @@ jobs:
       - name: Install Dependencies
         run: go mod tidy
 
+      - name: Create Dummy Frontend Assets
+        run: |
+          mkdir -p frontend/dist
+          touch frontend/dist/index.html
+
       - name: Run Unit Tests
         run: go test -v -race ./pkg/...
 
