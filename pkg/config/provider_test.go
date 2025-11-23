@@ -44,20 +44,33 @@ func TestDiscoveryService_DiscoverAll(t *testing.T) {
 }
 
 func TestGeminiProvider_Discover(t *testing.T) {
-	// Setup: Create dummy files
-	homeDir := GetUserHome()
-	projectDir, _ := os.Getwd()
+	// Setup: Create temporary directories for testing
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	
+	// Override HOME environment variable for testing
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
 
 	// Global
-	os.MkdirAll(filepath.Join(homeDir, ".gemini"), 0755)
-	os.WriteFile(filepath.Join(homeDir, ".gemini", "settings.json"), []byte("{}"), 0644)
+	if err := os.MkdirAll(filepath.Join(tempHome, ".gemini"), 0755); err != nil {
+		t.Fatalf("Failed to create global .gemini directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempHome, ".gemini", "settings.json"), []byte("{}"), 0644); err != nil {
+		t.Fatalf("Failed to write global settings.json: %v", err)
+	}
 
 	// Project
-	os.MkdirAll(filepath.Join(projectDir, ".gemini"), 0755)
-	os.WriteFile(filepath.Join(projectDir, ".gemini", "settings.json"), []byte("{}"), 0644)
+	if err := os.MkdirAll(filepath.Join(tempProject, ".gemini"), 0755); err != nil {
+		t.Fatalf("Failed to create project .gemini directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempProject, ".gemini", "settings.json"), []byte("{}"), 0644); err != nil {
+		t.Fatalf("Failed to write project settings.json: %v", err)
+	}
 
 	provider := &GeminiProvider{}
-	items, err := provider.Discover(projectDir)
+	items, err := provider.Discover(tempProject)
 	if err != nil {
 		t.Fatalf("GeminiProvider.Discover failed: %v", err)
 	}
@@ -83,9 +96,4 @@ func TestGeminiProvider_Discover(t *testing.T) {
 	if !projectFound {
 		t.Error("Expected to find a project config, but didn't")
 	}
-
-	t.Cleanup(func() {
-		os.RemoveAll(filepath.Join(homeDir, ".gemini"))
-		os.RemoveAll(filepath.Join(projectDir, ".gemini"))
-	})
 }
