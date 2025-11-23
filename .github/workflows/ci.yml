@@ -111,7 +111,7 @@ jobs:
           package: true
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.build.name }}-build
           path: build/bin/*
