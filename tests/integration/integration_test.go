@@ -2,7 +2,6 @@ package main_test
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -26,11 +25,11 @@ func TestIntegration_Discovery(t *testing.T) {
 	t.Setenv("HOME", tempHome)
 
 	// 2. Install Mock Config Files (mimicking what CLIs would create)
-	
+
 	// Claude
 	createFile(t, filepath.Join(tempHome, ".claude", "settings.json"), "{}")
 	createFile(t, filepath.Join(tempProject, ".claude", "settings.json"), "{}")
-	
+
 	// Gemini
 	createFile(t, filepath.Join(tempHome, ".gemini", "settings.json"), "{}")
 	createFile(t, filepath.Join(tempProject, "GEMINI.md"), "# Context")
@@ -47,9 +46,9 @@ func TestIntegration_Discovery(t *testing.T) {
 
 	// 4. Verify Results
 	expectedProviders := map[string]int{
-		"Claude Code":    2, // Global CLI + Project Settings
-		"Gemini":         2, // Global Settings + Project Context
-		"Codex CLI":      1, // Global Config
+		"Claude Code": 2, // Global CLI + Project Settings
+		"Gemini":      2, // Global Settings + Project Context
+		"Codex CLI":   1, // Global Config
 	}
 
 	counts := make(map[string]int)
@@ -78,7 +77,7 @@ func TestIntegration_CLI_Interaction(t *testing.T) {
 
 	// 2. easyConfig modifies the file
 	ds := config.NewDiscoveryService()
-	
+
 	// Verify read
 	content, err := ds.ReadConfig(configPath)
 	if err != nil {
@@ -114,10 +113,4 @@ func createFile(t *testing.T, path string, content string) {
 	if err != nil {
 		t.Fatalf("Failed to create file %s: %v", path, err)
 	}
-}
-
-// Helper to check if a command exists (for future real CLI tests)
-func commandExists(cmd string) bool {
-	_, err := exec.LookPath(cmd)
-	return err == nil
 }
