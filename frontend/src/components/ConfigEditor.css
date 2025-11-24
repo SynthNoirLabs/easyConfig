@@ -1,0 +1,96 @@
+.config-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.file-path {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-save:hover {
+  background-color: #005f9e;
+}
+
+.btn-save:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.editor-area {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.editor-textarea {
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  border: none;
+  resize: none;
+  outline: none;
+  background-color: #ffffff;
+  color: #24292e;
+}
+
+.editor-loading, .editor-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #666;
+  font-size: 14px;
+}
+
+.editor-error {
+  color: #d32f2f;
+}

@@ -9,3 +9,11 @@ export function Greet(arg1) {
 export function DiscoverConfigs(arg1) {
     return window['go']['main']['App']['DiscoverConfigs'](arg1);
 }
+
+export function ReadConfig(arg1) {
+    return window['go']['main']['App']['ReadConfig'](arg1);
+}
+
+export function SaveConfig(arg1, arg2) {
+    return window['go']['main']['App']['SaveConfig'](arg1, arg2);
+}

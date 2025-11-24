@@ -2,10 +2,11 @@ import { useState } from 'react';
 import './App.css';
 import Layout from './components/Layout';
 import Sidebar from './components/Sidebar';
+import ConfigEditor from './components/ConfigEditor';
 import { useConfig } from './context/ConfigContext';
 import { config } from '../wailsjs/go/config/models';
 
-function App() {
+function AppContent() {
   const { configs, loading, error } = useConfig();
   const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(null);
 
@@ -14,11 +15,19 @@ function App() {
   };
 
   if (loading) {
-    return <div className="loading">Loading configurations...</div>;
+    return (
+      <div className="app-loading">
+        <p>Loading configurations...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="error">Error: {error}</div>;
+    return (
+      <div className="app-error">
+        <p>Error: {error}</p>
+      </div>
+    );
   }
 
   return (
@@ -32,25 +41,7 @@ function App() {
     >
       <div className="app-content">
         {selectedItem ? (
-          <div className="config-details">
-            <h1 className="config-title">{selectedItem.name}</h1>
-            <div className="config-meta">
-              <div className="config-meta-item">
-                <span className="config-meta-label">Provider:</span>
-                <span className="config-meta-value">{selectedItem.provider}</span>
-              </div>
-              <div className="config-meta-item">
-                <span className="config-meta-label">Path:</span>
-                <span className="config-meta-value">{selectedItem.path}</span>
-              </div>
-            </div>
-            <div className="config-placeholder">
-              <p>Configuration editor will be displayed here.</p>
-              <p className="config-placeholder-note">
-                This is where you'll be able to view and edit the configuration file content.
-              </p>
-            </div>
-          </div>
+          <ConfigEditor configItem={selectedItem} />
         ) : (
           <div className="empty-state">
             <h2>Welcome to easyConfig</h2>
@@ -59,6 +50,12 @@ function App() {
         )}
       </div>
     </Layout>
+  );
+}
+
+function App() {
+  return (
+    <AppContent />
   );
 }
 
