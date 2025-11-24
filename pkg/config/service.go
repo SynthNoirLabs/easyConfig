@@ -63,24 +63,35 @@ func FileExists(path string) bool {
 	return !info.IsDir()
 }
 
-// ReadConfig reads the content of a configuration file at the given path
+// ReadConfig reads the content of a configuration file at the given path.
+//
+// Note: ReadConfig does not currently make use of any state on the
+// DiscoveryService; it is defined as a method for potential future
+// extensibility (for example, reading encrypted configs tied to a provider).
+// It performs the read directly and returns a user-friendly error when the
+// file cannot be found.
 func (s *DiscoveryService) ReadConfig(path string) (string, error) {
-	// Check if file exists
-	if !FileExists(path) {
-		return "", fmt.Errorf("file not found: %s", path)
-	}
-
-	// Read the file content
+	// Read the file content directly. Avoid a separate existence check to
+	// prevent TOCTOU race conditions; rely on os.ReadFile and check the error.
 	content, err := os.ReadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return "", fmt.Errorf("file not found: %s", path)
+		}
 		return "", fmt.Errorf("failed to read file: %w", err)
 	}
-
 	return string(content), nil
 }
 
-// SaveConfig writes content to a configuration file at the given path
-// If the file has a .json extension, it validates the JSON structure first
+// SaveConfig writes content to a configuration file at the given path.
+//
+// If the file has a `.json` extension, it validates the JSON structure first.
+// The method does not currently depend on any DiscoveryService state but is
+// defined on the type for symmetry with ReadConfig and future extension.
+//
+// When writing files, SaveConfig uses a restrictive permission mode (0600)
+// to avoid creating world-readable configuration files that may contain
+// secrets.
 func (s *DiscoveryService) SaveConfig(path string, content string) error {
 	// Validate JSON if the file is a .json file
 	ext := strings.ToLower(filepath.Ext(path))
@@ -91,11 +102,9 @@ func (s *DiscoveryService) SaveConfig(path string, content string) error {
 		}
 	}
 
-	// Write the content to the file
-	err := os.WriteFile(path, []byte(content), 0644)
-	if err != nil {
+	// Write the content to the file with restrictive permissions (0600).
+	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
 		return fmt.Errorf("failed to write file: %w", err)
 	}
-
 	return nil
 }
