@@ -64,6 +64,81 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	return items, nil
 }
 
+// --- Copilot Provider ---
+
+type CopilotProvider struct{}
+
+func (p *CopilotProvider) Name() string {
+	return "GitHub Copilot"
+}
+
+func (p *CopilotProvider) Discover(projectPath string) ([]ConfigItem, error) {
+	var items []ConfigItem
+	home := GetUserHome()
+
+	// 1. Global CLI Config
+	if home != "" {
+		path := filepath.Join(home, ".copilot", "mcp-config.json")
+		if FileExists(path) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "CLI Config",
+				FileName: "mcp-config.json",
+				Path:     path,
+				Scope:    ScopeGlobal,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+	}
+
+	// 2. Project Context
+	if projectPath != "" {
+		pathProj := filepath.Join(projectPath, ".github", "copilot-instructions.md")
+		if FileExists(pathProj) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Instructions",
+				FileName: "copilot-instructions.md",
+				Path:     pathProj,
+				Scope:    ScopeProject,
+				Format:   FormatMD,
+				Exists:   true,
+			})
+		}
+	}
+	return items, nil
+}
+
+// --- OpenAI Provider ---
+
+type OpenAIProvider struct{}
+
+func (p *OpenAIProvider) Name() string {
+	return "OpenAI"
+}
+
+func (p *OpenAIProvider) Discover(projectPath string) ([]ConfigItem, error) {
+	var items []ConfigItem
+	home := GetUserHome()
+
+	if home != "" {
+		path := filepath.Join(home, ".config", "openai", "config.yaml")
+		if FileExists(path) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Global Config",
+				FileName: "config.yaml",
+				Path:     path,
+				Scope:    ScopeGlobal,
+				Format:   FormatYAML,
+				Exists:   true,
+			})
+		}
+	}
+	return items, nil
+}
+
 // --- Jules Provider ---
 
 type JulesProvider struct{}

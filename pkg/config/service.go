@@ -16,11 +16,14 @@ type DiscoveryService struct {
 // NewDiscoveryService creates a new service with default providers
 func NewDiscoveryService() *DiscoveryService {
 	ds := &DiscoveryService{
-		providers: []Provider{},
+		providers: []Provider{
+			&ClaudeProvider{},
+			&JulesProvider{},
+			&GeminiProvider{},
+			&CopilotProvider{},
+			&OpenAIProvider{},
+		},
 	}
-	ds.RegisterProvider(&ClaudeProvider{})
-	ds.RegisterProvider(&JulesProvider{})
-	ds.RegisterProvider(&GeminiProvider{})
 	return ds
 }
 
