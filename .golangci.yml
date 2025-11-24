@@ -1,0 +1,42 @@
+run:
+  timeout: 5m
+  go: '1.24'
+
+linters-settings:
+  gci:
+    # Ensure imports are grouped: standard, default, and local prefixes
+    local-prefixes: github.com/komod0/easyConfig
+  gofumpt:
+    extra-rules: true # Enforce stricter formatting
+  govet:
+    check-shadowing: true
+  gocyclo:
+    min-complexity: 15
+  misspell:
+    locale: US
+
+linters:
+  # Use a 'disable-all' approach for explicit configuration
+  disable-all: true
+  enable:
+    # Core/Correctness
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    # Style, Formatting, and Best Practices
+    - bodyclose
+    - exportloopref
+    - gci
+    - gocyclo
+    - gofumpt
+    - goimports
+    - misspell
+    - revive
+    - unconvert
+    - whitespace
+    # Security
+    - gosec

@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: detect-private-key
+
+  # Go Hooks
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.60.0
+    hooks:
+      - id: golangci-lint
+        # Optimization: Run fast locally by only analyzing changed files
+        args: [--fast]
+
+  # Web Hooks (Biome)
+  - repo: https://github.com/biomejs/biome
+    rev: v1.8.3
+    hooks:
+      - id: biome
+        # Check and apply safe fixes automatically
+        args: ["check", "--write"]
+        files: ^frontend/

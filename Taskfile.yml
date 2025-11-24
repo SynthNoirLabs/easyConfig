@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  setup:
+    desc: Install dependencies and setup environment
+    cmds:
+      - mise install
+      - go mod download
+      - npm install --prefix frontend
+      - pre-commit install
+
+  dev:
+    desc: Run the application in development mode
+    cmds:
+      - wails dev
+
+  lint:go:
+    desc: Lint Go backend
+    cmds:
+      - golangci-lint run
+
+  lint:web:
+    desc: Lint Web frontend (Biome)
+    cmds:
+      - npx @biomejs/biome check frontend/
+
+  lint:
+    desc: Run all linters
+    cmds:
+      - task: lint:go
+      - task: lint:web

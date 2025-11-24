@@ -1,0 +1,6 @@
+[tools]
+go = '1.24.x'
+node = '22.x'
+task = 'latest'
+# Ensure consistent linter versions
+golangci-lint = '1.60.0'
