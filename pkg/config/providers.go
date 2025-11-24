@@ -185,3 +185,50 @@ func (p *JulesProvider) Discover(projectPath string) ([]ConfigItem, error) {
 
 	return items, nil
 }
+
+// --- Gemini Provider ---
+
+type GeminiProvider struct{}
+
+func (p *GeminiProvider) Name() string {
+	return "Gemini"
+}
+
+func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
+	var items []ConfigItem
+	home := GetUserHome()
+
+	// 1. Global settings
+	if home != "" {
+		path := filepath.Join(home, ".gemini", "settings.json")
+		if FileExists(path) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "User Settings",
+				FileName: "settings.json",
+				Path:     path,
+				Scope:    ScopeGlobal,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+	}
+
+	// 2. Project settings
+	if projectPath != "" {
+		path := filepath.Join(projectPath, ".gemini", "settings.json")
+		if FileExists(path) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Workspace Settings",
+				FileName: "settings.json",
+				Path:     path,
+				Scope:    ScopeProject,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+	}
+
+	return items, nil
+}

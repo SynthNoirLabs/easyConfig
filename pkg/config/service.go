@@ -19,6 +19,7 @@ func NewDiscoveryService() *DiscoveryService {
 		providers: []Provider{
 			&ClaudeProvider{},
 			&JulesProvider{},
+			&GeminiProvider{},
 			&CopilotProvider{},
 			&OpenAIProvider{},
 		},
