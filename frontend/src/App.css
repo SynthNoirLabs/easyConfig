@@ -1,59 +1,90 @@
-#app {
-    height: 100vh;
-    text-align: center;
+.app-content {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-#logo {
-    display: block;
-    width: 50%;
-    height: 50%;
-    margin: auto;
-    padding: 10% 0 0;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    background-origin: content-box;
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  text-align: center;
+  padding: 40px;
 }
 
-.result {
-    height: 20px;
-    line-height: 20px;
-    margin: 1.5rem auto;
+.empty-state h2 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
 }
 
-.input-box .btn {
-    width: 60px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 3px;
-    border: none;
-    margin: 0 0 0 20px;
-    padding: 0 8px;
-    cursor: pointer;
+.empty-state p {
+  margin: 0;
+  font-size: 16px;
+  color: #888;
 }
 
-.input-box .btn:hover {
-    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-    color: #333333;
+.config-details {
+  padding: 20px;
 }
 
-.input-box .input {
-    border: none;
-    border-radius: 3px;
-    outline: none;
-    height: 30px;
-    line-height: 30px;
-    padding: 0 10px;
-    background-color: rgba(240, 240, 240, 1);
-    -webkit-font-smoothing: antialiased;
+.config-title {
+  margin: 0 0 24px 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
 }
 
-.input-box .input:hover {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
+.config-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 24px;
 }
 
-.input-box .input:focus {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
+.config-meta-item {
+  display: flex;
+  gap: 12px;
+}
+
+.config-meta-label {
+  font-weight: 600;
+  color: #555;
+  min-width: 80px;
+}
+
+.config-meta-value {
+  color: #333;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.config-placeholder {
+  padding: 32px;
+  background-color: #fafafa;
+  border: 2px dashed #d0d0d0;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.config-placeholder p {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.config-placeholder p:last-child {
+  margin-bottom: 0;
+}
+
+.config-placeholder-note {
+  font-size: 14px;
+  color: #999;
 }
