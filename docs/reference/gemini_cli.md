@@ -1,74 +1,104 @@
 # Gemini CLI Configuration Reference
 
-**Source:** https://geminicli.com/docs/cli/settings/
+**Source:** https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/configuration.md
 
 ## Settings File Locations
-*   **User settings:** `~/.gemini/settings.json`
-*   **Workspace settings:** `./.gemini/settings.json` (Overrides user)
+*   **User Settings:** `~/.gemini/settings.json`
+*   **Workspace Settings:** `./.gemini/settings.json` (Overrides user settings)
+*   **System Defaults (Linux):** `/etc/gemini-cli/system-defaults.json`
+*   **System Overrides (Linux):** `/etc/gemini-cli/settings.json`
 
 ## Format: JSON
 
-## Key Settings Categories
+## Configuration Options
 
 ### 1. UI & Appearance
 ```json
-"ui": {
-  "hideWindowTitle": false,
-  "showStatusInTitle": true,
-  "hideTips": false,
-  "useFullWidth": true
-}
-```
-
-### 2. Context & Files
-```json
-"context": {
-  "fileFiltering": {
-    "respectGitIgnore": true,
-    "respectGeminiIgnore": true,
-    "enableRecursiveFileSearch": true
-  },
-  "discoveryMaxDirs": 200
-}
-```
-
-### 3. Tools & Security
-```json
-"tools": {
-  "useRipgrep": true,
-  "autoAccept": false
-},
-"security": {
-  "disableYoloMode": false,
-  "blockGitExtensions": false
-}
-```
-
-### 4. Model Parameters
-```json
-"model": {
-  "maxSessionTurns": -1,
-  "compressionThreshold": 0.2
-}
-```
-
-## CLI Commands
-*   `/settings`: Opens interactive settings dialog.
-*   `/init`: Generates a `GEMINI.md` context file.
-
-## Example `settings.json`
-```json
 {
   "ui": {
-    "showLineNumbers": true
-  },
-  "context": {
-    "fileFiltering": {
-      "respectGitIgnore": true
+    "theme": "GitHub",
+    "hideBanner": true,
+    "hideTips": false,
+    "showStatusInTitle": true
+  }
+}
+```
+
+### 2. Model & Session
+```json
+{
+  "model": {
+    "name": "gemini-1.5-pro-latest",
+    "maxSessionTurns": 10,
+    "summarizeToolOutput": {
+      "run_shell_command": {
+        "tokenBudget": 100
+      }
+    }
+  }
+}
+```
+
+### 3. Tool Management & Sandbox
+```json
+{
+  "tools": {
+    "sandbox": "docker",
+    "discoveryCommand": "bin/get_tools",
+    "callCommand": "bin/call_tool",
+    "exclude": ["write_file"]
+  }
+}
+```
+
+### 4. MCP Servers
+Configure Model Context Protocol (MCP) servers.
+```json
+{
+  "mcpServers": {
+    "mainServer": {
+      "command": "bin/mcp_server.py",
+      "args": ["--verbose"],
+      "env": {
+        "API_KEY": "$MY_API_TOKEN"
+      },
+      "cwd": "./server-dir",
+      "timeout": 30000
     }
   },
-  "general": {
-    "disableAutoUpdate": false
+  "mcp": {
+    "allowed": ["mainServer"],
+    "excluded": ["experimental"]
+  }
+}
+```
+
+### 5. Context & Discovery
+```json
+{
+  "context": {
+    "fileName": ["CONTEXT.md", "GEMINI.md"],
+    "includeDirectories": ["./docs", "./src/types"],
+    "loadFromIncludeDirectories": true,
+    "fileFiltering": {
+      "respectGitIgnore": true,
+      "enableRecursiveFileSearch": true
+    }
+  },
+  "advanced": {
+    "excludedEnvVars": ["DEBUG", "NODE_ENV"]
+  }
+}
+```
+
+### 6. Telemetry
+```json
+{
+  "telemetry": {
+    "enabled": true,
+    "target": "local",
+    "otlpEndpoint": "http://localhost:4317",
+    "logPrompts": false
   }
 }
 ```

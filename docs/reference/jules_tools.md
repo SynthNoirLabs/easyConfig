@@ -3,38 +3,42 @@
 **Source:** https://jules.google/docs/cli/reference/
 
 ## Overview
-Jules is designed to be autonomous and stateless on the client side, relying heavily on cloud sessions and project-based context.
+Jules is an autonomous coding agent integrated with Google Cloud and GitHub. It relies primarily on cloud-side sessions but maintains some local state.
 
 ## Configuration Locations
 
 ### 1. Agent Context (Project Root)
-*   **File:** `AGENTS.md` or `JULES.md` (Project Root)
-*   **Purpose:** Defines the persona, tools, and instructions for the agent.
-*   **Format:** Markdown with optional frontmatter? (Search results imply standard Markdown instructions).
+*   **File:** `AGENTS.md` (Recommended)
+*   **Purpose:** Defines the persona, architecture overview, and high-level instructions for Jules.
+*   **Format:** Markdown.
 
 ### 2. Local Data Store
 *   **Path:** `~/.jules-mcp/data.json`
-*   **Purpose:** Persists local state, session IDs, and possibly cached credentials.
+*   **Purpose:** Persists local state, session IDs, and authentication tokens.
 *   **Env Var:** `JULES_DATA_PATH` can override this location.
 
-### 3. Authentication
-*   Managed via `jules login`.
-*   Tokens likely stored in system keychain or `~/.config/google-jules/`.
+## API Interaction (Reference)
+Jules is often driven via API or the GitHub App. Here is an example of a session creation request:
 
-## CLI Reference
-*   `jules remote new`: Start a task.
-*   `jules remote list`: List sessions.
-*   `jules remote pull`: Apply changes.
-*   `--theme [light|dark]`: UI preference.
-
-## Example `AGENTS.md`
-```markdown
-# Project Context for Jules
-
-## Architecture
-This project uses a Provider Pattern in Go.
-
-## Tools
-- Use `go test ./...` to verify changes.
-- Configs are in `pkg/config/`.
+```bash
+curl 'https://jules.googleapis.com/v1alpha/sessions' \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -H 'X-Goog-Api-Key: YOUR_API_KEY' \
+    -d '{
+      "prompt": "Refactor the login module",
+      "sourceContext": {
+        "source": "sources/github/owner/repo",
+        "githubRepoContext": {
+          "startingBranch": "main"
+        }
+      },
+      "title": "Refactor Login"
+    }'
 ```
+
+## CLI Commands
+*   `jules login`: Authenticate with Google.
+*   `jules remote new`: Start a new task.
+*   `jules remote list`: List active sessions.
+*   `jules remote pull`: Apply changes from a session to local disk.

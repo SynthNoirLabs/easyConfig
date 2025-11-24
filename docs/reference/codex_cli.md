@@ -1,34 +1,42 @@
 # Codex CLI Configuration Reference
 
-**Source:** https://developers.openai.com/codex/local-config/
-**See Also:** https://vladimirsiedykh.com/blog/codex-mcp-config-toml-shared-configuration-cli-vscode-setup-2025
+**Source:** https://github.com/openai/codex/blob/main/docs/config.md
 
 ## Settings File Locations
-*   **Shared Config:** `~/.codex/config.toml` (Shared between CLI and VSCode extension)
-*   **Project Config:** `./.codex/config.toml` (Overrides global)
+*   **Shared Config:** `~/.codex/config.toml` (Global user config)
+*   **Project Config:** `./.codex/config.toml` (Overrides global config)
 
 ## Format: TOML
 
-## Key Settings
+## Configuration Options
 
-### 1. Model Selection
+### 1. Model & Provider
 ```toml
-model = "gpt-4o"
+model = "o3"
 model_provider = "openai"
-# Optional: Azure settings
-[model_providers.azure]
-name = "Azure OpenAI"
-base_url = "..."
+
+[model_providers.openai]
+name = "OpenAI"
+base_url = "https://api.openai.com/v1"
+env_key = "OPENAI_API_KEY"
+request_max_retries = 4
+stream_max_retries = 10
 ```
 
-### 2. Sandboxing
+### 2. Profiles
+Define preset configurations switchable via `--profile`.
 ```toml
-[sandbox]
-enabled = true
+[profiles.dev]
+model = "gpt-4o"
+approval_policy = "always"
+
+[profiles.ci]
+model = "o3"
+approval_policy = "never"
 ```
 
 ### 3. MCP Servers
-Codex uses a shared TOML format for MCP servers.
+Configure tools using the Model Context Protocol.
 ```toml
 [mcp.servers.filesystem]
 command = "npx"
@@ -38,21 +46,23 @@ args = ["-y", "@modelcontextprotocol/server-filesystem", "/Users/me/desktop"]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-github"]
 env = { "GITHUB_TOKEN" = "..." }
+cwd = "/path/to/run"
 ```
 
-## Context
-*   **Prompts:** `~/.codex/prompts/*.md`
-*   **Project Context:** `AGENTS.md` (in project root)
-
-## Example `config.toml`
+### 4. Sandboxing & Environment
 ```toml
-model = "gpt-5-codex"
-model_provider = "openai"
-
 [sandbox]
 enabled = true
 
-[mcp.servers.memory]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-memory"]
+[shell_environment_policy]
+inherit = "none"
+set = { PATH = "/usr/bin", TERM = "xterm-256color" }
+```
+
+### 5. Tool Management
+```toml
+startup_timeout_sec = 20
+tool_timeout_sec = 30
+enabled_tools = ["search", "summarize"]
+disabled_tools = ["dangerous_tool"]
 ```
