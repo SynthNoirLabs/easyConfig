@@ -45,8 +45,35 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		}
 	}
 
-	// 3. Project Settings
+	// 3. System Settings (Linux)
+	sysSettings := "/etc/claude-code/managed-settings.json"
+	if FileExists(sysSettings) {
+		items = append(items, ConfigItem{
+			Provider: p.Name(),
+			Name:     "Managed Settings",
+			FileName: "managed-settings.json",
+			Path:     sysSettings,
+			Scope:    ScopeSystem,
+			Format:   FormatJSON,
+			Exists:   true,
+		})
+	}
+	sysMCP := "/etc/claude-code/managed-mcp.json"
+	if FileExists(sysMCP) {
+		items = append(items, ConfigItem{
+			Provider: p.Name(),
+			Name:     "Managed MCP",
+			FileName: "managed-mcp.json",
+			Path:     sysMCP,
+			Scope:    ScopeSystem,
+			Format:   FormatJSON,
+			Exists:   true,
+		})
+	}
+
+	// 4. Project Settings
 	if projectPath != "" {
+		// settings.json
 		pathProj := filepath.Join(projectPath, ".claude", "settings.json")
 		if FileExists(pathProj) {
 			items = append(items, ConfigItem{
@@ -56,6 +83,32 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 				Path:     pathProj,
 				Scope:    ScopeProject,
 				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+		// settings.local.json
+		pathLocal := filepath.Join(projectPath, ".claude", "settings.local.json")
+		if FileExists(pathLocal) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Local Settings",
+				FileName: "settings.local.json",
+				Path:     pathLocal,
+				Scope:    ScopeProject,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+		// CLAUDE.md
+		pathMemory := filepath.Join(projectPath, "CLAUDE.md")
+		if FileExists(pathMemory) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Memory File",
+				FileName: "CLAUDE.md",
+				Path:     pathMemory,
+				Scope:    ScopeProject,
+				Format:   FormatMD,
 				Exists:   true,
 			})
 		}
@@ -214,8 +267,35 @@ func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		}
 	}
 
-	// 2. Project settings
+	// 2. System Settings (Linux)
+	sysDefaults := "/etc/gemini-cli/system-defaults.json"
+	if FileExists(sysDefaults) {
+		items = append(items, ConfigItem{
+			Provider: p.Name(),
+			Name:     "System Defaults",
+			FileName: "system-defaults.json",
+			Path:     sysDefaults,
+			Scope:    ScopeSystem,
+			Format:   FormatJSON,
+			Exists:   true,
+		})
+	}
+	sysOverrides := "/etc/gemini-cli/settings.json"
+	if FileExists(sysOverrides) {
+		items = append(items, ConfigItem{
+			Provider: p.Name(),
+			Name:     "System Overrides",
+			FileName: "settings.json",
+			Path:     sysOverrides,
+			Scope:    ScopeSystem,
+			Format:   FormatJSON,
+			Exists:   true,
+		})
+	}
+
+	// 3. Project settings
 	if projectPath != "" {
+		// settings.json
 		path := filepath.Join(projectPath, ".gemini", "settings.json")
 		if FileExists(path) {
 			items = append(items, ConfigItem{
@@ -225,6 +305,19 @@ func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
 				Path:     path,
 				Scope:    ScopeProject,
 				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+		// GEMINI.md
+		pathContext := filepath.Join(projectPath, "GEMINI.md")
+		if FileExists(pathContext) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Context File",
+				FileName: "GEMINI.md",
+				Path:     pathContext,
+				Scope:    ScopeProject,
+				Format:   FormatMD,
 				Exists:   true,
 			})
 		}
