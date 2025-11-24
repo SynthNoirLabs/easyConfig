@@ -1,59 +1,31 @@
 import { useState } from 'react';
 import './App.css';
 import Layout from './components/Layout';
-import Sidebar, { ConfigItem } from './components/Sidebar';
-
-// Dummy data for testing
-const dummyConfigItems: ConfigItem[] = [
-  {
-    name: 'claude_desktop_config.json',
-    provider: 'Claude Code',
-    path: '~/.config/claude/config.json',
-  },
-  {
-    name: 'mcp_servers.json',
-    provider: 'Claude Code',
-    path: '~/.config/claude/mcp_servers.json',
-  },
-  {
-    name: 'hooks.json',
-    provider: 'Claude Code',
-    path: '~/.config/claude/hooks.json',
-  },
-  {
-    name: 'settings.json',
-    provider: 'VS Code',
-    path: '~/.config/Code/User/settings.json',
-  },
-  {
-    name: 'keybindings.json',
-    provider: 'VS Code',
-    path: '~/.config/Code/User/keybindings.json',
-  },
-  {
-    name: 'gemini_config.json',
-    provider: 'Gemini',
-    path: '~/.config/gemini/config.json',
-  },
-  {
-    name: 'model_settings.json',
-    provider: 'Gemini',
-    path: '~/.config/gemini/model_settings.json',
-  },
-];
+import Sidebar from './components/Sidebar';
+import { useConfig } from './context/ConfigContext';
+import { config } from '../wailsjs/go/config/models';
 
 function App() {
-  const [selectedItem, setSelectedItem] = useState<ConfigItem | null>(null);
+  const { configs, loading, error } = useConfig();
+  const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(null);
 
-  const handleSelectConfig = (item: ConfigItem) => {
+  const handleSelectConfig = (item: config.ConfigItem) => {
     setSelectedItem(item);
   };
+
+  if (loading) {
+    return <div className="loading">Loading configurations...</div>;
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
 
   return (
     <Layout
       sidebar={
         <Sidebar
-          items={dummyConfigItems}
+          items={configs}
           onSelect={handleSelectConfig}
         />
       }
