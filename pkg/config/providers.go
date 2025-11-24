@@ -12,15 +12,15 @@ func (p *ClaudeProvider) Name() string {
 	return "Claude Code"
 }
 
-func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
-	var items []ConfigItem
+func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
 	home := GetUserHome()
 
 	// 1. Global Desktop Config
 	if home != "" {
 		path := filepath.Join(home, ".claude", "claude_desktop_config.json")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Desktop Config",
 				FileName: "claude_desktop_config.json",
@@ -33,7 +33,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		// 2. Global CLI Settings
 		pathCLI := filepath.Join(home, ".claude", "settings.json")
 		if FileExists(pathCLI) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "CLI Settings",
 				FileName: "settings.json",
@@ -48,7 +48,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	// 3. System Settings (Linux)
 	sysSettings := "/etc/claude-code/managed-settings.json"
 	if FileExists(sysSettings) {
-		items = append(items, ConfigItem{
+		items = append(items, Item{
 			Provider: p.Name(),
 			Name:     "Managed Settings",
 			FileName: "managed-settings.json",
@@ -60,7 +60,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	}
 	sysMCP := "/etc/claude-code/managed-mcp.json"
 	if FileExists(sysMCP) {
-		items = append(items, ConfigItem{
+		items = append(items, Item{
 			Provider: p.Name(),
 			Name:     "Managed MCP",
 			FileName: "managed-mcp.json",
@@ -76,7 +76,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		// settings.json
 		pathProj := filepath.Join(projectPath, ".claude", "settings.json")
 		if FileExists(pathProj) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Project Settings",
 				FileName: "settings.json",
@@ -89,7 +89,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		// settings.local.json
 		pathLocal := filepath.Join(projectPath, ".claude", "settings.local.json")
 		if FileExists(pathLocal) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Local Settings",
 				FileName: "settings.local.json",
@@ -102,7 +102,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		// CLAUDE.md
 		pathMemory := filepath.Join(projectPath, "CLAUDE.md")
 		if FileExists(pathMemory) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Memory File",
 				FileName: "CLAUDE.md",
@@ -125,15 +125,15 @@ func (p *CopilotProvider) Name() string {
 	return "GitHub Copilot"
 }
 
-func (p *CopilotProvider) Discover(projectPath string) ([]ConfigItem, error) {
-	var items []ConfigItem
+func (p *CopilotProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
 	home := GetUserHome()
 
 	// 1. Global CLI Config
 	if home != "" {
 		path := filepath.Join(home, ".copilot", "mcp-config.json")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "CLI Config",
 				FileName: "mcp-config.json",
@@ -149,7 +149,7 @@ func (p *CopilotProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	if projectPath != "" {
 		pathProj := filepath.Join(projectPath, ".github", "copilot-instructions.md")
 		if FileExists(pathProj) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Instructions",
 				FileName: "copilot-instructions.md",
@@ -171,14 +171,14 @@ func (p *OpenAIProvider) Name() string {
 	return "OpenAI"
 }
 
-func (p *OpenAIProvider) Discover(projectPath string) ([]ConfigItem, error) {
-	var items []ConfigItem
+func (p *OpenAIProvider) Discover(_ string) ([]Item, error) {
+	var items []Item
 	home := GetUserHome()
 
 	if home != "" {
 		path := filepath.Join(home, ".config", "openai", "config.yaml")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Global Config",
 				FileName: "config.yaml",
@@ -200,15 +200,15 @@ func (p *JulesProvider) Name() string {
 	return "Jules"
 }
 
-func (p *JulesProvider) Discover(projectPath string) ([]ConfigItem, error) {
-	var items []ConfigItem
+func (p *JulesProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
 	home := GetUserHome()
 
 	// 1. Global Data
 	if home != "" {
 		path := filepath.Join(home, ".jules-mcp", "data.json")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Global Config",
 				FileName: "data.json",
@@ -224,7 +224,7 @@ func (p *JulesProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	if projectPath != "" {
 		pathProj := filepath.Join(projectPath, "AGENTS.md")
 		if FileExists(pathProj) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Agents Context",
 				FileName: "AGENTS.md",
@@ -247,15 +247,15 @@ func (p *GeminiProvider) Name() string {
 	return "Gemini"
 }
 
-func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
-	var items []ConfigItem
+func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
 	home := GetUserHome()
 
 	// 1. Global settings
 	if home != "" {
 		path := filepath.Join(home, ".gemini", "settings.json")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "User Settings",
 				FileName: "settings.json",
@@ -270,7 +270,7 @@ func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	// 2. System Settings (Linux)
 	sysDefaults := "/etc/gemini-cli/system-defaults.json"
 	if FileExists(sysDefaults) {
-		items = append(items, ConfigItem{
+		items = append(items, Item{
 			Provider: p.Name(),
 			Name:     "System Defaults",
 			FileName: "system-defaults.json",
@@ -282,7 +282,7 @@ func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	}
 	sysOverrides := "/etc/gemini-cli/settings.json"
 	if FileExists(sysOverrides) {
-		items = append(items, ConfigItem{
+		items = append(items, Item{
 			Provider: p.Name(),
 			Name:     "System Overrides",
 			FileName: "settings.json",
@@ -298,7 +298,7 @@ func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		// settings.json
 		path := filepath.Join(projectPath, ".gemini", "settings.json")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Workspace Settings",
 				FileName: "settings.json",
@@ -311,7 +311,7 @@ func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
 		// GEMINI.md
 		pathContext := filepath.Join(projectPath, "GEMINI.md")
 		if FileExists(pathContext) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Context File",
 				FileName: "GEMINI.md",
@@ -334,15 +334,15 @@ func (p *CodexProvider) Name() string {
 	return "Codex CLI"
 }
 
-func (p *CodexProvider) Discover(projectPath string) ([]ConfigItem, error) {
-	var items []ConfigItem
+func (p *CodexProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
 	home := GetUserHome()
 
 	// 1. Global Config
 	if home != "" {
 		path := filepath.Join(home, ".codex", "config.toml")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Global Config",
 				FileName: "config.toml",
@@ -358,7 +358,7 @@ func (p *CodexProvider) Discover(projectPath string) ([]ConfigItem, error) {
 	if projectPath != "" {
 		path := filepath.Join(projectPath, ".codex", "config.toml")
 		if FileExists(path) {
-			items = append(items, ConfigItem{
+			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Project Config",
 				FileName: "config.toml",

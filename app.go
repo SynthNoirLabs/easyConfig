@@ -31,7 +31,7 @@ func (a *App) Greet(name string) string {
 }
 
 // DiscoverConfigs returns all the discovered configurations
-func (a *App) DiscoverConfigs(projectPath string) ([]config.ConfigItem, error) {
+func (a *App) DiscoverConfigs(projectPath string) ([]config.Item, error) {
 	return a.discoveryService.DiscoverAll(projectPath)
 }
 

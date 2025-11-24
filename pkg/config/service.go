@@ -35,8 +35,8 @@ func (s *DiscoveryService) RegisterProvider(p Provider) {
 
 // DiscoverAll iterates through all registered providers and collects configs
 // projectPath: The root directory of the current project (optional)
-func (s *DiscoveryService) DiscoverAll(projectPath string) ([]ConfigItem, error) {
-	var allConfigs []ConfigItem
+func (s *DiscoveryService) DiscoverAll(projectPath string) ([]Item, error) {
+	var allConfigs []Item
 
 	for _, p := range s.providers {
 		items, err := p.Discover(projectPath)
@@ -98,7 +98,7 @@ func (s *DiscoveryService) ReadConfig(path string) (string, error) {
 // When writing files, SaveConfig uses a restrictive permission mode (0600)
 // to avoid creating world-readable configuration files that may contain
 // secrets.
-func (s *DiscoveryService) SaveConfig(path string, content string) error {
+func (s *DiscoveryService) SaveConfig(path, content string) error {
 	// Validate JSON if the file is a .json file
 	ext := strings.ToLower(filepath.Ext(path))
 	if ext == ".json" {
@@ -109,7 +109,7 @@ func (s *DiscoveryService) SaveConfig(path string, content string) error {
 	}
 
 	// Write the content to the file with restrictive permissions (0600).
-	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
 		return fmt.Errorf("failed to write file: %w", err)
 	}
 	return nil

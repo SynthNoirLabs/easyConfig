@@ -8,14 +8,14 @@ import (
 
 type MockProvider struct {
 	name  string
-	items []ConfigItem
+	items []Item
 }
 
 func (m *MockProvider) Name() string {
 	return m.name
 }
 
-func (m *MockProvider) Discover(projectPath string) ([]ConfigItem, error) {
+func (m *MockProvider) Discover(_ string) ([]Item, error) {
 	return m.items, nil
 }
 
@@ -25,7 +25,7 @@ func TestDiscoveryService_DiscoverAll(t *testing.T) {
 
 	mock1 := &MockProvider{
 		name: "Mock1",
-		items: []ConfigItem{
+		items: []Item{
 			{Provider: "Mock1", Name: "Config1", Path: "/tmp/1", Scope: ScopeGlobal},
 		},
 	}
@@ -50,7 +50,7 @@ func TestReadConfig_Success(t *testing.T) {
 	testFile := filepath.Join(tmpDir, "test.txt")
 	expectedContent := "test content\nline 2"
 
-	err := os.WriteFile(testFile, []byte(expectedContent), 0644)
+	err := os.WriteFile(testFile, []byte(expectedContent), 0o600)
 	if err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
@@ -163,25 +163,25 @@ func TestGeminiProvider_Discover(t *testing.T) {
 	// Setup: Create temporary directories for testing
 	tempHome := t.TempDir()
 	tempProject := t.TempDir()
-	
+
 	// Override HOME environment variable for testing
 	originalHome := os.Getenv("HOME")
 	t.Setenv("HOME", tempHome)
 	defer os.Setenv("HOME", originalHome)
 
 	// Global
-	if err := os.MkdirAll(filepath.Join(tempHome, ".gemini"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(tempHome, ".gemini"), 0o755); err != nil {
 		t.Fatalf("Failed to create global .gemini directory: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(tempHome, ".gemini", "settings.json"), []byte("{}"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tempHome, ".gemini", "settings.json"), []byte("{}"), 0o600); err != nil {
 		t.Fatalf("Failed to write global settings.json: %v", err)
 	}
 
 	// Project
-	if err := os.MkdirAll(filepath.Join(tempProject, ".gemini"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(tempProject, ".gemini"), 0o755); err != nil {
 		t.Fatalf("Failed to create project .gemini directory: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(tempProject, ".gemini", "settings.json"), []byte("{}"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tempProject, ".gemini", "settings.json"), []byte("{}"), 0o600); err != nil {
 		t.Fatalf("Failed to write project settings.json: %v", err)
 	}
 
@@ -225,18 +225,18 @@ func TestCodexProvider_Discover(t *testing.T) {
 	defer os.Setenv("HOME", originalHome)
 
 	// Global
-	if err := os.MkdirAll(filepath.Join(tempHome, ".codex"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(tempHome, ".codex"), 0o755); err != nil {
 		t.Fatalf("Failed to create global .codex directory: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(tempHome, ".codex", "config.toml"), []byte("# config"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tempHome, ".codex", "config.toml"), []byte("# config"), 0o600); err != nil {
 		t.Fatalf("Failed to write global config.toml: %v", err)
 	}
 
 	// Project
-	if err := os.MkdirAll(filepath.Join(tempProject, ".codex"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(tempProject, ".codex"), 0o755); err != nil {
 		t.Fatalf("Failed to create project .codex directory: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(tempProject, ".codex", "config.toml"), []byte("# config"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tempProject, ".codex", "config.toml"), []byte("# config"), 0o600); err != nil {
 		t.Fatalf("Failed to write project config.toml: %v", err)
 	}
 
@@ -268,4 +268,3 @@ func TestCodexProvider_Discover(t *testing.T) {
 		t.Error("Expected to find a project config, but didn't")
 	}
 }
-
