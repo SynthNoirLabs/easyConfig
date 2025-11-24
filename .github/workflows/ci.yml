@@ -46,8 +46,25 @@ jobs:
           mkdir -p frontend/dist
           touch frontend/dist/index.html
 
-      - name: Run Unit Tests
-        run: go test -v -race ./pkg/...
+      - name: Run Unit Tests with Coverage
+        run: go test -v -race -coverprofile=coverage.out ./pkg/...
+
+      - name: Check Code Coverage
+        run: |
+          # Extract total coverage percentage (e.g., "90.4%")
+          COVERAGE_Output=$(go tool cover -func=coverage.out | grep total:)
+          echo "$COVERAGE_Output"
+          
+          # Parse percentage number
+          PERCENT=$(echo "$COVERAGE_Output" | awk '{print $3}' | sed 's/%//')
+          
+          echo "Coverage: ${PERCENT}%"
+          
+          # Compare using awk for float comparison
+          if awk "BEGIN {exit !($PERCENT < 80)}"; then
+            echo "Error: Code coverage ($PERCENT%) is below the 80% threshold."
+            exit 1
+          fi
 
       - name: Run Linter
         uses: golangci/golangci-lint-action@v6

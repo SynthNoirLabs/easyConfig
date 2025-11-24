@@ -249,22 +249,133 @@ func TestCodexProvider_Discover(t *testing.T) {
 	if len(items) != 2 {
 		t.Errorf("Expected 2 config items, got %d", len(items))
 	}
+}
 
-	globalFound := false
-	projectFound := false
-	for _, item := range items {
-		if item.Scope == ScopeGlobal {
-			globalFound = true
-		}
-		if item.Scope == ScopeProject {
-			projectFound = true
-		}
+func TestClaudeProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global
+	if err := os.MkdirAll(filepath.Join(tempHome, ".claude"), 0o755); err != nil {
+		t.Fatalf("Failed to create global .claude directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempHome, ".claude", "claude_desktop_config.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write desktop config: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempHome, ".claude", "settings.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write cli config: %v", err)
 	}
 
-	if !globalFound {
-		t.Error("Expected to find a global config, but didn't")
+	// Project
+	if err := os.MkdirAll(filepath.Join(tempProject, ".claude"), 0o755); err != nil {
+		t.Fatalf("Failed to create project .claude directory: %v", err)
 	}
-	if !projectFound {
-		t.Error("Expected to find a project config, but didn't")
+	if err := os.WriteFile(filepath.Join(tempProject, ".claude", "settings.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write project config: %v", err)
+	}
+
+	provider := &ClaudeProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("ClaudeProvider.Discover failed: %v", err)
+	}
+
+	// Expecting: Desktop Config (Global), CLI Settings (Global), Project Settings (Project)
+	expectedCount := 3
+	if len(items) < expectedCount {
+		t.Errorf("Expected at least %d config items, got %d", expectedCount, len(items))
+	}
+}
+
+func TestCopilotProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global
+	if err := os.MkdirAll(filepath.Join(tempHome, ".copilot"), 0o755); err != nil {
+		t.Fatalf("Failed to create global .copilot directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempHome, ".copilot", "mcp-config.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write global mcp-config: %v", err)
+	}
+
+	// Project
+	if err := os.MkdirAll(filepath.Join(tempProject, ".github"), 0o755); err != nil {
+		t.Fatalf("Failed to create project .github directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempProject, ".github", "copilot-instructions.md"), []byte("# Instructions"), 0o600); err != nil {
+		t.Fatalf("Failed to write project instructions: %v", err)
+	}
+
+	provider := &CopilotProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("CopilotProvider.Discover failed: %v", err)
+	}
+
+	if len(items) != 2 {
+		t.Errorf("Expected 2 config items, got %d", len(items))
+	}
+}
+
+func TestOpenAIProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global
+	if err := os.MkdirAll(filepath.Join(tempHome, ".config", "openai"), 0o755); err != nil {
+		t.Fatalf("Failed to create global .config/openai directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempHome, ".config", "openai", "config.yaml"), []byte("key: value"), 0o600); err != nil {
+		t.Fatalf("Failed to write global config.yaml: %v", err)
+	}
+
+	provider := &OpenAIProvider{}
+	items, err := provider.Discover("") // No project path
+	if err != nil {
+		t.Fatalf("OpenAIProvider.Discover failed: %v", err)
+	}
+
+	if len(items) != 1 {
+		t.Errorf("Expected 1 config item, got %d", len(items))
+	}
+}
+
+func TestJulesProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global
+	if err := os.MkdirAll(filepath.Join(tempHome, ".jules-mcp"), 0o755); err != nil {
+		t.Fatalf("Failed to create global .jules-mcp directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempHome, ".jules-mcp", "data.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write global data.json: %v", err)
+	}
+
+	// Project
+	if err := os.WriteFile(filepath.Join(tempProject, "AGENTS.md"), []byte("# Agents"), 0o600); err != nil {
+		t.Fatalf("Failed to write project AGENTS.md: %v", err)
+	}
+
+	provider := &JulesProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("JulesProvider.Discover failed: %v", err)
+	}
+
+	if len(items) != 2 {
+		t.Errorf("Expected 2 config items, got %d", len(items))
 	}
 }
