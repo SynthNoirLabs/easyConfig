@@ -174,35 +174,35 @@ Taskfile provides robust, cross-platform task execution.
     ```yaml
     version: '3'
 
-    tasks:
-      setup:
-        desc: Install dependencies and setup environment
-        cmds:
-          - mise install
-          - go mod download
-          - npm install --prefix frontend
-          - pre-commit install
+tasks:
+  setup:
+    desc: Install dependencies and setup environment
+    cmds:
+      - mise install
+      - go mod download
+      - npm install --prefix frontend
+      - pre-commit install
 
-      dev:
-        desc: Run the application in development mode
-        cmds:
-          - wails dev
+  dev:
+    desc: Run the application in development mode
+    cmds:
+      - wails dev
 
-      lint:go:
-        desc: Lint Go backend
-        cmds:
-          - golangci-lint run
+  lint:go:
+    desc: Lint Go backend
+    cmds:
+      - golangci-lint run
 
-      lint:web:
-        desc: Lint Web frontend (Biome)
-        cmds:
-          - npx @biomejs/biome check frontend/
+  lint:web:
+    desc: Lint Web frontend (Biome)
+    cmds:
+      - npx @biomejs/biome check frontend/
 
-      lint:
-        desc: Run all linters
-        cmds:
-          - task: lint:go
-          - task: lint:web
+  lint:
+    desc: Run all linters
+    cmds:
+      - task: lint:go
+      - task: lint:web
     ```
 
 #### 1.2.3. Pre-commit Hooks (`.pre-commit-config.yaml`)
@@ -290,7 +290,7 @@ type AgentConfig interface {
     // Save() error // For implementing write functionality
 }
 
-// CopilotVSCodeSettings represents relevant parts of settings.json.
+// CopilotVSCodeSettings represents relevant parts of VS Code settings.json.
 // Note: This requires careful parsing as settings.json contains many other settings.
 type CopilotVSCodeSettings struct {
     Metadata              ConfigMetadata `json:"-"`
