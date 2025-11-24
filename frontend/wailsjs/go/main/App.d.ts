@@ -6,3 +6,7 @@ import {config} from '../config/models';
 export function Greet(arg1: string): Promise<string>;
 
 export function DiscoverConfigs(arg1: string): Promise<Array<config.ConfigItem>>;
+
+export function ReadConfig(arg1: string): Promise<string>;
+
+export function SaveConfig(arg1: string, arg2: string): Promise<void>;

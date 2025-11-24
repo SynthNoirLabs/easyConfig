@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { DiscoverConfigs } from '../../wailsjs/go/main/App';
+import { DiscoverConfigs, ReadConfig, SaveConfig } from '../../wailsjs/go/main/App';
 import { config } from '../../wailsjs/go/config/models';
 
 interface ConfigContextType {
@@ -7,6 +7,8 @@ interface ConfigContextType {
   loading: boolean;
   error: string | null;
   refreshConfigs: () => Promise<void>;
+  readConfig: (path: string) => Promise<string>;
+  saveConfig: (path: string, content: string) => Promise<void>;
 }
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
@@ -36,12 +38,37 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const readConfig = async (path: string): Promise<string> => {
+    try {
+      return await ReadConfig(path);
+    } catch (err) {
+      console.error("Failed to read config:", err);
+      throw err;
+    }
+  };
+
+  const saveConfig = async (path: string, content: string): Promise<void> => {
+    try {
+      await SaveConfig(path, content);
+    } catch (err) {
+      console.error("Failed to save config:", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     fetchConfigs();
   }, []);
 
   return (
-    <ConfigContext.Provider value={{ configs, loading, error, refreshConfigs: fetchConfigs }}>
+    <ConfigContext.Provider value={{ 
+      configs, 
+      loading, 
+      error, 
+      refreshConfigs: fetchConfigs,
+      readConfig,
+      saveConfig
+    }}>
       {children}
     </ConfigContext.Provider>
   );
