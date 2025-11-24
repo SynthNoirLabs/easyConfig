@@ -105,11 +105,11 @@ func TestIntegration_CLI_Interaction(t *testing.T) {
 }
 
 func createFile(t *testing.T, path string, content string) {
-	err := os.MkdirAll(filepath.Dir(path), 0755)
+	err := os.MkdirAll(filepath.Dir(path), 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create directory for %s: %v", path, err)
 	}
-	err = os.WriteFile(path, []byte(content), 0600)
+	err = os.WriteFile(path, []byte(content), 0o600)
 	if err != nil {
 		t.Fatalf("Failed to create file %s: %v", path, err)
 	}
