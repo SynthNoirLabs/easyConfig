@@ -41,3 +41,4 @@ This file serves as the Master Backlog. Agents (Jules, Claude, etc.) should look
 ## 🚀 Phase 5: Advanced Features
 - [ ] **MCP Injector**: Logic to parse `mcpServers` block and inject a new server entry.
 - [ ] **File Watcher**: Auto-reload configs when changed on disk (fsnotify).
+- [ ] **Auto-Schema Fetcher**: Scrape official docs/repos to update local references.
