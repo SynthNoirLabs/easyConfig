@@ -1,0 +1,22 @@
+name: Agent PR Review (Claude)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Claude Code Action for Review
+      uses: anthropics/claude-code-action@v1
+      with:
+        prompt: "/review"
+        anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}

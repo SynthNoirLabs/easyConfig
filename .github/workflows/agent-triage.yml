@@ -1,0 +1,25 @@
+name: Agent Issue Triage
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run Claude Code for Triage
+      uses: anthropics/claude-code-action@v1
+      with:
+        anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+        prompt: |
+          Analyze the issue title and body provided in the GitHub event context.
+          Determine the appropriate labels from the repository's existing labels (e.g., 'bug', 'feature', 'backend', 'frontend', 'CI', 'devops').
+          Apply the labels to the issue using the available GitHub tools. Do not add comments unless the issue is unclear.
