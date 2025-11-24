@@ -2,9 +2,9 @@ name: Gemini Agent
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled]
   issues:
-    types: [opened]
+    types: [opened, labeled]
   issue_comment:
     types: [created]
 
@@ -15,8 +15,16 @@ permissions:
 
 jobs:
   # 1. Automated PR Review
+  # Runs on PR Open, Sync, Reopen, OR when label 'gemini-review' is added
   gemini-review:
-    if: github.event_name == 'pull_request'
+    if: |
+      (github.event_name == 'pull_request') && 
+      (
+        github.event.action == 'opened' || 
+        github.event.action == 'synchronize' || 
+        github.event.action == 'reopened' || 
+        (github.event.action == 'labeled' && github.event.label.name == 'gemini-review')
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,8 +35,14 @@ jobs:
           command: 'review'
 
   # 2. Automated Issue Triage
+  # Runs on Issue Open OR when label 'gemini-triage' is added
   gemini-triage:
-    if: github.event_name == 'issues' && github.event.action == 'opened'
+    if: |
+      (github.event_name == 'issues') && 
+      (
+        github.event.action == 'opened' || 
+        (github.event.action == 'labeled' && github.event.label.name == 'gemini-triage')
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
