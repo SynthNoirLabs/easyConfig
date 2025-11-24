@@ -21,5 +21,13 @@ jobs:
         anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
         prompt: |
           Analyze the issue title and body provided in the GitHub event context.
-          Determine the appropriate labels from the repository's existing labels (e.g., 'bug', 'feature', 'backend', 'frontend', 'CI', 'devops').
-          Apply the labels to the issue using the available GitHub tools. Do not add comments unless the issue is unclear.
+          
+          1. Determine appropriate category labels (e.g., 'bug', 'feature', 'backend', 'frontend', 'CI', 'devops').
+          
+          2. Assign an AI Agent by applying ONE of the following labels based on the task type:
+             - 'agent:jules': For complex backend logic, refactoring, or multi-file architectural changes.
+             - 'agent:claude': For Frontend (React/TypeScript), UI components, and design work.
+             - 'agent:gemini': For documentation, general triage, or simple logic checks.
+             - 'agent:codex': For CI/CD scripts, automation, or one-off script fixes.
+          
+          Apply the selected labels using the available GitHub tools.

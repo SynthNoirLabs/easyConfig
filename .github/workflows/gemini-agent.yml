@@ -35,13 +35,13 @@ jobs:
           command: 'review'
 
   # 2. Automated Issue Triage
-  # Runs on Issue Open OR when label 'gemini-triage' is added
+  # Runs on Issue Open OR when label 'gemini-triage' or 'agent:gemini' is added
   gemini-triage:
     if: |
       (github.event_name == 'issues') && 
       (
         github.event.action == 'opened' || 
-        (github.event.action == 'labeled' && github.event.label.name == 'gemini-triage')
+        (github.event.action == 'labeled' && (github.event.label.name == 'gemini-triage' || github.event.label.name == 'agent:gemini'))
       )
     runs-on: ubuntu-latest
     steps:
