@@ -12,18 +12,29 @@ env:
   NODE_OPTIONS: "--max-old-space-size=4096"
 
 jobs:
-  # 1. Backend Quality
+  # 1. Security & Dependencies
+  dependency-review:
+    name: "Dependency Review"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+
+  # 2. Backend Quality
   test-backend:
     name: "Go Backend (Test & Lint)"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version-file: 'go.mod'
           check-latest: true
           cache: true
 
@@ -52,7 +63,7 @@ jobs:
           exit-code: '0' # Warning only for now to prevent build block
           severity: 'CRITICAL,HIGH'
 
-  # 2. Frontend Quality
+  # 3. Frontend Quality
   test-frontend:
     name: "Frontend (Build & Typecheck)"
     runs-on: ubuntu-latest
@@ -61,7 +72,7 @@ jobs:
         working-directory: ./frontend
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -82,7 +93,7 @@ jobs:
       - name: Type Check (TSC)
         run: npm run build
 
-  # 3. Full Application Build
+  # 4. Full Application Build
   build-app:
     name: "Build Wails Binary"
     needs: [test-backend, test-frontend]
@@ -104,7 +115,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
