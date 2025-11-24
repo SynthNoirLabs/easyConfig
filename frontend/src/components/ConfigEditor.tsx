@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Save } from 'lucide-react';
-import { useConfig } from '../context/ConfigContext';
-import { config } from '../../wailsjs/go/config/models';
-import './ConfigEditor.css';
+import { Save } from "lucide-react";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { config } from "../../wailsjs/go/config/models";
+import { useConfig } from "../context/ConfigContext";
+import "./ConfigEditor.css";
 
 interface ConfigEditorProps {
   configItem: config.ConfigItem;
@@ -10,17 +11,13 @@ interface ConfigEditorProps {
 
 const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const { readConfig, saveConfig } = useConfig();
-  const [content, setContent] = useState<string>('');
+  const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  useEffect(() => {
-    loadFile();
-  }, [configItem.path]);
-
-  const loadFile = async () => {
+  const loadFile = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -31,27 +28,35 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
       setIsDirty(false);
     } catch (err) {
       console.error("Error loading file:", err);
-      setError("Failed to load file content. Please check if the backend is running.");
+      setError(
+        "Failed to load file content. Please check if the backend is running.",
+      );
       // For demo purposes in browser environment without backend:
       if (String(err).includes("window.go")) {
-         setContent(`// Mock content for ${configItem.name}\n// Backend not connected.`);
-         setIsDirty(false);
-         setError(null); 
+        setContent(
+          `// Mock content for ${configItem.name}\n// Backend not connected.`,
+        );
+        setIsDirty(false);
+        setError(null);
       }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [configItem.path, configItem.name, readConfig]);
+
+  useEffect(() => {
+    loadFile();
+  }, [loadFile]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
       // Basic JSON validation
-      if (configItem.format === 'json') {
+      if (configItem.format === "json") {
         try {
           JSON.parse(content);
-        } catch (e) {
-          alert('Invalid JSON format. Please fix errors before saving.');
+        } catch (_e) {
+          alert("Invalid JSON format. Please fix errors before saving.");
           setIsSaving(false);
           return;
         }
@@ -80,26 +85,27 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <span className="file-path">{configItem.path}</span>
         </div>
         <div className="editor-actions">
-          <button 
-            className="btn-save" 
-            onClick={handleSave} 
+          <button
+            type="button"
+            className="btn-save"
+            onClick={handleSave}
             disabled={!isDirty || isSaving || isLoading}
           >
             <Save size={16} />
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
-      
+
       <div className="editor-area">
         {isLoading ? (
           <div className="editor-loading">Loading...</div>
         ) : error ? (
           <div className="editor-error">{error}</div>
         ) : (
-          <textarea 
-            className="editor-textarea" 
-            value={content} 
+          <textarea
+            className="editor-textarea"
+            value={content}
             onChange={handleTextChange}
             spellCheck={false}
           />

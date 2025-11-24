@@ -1,14 +1,16 @@
-import { useState } from 'react';
-import './App.css';
-import Layout from './components/Layout';
-import Sidebar from './components/Sidebar';
-import ConfigEditor from './components/ConfigEditor';
-import { useConfig } from './context/ConfigContext';
-import { config } from '../wailsjs/go/config/models';
+import { useState } from "react";
+import "./App.css";
+import type { config } from "../wailsjs/go/config/models";
+import ConfigEditor from "./components/ConfigEditor";
+import Layout from "./components/Layout";
+import Sidebar from "./components/Sidebar";
+import { useConfig } from "./context/ConfigContext";
 
 function AppContent() {
   const { configs, loading, error } = useConfig();
-  const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(
+    null,
+  );
 
   const handleSelectConfig = (item: config.ConfigItem) => {
     setSelectedItem(item);
@@ -31,14 +33,7 @@ function AppContent() {
   }
 
   return (
-    <Layout
-      sidebar={
-        <Sidebar
-          items={configs}
-          onSelect={handleSelectConfig}
-        />
-      }
-    >
+    <Layout sidebar={<Sidebar items={configs} onSelect={handleSelectConfig} />}>
       <div className="app-content">
         {selectedItem ? (
           <ConfigEditor configItem={selectedItem} />
@@ -54,9 +49,7 @@ function AppContent() {
 }
 
 function App() {
-  return (
-    <AppContent />
-  );
+  return <AppContent />;
 }
 
 export default App;

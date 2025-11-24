@@ -1,6 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { DiscoverConfigs, ReadConfig, SaveConfig } from '../../wailsjs/go/main/App';
-import { config } from '../../wailsjs/go/config/models';
+import type React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { config } from "../../wailsjs/go/config/models";
+import {
+  DiscoverConfigs,
+  ReadConfig,
+  SaveConfig,
+} from "../../wailsjs/go/main/App";
 
 interface ConfigContextType {
   configs: config.ConfigItem[];
@@ -13,12 +18,14 @@ interface ConfigContextType {
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
-export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [configs, setConfigs] = useState<config.ConfigItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchConfigs = async () => {
+  const fetchConfigs = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -27,16 +34,21 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setConfigs(items || []);
     } catch (err) {
       console.error("Failed to load configs:", err);
-      setError(err instanceof Error ? err.message : "Failed to load configurations");
+      setError(
+        err instanceof Error ? err.message : "Failed to load configurations",
+      );
       // Mock data for development if Wails is not available (e.g. in browser)
-      if (String(err).includes("window.go") || String(err).includes("is not a function")) {
-         console.warn("Wails runtime not found. Using mock data.");
-         // Optional: Set mock data here if we want to test UI without backend
+      if (
+        String(err).includes("window.go") ||
+        String(err).includes("is not a function")
+      ) {
+        console.warn("Wails runtime not found. Using mock data.");
+        // Optional: Set mock data here if we want to test UI without backend
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const readConfig = async (path: string): Promise<string> => {
     try {
@@ -58,17 +70,19 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     fetchConfigs();
-  }, []);
+  }, [fetchConfigs]);
 
   return (
-    <ConfigContext.Provider value={{ 
-      configs, 
-      loading, 
-      error, 
-      refreshConfigs: fetchConfigs,
-      readConfig,
-      saveConfig
-    }}>
+    <ConfigContext.Provider
+      value={{
+        configs,
+        loading,
+        error,
+        refreshConfigs: fetchConfigs,
+        readConfig,
+        saveConfig,
+      }}
+    >
       {children}
     </ConfigContext.Provider>
   );
@@ -77,7 +91,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 export const useConfig = () => {
   const context = useContext(ConfigContext);
   if (context === undefined) {
-    throw new Error('useConfig must be used within a ConfigProvider');
+    throw new Error("useConfig must be used within a ConfigProvider");
   }
   return context;
 };

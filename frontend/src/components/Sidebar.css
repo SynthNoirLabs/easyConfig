@@ -116,7 +116,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .sidebar-item-active .sidebar-item-path {

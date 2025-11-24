@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { FileJson, Box } from 'lucide-react';
-import './Sidebar.css';
-import { config } from '../../wailsjs/go/config/models';
+import { Box, FileJson } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import "./Sidebar.css";
+import type { config } from "../../wailsjs/go/config/models";
 
 interface SidebarProps {
   items: config.ConfigItem[];
@@ -12,13 +13,16 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect }) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
   // Group items by provider
-  const groupedItems = items.reduce((acc, item) => {
-    if (!acc[item.provider]) {
-      acc[item.provider] = [];
-    }
-    acc[item.provider].push(item);
-    return acc;
-  }, {} as Record<string, config.ConfigItem[]>);
+  const groupedItems = items.reduce(
+    (acc, item) => {
+      if (!acc[item.provider]) {
+        acc[item.provider] = [];
+      }
+      acc[item.provider].push(item);
+      return acc;
+    },
+    {} as Record<string, config.ConfigItem[]>,
+  );
 
   const handleItemClick = (item: config.ConfigItem) => {
     setSelectedPath(item.path);
@@ -39,17 +43,23 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect }) => {
             </div>
             <div className="sidebar-group-items">
               {providerItems.map((item) => (
-                <div
+                <button
                   key={item.path}
-                  className={`sidebar-item ${selectedPath === item.path ? 'sidebar-item-active' : ''}`}
+                  className={`sidebar-item ${selectedPath === item.path ? "sidebar-item-active" : ""}`}
                   onClick={() => handleItemClick(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleItemClick(item);
+                    }
+                  }}
+                  type="button"
                 >
                   <FileJson size={16} className="sidebar-item-icon" />
                   <div className="sidebar-item-content">
                     <div className="sidebar-item-name">{item.name}</div>
                     <div className="sidebar-item-path">{item.path}</div>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
