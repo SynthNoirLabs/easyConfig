@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { FileJson, Box } from 'lucide-react';
 import './Sidebar.css';
-
-export interface ConfigItem {
-  name: string;
-  provider: string;
-  path: string;
-}
+import { config } from '../../wailsjs/go/config/models';
 
 interface SidebarProps {
-  items: ConfigItem[];
-  onSelect: (item: ConfigItem) => void;
+  items: config.ConfigItem[];
+  onSelect: (item: config.ConfigItem) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ items, onSelect }) => {
@@ -23,9 +18,9 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect }) => {
     }
     acc[item.provider].push(item);
     return acc;
-  }, {} as Record<string, ConfigItem[]>);
+  }, {} as Record<string, config.ConfigItem[]>);
 
-  const handleItemClick = (item: ConfigItem) => {
+  const handleItemClick = (item: config.ConfigItem) => {
     setSelectedPath(item.path);
     onSelect(item);
   };
