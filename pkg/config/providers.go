@@ -232,3 +232,50 @@ func (p *GeminiProvider) Discover(projectPath string) ([]ConfigItem, error) {
 
 	return items, nil
 }
+
+// --- Codex Provider ---
+
+type CodexProvider struct{}
+
+func (p *CodexProvider) Name() string {
+	return "Codex CLI"
+}
+
+func (p *CodexProvider) Discover(projectPath string) ([]ConfigItem, error) {
+	var items []ConfigItem
+	home := GetUserHome()
+
+	// 1. Global Config
+	if home != "" {
+		path := filepath.Join(home, ".codex", "config.toml")
+		if FileExists(path) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Global Config",
+				FileName: "config.toml",
+				Path:     path,
+				Scope:    ScopeGlobal,
+				Format:   FormatTOML,
+				Exists:   true,
+			})
+		}
+	}
+
+	// 2. Project Config
+	if projectPath != "" {
+		path := filepath.Join(projectPath, ".codex", "config.toml")
+		if FileExists(path) {
+			items = append(items, ConfigItem{
+				Provider: p.Name(),
+				Name:     "Project Config",
+				FileName: "config.toml",
+				Path:     path,
+				Scope:    ScopeProject,
+				Format:   FormatTOML,
+				Exists:   true,
+			})
+		}
+	}
+
+	return items, nil
+}

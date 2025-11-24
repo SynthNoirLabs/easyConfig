@@ -213,3 +213,59 @@ func TestGeminiProvider_Discover(t *testing.T) {
 		t.Error("Expected to find a project config, but didn't")
 	}
 }
+
+func TestCodexProvider_Discover(t *testing.T) {
+	// Setup: Create temporary directories for testing
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+
+	// Override HOME environment variable for testing
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global
+	if err := os.MkdirAll(filepath.Join(tempHome, ".codex"), 0755); err != nil {
+		t.Fatalf("Failed to create global .codex directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempHome, ".codex", "config.toml"), []byte("# config"), 0644); err != nil {
+		t.Fatalf("Failed to write global config.toml: %v", err)
+	}
+
+	// Project
+	if err := os.MkdirAll(filepath.Join(tempProject, ".codex"), 0755); err != nil {
+		t.Fatalf("Failed to create project .codex directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempProject, ".codex", "config.toml"), []byte("# config"), 0644); err != nil {
+		t.Fatalf("Failed to write project config.toml: %v", err)
+	}
+
+	provider := &CodexProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("CodexProvider.Discover failed: %v", err)
+	}
+
+	if len(items) != 2 {
+		t.Errorf("Expected 2 config items, got %d", len(items))
+	}
+
+	globalFound := false
+	projectFound := false
+	for _, item := range items {
+		if item.Scope == ScopeGlobal {
+			globalFound = true
+		}
+		if item.Scope == ScopeProject {
+			projectFound = true
+		}
+	}
+
+	if !globalFound {
+		t.Error("Expected to find a global config, but didn't")
+	}
+	if !projectFound {
+		t.Error("Expected to find a project config, but didn't")
+	}
+}
+
