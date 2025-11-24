@@ -3,15 +3,21 @@ name: Agent Interactive (On-Demand)
 on:
   issue_comment:
     types: [created]
+  issues:
+    types: [labeled]
+  pull_request:
+    types: [labeled]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
   pull-requests: write
 
 jobs:
   claude-interactive:
-    if: contains(github.event.comment.body, '@claude')
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event.action == 'labeled' && github.event.label.name == 'agent:claude')
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code

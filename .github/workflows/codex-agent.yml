@@ -2,7 +2,7 @@ name: Codex Agent
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, labeled]
   workflow_run:
     workflows: ["Wails CI/CD"]
     types: [completed]
@@ -15,7 +15,13 @@ permissions:
 jobs:
   # 1. PR Code Review
   codex-review:
-    if: github.event_name == 'pull_request'
+    if: |
+      (github.event_name == 'pull_request') &&
+      (
+        github.event.action == 'opened' || 
+        github.event.action == 'synchronize' || 
+        (github.event.action == 'labeled' && (github.event.label.name == 'codex-review' || github.event.label.name == 'agent:codex'))
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
