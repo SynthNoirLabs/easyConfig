@@ -1,0 +1,56 @@
+name: Codex Agent
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_run:
+    workflows: ["Wails CI/CD"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  # 1. PR Code Review
+  codex-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Codex Review
+        uses: openai/codex-action@v1
+        continue-on-error: true
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt: "Review this pull request. Identify bugs, security issues, and style violations."
+          safety-strategy: read-only
+
+  # 2. Auto-Fix CI Failures
+  codex-autofix:
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Install Codex CLI
+        run: npm install -g @openai/codex
+
+      - name: Analyze and Fix
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # In a real scenario, we'd fetch the logs from the failed run
+          echo "Analyzing failure for run ${{ github.event.workflow_run.id }}..."
+          
+          # Run codex fix (hypothetical CLI command based on standard patterns)
+          # codex fix --auto-commit --push --branch "codex-fix/${{ github.run_id }}"
+          
+          echo "Auto-fix logic placeholder. Ensure @openai/codex is configured."
