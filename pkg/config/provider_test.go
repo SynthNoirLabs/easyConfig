@@ -21,6 +21,7 @@ func (m *MockProvider) Discover(projectPath string) ([]ConfigItem, error) {
 
 func TestDiscoveryService_DiscoverAll(t *testing.T) {
 	ds := NewDiscoveryService()
+	ds.providers = []Provider{} // Clear default providers for testing
 
 	mock1 := &MockProvider{
 		name: "Mock1",
