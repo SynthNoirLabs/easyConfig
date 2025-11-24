@@ -34,3 +34,13 @@ func (a *App) Greet(name string) string {
 func (a *App) DiscoverConfigs(projectPath string) ([]config.ConfigItem, error) {
 	return a.discoveryService.DiscoverAll(projectPath)
 }
+
+// ReadConfig reads the content of a configuration file
+func (a *App) ReadConfig(path string) (string, error) {
+	return a.discoveryService.ReadConfig(path)
+}
+
+// SaveConfig saves content to a configuration file
+func (a *App) SaveConfig(path string, content string) error {
+	return a.discoveryService.SaveConfig(path, content)
+}
