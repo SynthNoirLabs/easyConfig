@@ -24,6 +24,7 @@ type App struct {
 	smitheryClient   *marketplaces.SmitheryClient
 	awesomeClient    *marketplaces.AwesomeClient
 	workflowGen      *workflows.Generator
+	secretsManager   *workflows.SecretsManager
 }
 
 // NewApp creates a new App application struct
@@ -41,6 +42,7 @@ func (a *App) startup(ctx context.Context) {
 	a.smitheryClient = marketplaces.NewSmitheryClient()
 	a.awesomeClient = marketplaces.NewAwesomeClient()
 	a.workflowGen = workflows.NewGenerator()
+	a.secretsManager = workflows.NewSecretsManager()
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -201,8 +203,14 @@ func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
 }
 
 // GenerateWorkflow generates a GitHub Actions workflow content
-func (a *App) GenerateWorkflow(agent, trigger string) (string, error) {
+// Returns content, requiredSecrets, setupInstructions, error
+func (a *App) GenerateWorkflow(agent, trigger string) (string, []string, string, error) {
 	return a.workflowGen.GenerateWorkflow(agent, trigger)
+}
+
+// SetSecret sets a repository secret
+func (a *App) SetSecret(name, value string) error {
+	return a.secretsManager.SetRepositorySecret(name, value)
 }
 
 // SaveWorkflow saves the workflow content to .github/workflows/

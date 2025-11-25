@@ -14,7 +14,8 @@ func NewGenerator() *Generator {
 }
 
 // GenerateWorkflow generates a workflow content for a specific agent and trigger
-func (g *Generator) GenerateWorkflow(agent, trigger string) (string, error) {
+// Returns content, requiredSecrets, setupInstructions, error
+func (g *Generator) GenerateWorkflow(agent, trigger string) (string, []string, string, error) {
 	// Map agent+trigger to TemplateID
 	// This is a simple mapping for now, could be more sophisticated
 	var templateID TemplateID
@@ -31,15 +32,15 @@ func (g *Generator) GenerateWorkflow(agent, trigger string) (string, error) {
 	case "copilot-manual":
 		templateID = CopilotManual
 	default:
-		return "", fmt.Errorf("unsupported combination: agent=%s, trigger=%s", agent, trigger)
+		return "", nil, "", fmt.Errorf("unsupported combination: agent=%s, trigger=%s", agent, trigger)
 	}
 
-	content, ok := templates[templateID]
+	tmpl, ok := templates[templateID]
 	if !ok {
-		return "", fmt.Errorf("template not found for ID: %s", templateID)
+		return "", nil, "", fmt.Errorf("template not found for ID: %s", templateID)
 	}
 
-	return content, nil
+	return tmpl.Content, tmpl.RequiredSecrets, tmpl.SetupInstructions, nil
 }
 
 // GetSupportedWorkflows returns a list of supported agent-trigger combinations

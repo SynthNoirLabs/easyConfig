@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { GenerateWorkflow, SaveWorkflow, GetSupportedWorkflows } from "../../wailsjs/go/main/App";
+import { GenerateWorkflow, SaveWorkflow, GetSupportedWorkflows, SetSecret } from "../../wailsjs/go/main/App";
 import "./Workflows.css";
 
 export default function Workflows() {
@@ -9,6 +9,11 @@ export default function Workflows() {
   const [selectedTrigger, setSelectedTrigger] = useState("");
   const [generatedContent, setGeneratedContent] = useState("");
   const [filename, setFilename] = useState("");
+  
+  // New state for secrets and nudges
+  const [requiredSecrets, setRequiredSecrets] = useState<string[]>([]);
+  const [setupInstructions, setSetupInstructions] = useState("");
+  const [secretValues, setSecretValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadSupportedWorkflows();
@@ -18,14 +23,6 @@ export default function Workflows() {
     try {
       const workflows = await GetSupportedWorkflows();
       setAgents(workflows);
-      if (workflows.length > 0) {
-        // Parse "Agent (Trigger)" format
-        const first = workflows[0];
-        const parts = first.split(" (");
-        if (parts.length > 1) {
-             // Just setting defaults for UI
-        }
-      }
     } catch (err) {
       toast.error("Failed to load supported workflows");
     }
@@ -38,8 +35,12 @@ export default function Workflows() {
     }
 
     try {
-      const content = await GenerateWorkflow(selectedAgent, selectedTrigger);
+      // Backend now returns: content, requiredSecrets, setupInstructions, error
+      const [content, secrets, instructions] = await GenerateWorkflow(selectedAgent, selectedTrigger);
       setGeneratedContent(content);
+      setRequiredSecrets(secrets || []);
+      setSetupInstructions(instructions || "");
+      setSecretValues({}); // Reset secret inputs
       
       // Auto-generate filename
       const agentLower = selectedAgent.toLowerCase();
@@ -65,12 +66,24 @@ export default function Workflows() {
     }
   };
 
-  // Helper to parse the "Agent (Trigger)" strings from backend
-  // In a real app, backend might return structured objects
+  const handleSetSecret = async (secretName: string) => {
+    const value = secretValues[secretName];
+    if (!value) {
+      toast.error(`Please enter a value for ${secretName}`);
+      return;
+    }
+
+    try {
+      await SetSecret(secretName, value);
+      toast.success(`Secret ${secretName} set successfully!`);
+      // Clear the input for security
+      setSecretValues(prev => ({ ...prev, [secretName]: "" }));
+    } catch (err) {
+      toast.error(`Failed to set secret: ${err}`);
+    }
+  };
+
   const parseOptions = () => {
-      // For this MVP, we'll hardcode the mapping based on what backend returns
-      // Backend returns strings like "Claude (Comment)"
-      // We can just let user select from the list
       return agents.map(a => {
           const match = a.match(/(.+) \((.+)\)/);
           if (match) {
@@ -93,10 +106,14 @@ export default function Workflows() {
           <select 
             onChange={(e) => {
                 const idx = e.target.selectedIndex;
-                if (idx > 0) { // 0 is placeholder
+                if (idx > 0) {
                     const opt = options[idx - 1];
                     setSelectedAgent(opt.agent);
                     setSelectedTrigger(opt.trigger);
+                    // Reset state when selection changes
+                    setGeneratedContent("");
+                    setRequiredSecrets([]);
+                    setSetupInstructions("");
                 }
             }}
           >
@@ -113,23 +130,63 @@ export default function Workflows() {
       </div>
 
       {generatedContent && (
-        <div className="preview-section">
-          <div className="preview-header">
-            <input 
-              type="text" 
-              value={filename} 
-              onChange={(e) => setFilename(e.target.value)}
-              placeholder="workflow.yml"
+        <div className="workflow-content">
+          <div className="preview-section">
+            <div className="preview-header">
+              <input 
+                type="text" 
+                value={filename} 
+                onChange={(e) => setFilename(e.target.value)}
+                placeholder="workflow.yml"
+              />
+              <button className="btn-secondary" onClick={handleSave}>
+                Save to Project
+              </button>
+            </div>
+            <textarea 
+              className="code-preview" 
+              value={generatedContent} 
+              readOnly 
             />
-            <button className="btn-secondary" onClick={handleSave}>
-              Save to Project
-            </button>
           </div>
-          <textarea 
-            className="code-preview" 
-            value={generatedContent} 
-            readOnly 
-          />
+
+          <div className="sidebar-section">
+            {setupInstructions && (
+              <div className="nudge-box">
+                <h4>Setup Instructions</h4>
+                <p>{setupInstructions}</p>
+              </div>
+            )}
+
+            {requiredSecrets.length > 0 && (
+              <div className="secrets-box">
+                <h4>Required Secrets</h4>
+                <p className="secrets-hint">Set these secrets in your repository to enable the workflow.</p>
+                
+                <div className="secrets-list">
+                  {requiredSecrets.map(secret => (
+                    <div key={secret} className="secret-item">
+                      <label>{secret}</label>
+                      <div className="secret-input-group">
+                        <input 
+                          type="password" 
+                          placeholder="Enter value..."
+                          value={secretValues[secret] || ""}
+                          onChange={(e) => setSecretValues(prev => ({ ...prev, [secret]: e.target.value }))}
+                        />
+                        <button 
+                          className="btn-small"
+                          onClick={() => handleSetSecret(secret)}
+                        >
+                          Set
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

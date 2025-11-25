@@ -10,8 +10,16 @@ const (
 	CopilotManual TemplateID = "copilot-manual"
 )
 
-var templates = map[TemplateID]string{
-	ClaudeComment: `name: Claude Agent
+// WorkflowTemplate holds the content and metadata for a workflow
+type WorkflowTemplate struct {
+	Content           string
+	RequiredSecrets   []string
+	SetupInstructions string
+}
+
+var templates = map[TemplateID]WorkflowTemplate{
+	ClaudeComment: {
+		Content: `name: Claude Agent
 on:
   issue_comment:
     types: [created]
@@ -38,7 +46,11 @@ jobs:
           # This is a placeholder command. Adjust based on actual CLI usage.
           npx @anthropic-ai/claude-code --prompt "${{ github.event.comment.body }}"
 `,
-	JulesLabel: `name: Jules Agent
+		RequiredSecrets:   []string{"ANTHROPIC_API_KEY"},
+		SetupInstructions: "Tip: Run `/install-github-app` in your Claude Code terminal for a guided setup.",
+	},
+	JulesLabel: {
+		Content: `name: Jules Agent
 on:
   issues:
     types: [labeled]
@@ -61,7 +73,11 @@ jobs:
           echo "Triggering Jules Agent..."
           # Insert actual Jules CLI or API call here
 `,
-	CodexPR: `name: Codex Review
+		RequiredSecrets:   []string{"JULES_API_KEY"},
+		SetupInstructions: "Ensure you have the 'jules' label created in your repository.",
+	},
+	CodexPR: {
+		Content: `name: Codex Review
 on:
   pull_request:
     types: [opened, synchronize]
@@ -81,7 +97,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           model: 'gpt-4' # or specific codex model
 `,
-	CopilotManual: `name: Copilot Task
+		RequiredSecrets:   []string{"OPENAI_API_KEY"},
+		SetupInstructions: "Get your API key from platform.openai.com.",
+	},
+	CopilotManual: {
+		Content: `name: Copilot Task
 on:
   workflow_dispatch:
     inputs:
@@ -100,4 +120,7 @@ jobs:
         run: |
           gh copilot suggest "${{ inputs.task }}"
 `,
+		RequiredSecrets:   []string{}, // GITHUB_TOKEN is automatic
+		SetupInstructions: "This workflow uses the standard GITHUB_TOKEN.",
+	},
 }
