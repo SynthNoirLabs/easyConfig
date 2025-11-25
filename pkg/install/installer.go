@@ -2,11 +2,8 @@ package install
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -110,8 +107,8 @@ type ServerConfig struct {
 	Env     map[string]string `json:"env,omitempty"`
 }
 
-// CreateServerConfig creates a configuration file for an MCP server
-func (i *Installer) CreateServerConfig(packageName string, packageType PackageType, targetDir string) error {
+// GetServerConfig returns the configuration for an MCP server
+func (i *Installer) GetServerConfig(packageName string, packageType PackageType) (*ServerConfig, error) {
 	var config ServerConfig
 
 	switch packageType {
@@ -134,33 +131,10 @@ func (i *Installer) CreateServerConfig(packageName string, packageType PackageTy
 			}
 		}
 	default:
-		return fmt.Errorf("unsupported package type: %s", packageType)
+		return nil, fmt.Errorf("unsupported package type: %s", packageType)
 	}
 
-	// Create config file
-	configPath := filepath.Join(targetDir, fmt.Sprintf("mcp-%s.json", sanitizePackageName(packageName)))
-
-	// Ensure directory exists
-	if err := os.MkdirAll(targetDir, 0o755); err != nil {
-		return fmt.Errorf("failed to create directory: %w", err)
-	}
-
-	// Marshal config
-	data, err := json.MarshalIndent(map[string]interface{}{
-		"mcpServers": map[string]ServerConfig{
-			sanitizePackageName(packageName): config,
-		},
-	}, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal config: %w", err)
-	}
-
-	// Write file
-	if err := os.WriteFile(configPath, data, 0o600); err != nil {
-		return fmt.Errorf("failed to write config: %w", err)
-	}
-
-	return nil
+	return &config, nil
 }
 
 // sanitizePackageName converts package names to valid identifiers
@@ -177,20 +151,21 @@ func sanitizePackageName(name string) string {
 	return name
 }
 
-// InstallPackage is the main installation function
-func (i *Installer) InstallPackage(ctx context.Context, packageName, targetDir string) error {
+// InstallPackage verifies the package and returns its configuration
+func (i *Installer) InstallPackage(ctx context.Context, packageName string) (*ServerConfig, error) {
 	// Detect package type
 	packageType, err := i.DetectPackageType(ctx, packageName)
 	if err != nil {
-		return i.generateHelpfulError(err, packageName)
+		return nil, i.generateHelpfulError(err, packageName)
 	}
 
-	// Create server config
-	if err := i.CreateServerConfig(packageName, packageType, targetDir); err != nil {
-		return fmt.Errorf("failed to create config: %w", err)
+	// Get server config
+	config, err := i.GetServerConfig(packageName, packageType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get config: %w", err)
 	}
 
-	return nil
+	return config, nil
 }
 
 // generateHelpfulError creates user-friendly error messages

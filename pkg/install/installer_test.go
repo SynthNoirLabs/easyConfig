@@ -3,8 +3,6 @@ package install
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 )
 
@@ -29,8 +27,7 @@ func TestSanitizePackageName(t *testing.T) {
 	}
 }
 
-func TestCreateServerConfig(t *testing.T) {
-	tempDir := t.TempDir()
+func TestGetServerConfig(t *testing.T) {
 	installer := NewInstaller()
 
 	tests := []struct {
@@ -38,18 +35,21 @@ func TestCreateServerConfig(t *testing.T) {
 		packageName string
 		packageType PackageType
 		expectError bool
+		wantCmd     string
 	}{
 		{
 			name:        "Node.js package",
 			packageName: "@test/server",
 			packageType: PackageTypeNodeJS,
 			expectError: false,
+			wantCmd:     "npx",
 		},
 		{
 			name:        "Python package",
 			packageName: "test-server",
 			packageType: PackageTypePython,
 			expectError: false,
+			wantCmd:     "uvx", // Assuming uvx is mocked or we just check logic
 		},
 		{
 			name:        "Unknown package type",
@@ -61,16 +61,26 @@ func TestCreateServerConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := installer.CreateServerConfig(tt.packageName, tt.packageType, tempDir)
+			// We can't easily mock checkToolExists without refactoring Installer to use an interface or variable for lookPath.
+			// For now, we'll assume the environment might not have tools, so we only check if it returns *a* config or error as expected.
+			// Actually, GetServerConfig calls checkToolExists.
+			// If we run this in an env without uvx, the Python test might default to "uv" or fail if neither exists?
+			// Wait, the logic is: if uvx exists use it, else use uv.
+			// It doesn't error if neither exists during GetServerConfig?
+			// Ah, checkToolExists returns error.
+			// In GetServerConfig: `if i.checkToolExists("uvx") == nil`. It just checks.
+			// So it won't fail, it will just pick one path.
+
+			config, err := installer.GetServerConfig(tt.packageName, tt.packageType)
 			if (err != nil) != tt.expectError {
-				t.Errorf("CreateServerConfig() error = %v, expectError %v", err, tt.expectError)
+				t.Errorf("GetServerConfig() error = %v, expectError %v", err, tt.expectError)
+				return
 			}
 
-			if !tt.expectError {
-				// Verify file was created
-				expectedFile := filepath.Join(tempDir, "mcp-"+sanitizePackageName(tt.packageName)+".json")
-				if _, err := os.Stat(expectedFile); os.IsNotExist(err) {
-					t.Errorf("Expected config file %s was not created", expectedFile)
+			if !tt.expectError && config != nil {
+				if config.Command != tt.wantCmd && config.Command != "uv" {
+					// Allow uv fallback for python
+					t.Errorf("GetServerConfig() command = %v, want %v", config.Command, tt.wantCmd)
 				}
 			}
 		})
