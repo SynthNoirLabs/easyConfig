@@ -41,6 +41,6 @@ func (a *App) ReadConfig(path string) (string, error) {
 }
 
 // SaveConfig saves content to a configuration file
-func (a *App) SaveConfig(path string, content string) error {
+func (a *App) SaveConfig(path, content string) error {
 	return a.discoveryService.SaveConfig(path, content)
 }

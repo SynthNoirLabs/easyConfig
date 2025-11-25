@@ -379,3 +379,83 @@ func TestJulesProvider_Discover(t *testing.T) {
 		t.Errorf("Expected 2 config items, got %d", len(items))
 	}
 }
+
+func TestOpenCodeProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global: ~/.config/opencode/opencode.json
+	globalDir := filepath.Join(tempHome, ".config", "opencode")
+	if err := os.MkdirAll(globalDir, 0o755); err != nil {
+		t.Fatalf("Failed to create global opencode dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(globalDir, "opencode.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write global opencode.json: %v", err)
+	}
+
+	// Project: opencode.json and opencode.local.json
+	if err := os.WriteFile(filepath.Join(tempProject, "opencode.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write project opencode.json: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempProject, "opencode.local.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write project opencode.local.json: %v", err)
+	}
+
+	provider := &OpenCodeProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("OpenCodeProvider.Discover failed: %v", err)
+	}
+
+	// Expecting: Global, Project, Local Secrets
+	expectedCount := 3
+	if len(items) != expectedCount {
+		t.Errorf("Expected %d config items, got %d", expectedCount, len(items))
+	}
+}
+
+func TestCrushProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global: ~/.config/crush/crush.json & providers.json
+	globalDir := filepath.Join(tempHome, ".config", "crush")
+	if err := os.MkdirAll(globalDir, 0o755); err != nil {
+		t.Fatalf("Failed to create global crush dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(globalDir, "crush.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write global crush.json: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(globalDir, "providers.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write global providers.json: %v", err)
+	}
+
+	// Project: .crush.json, crush.json, .crushignore
+	if err := os.WriteFile(filepath.Join(tempProject, ".crush.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write project .crush.json: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempProject, "crush.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write project crush.json: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(tempProject, ".crushignore"), []byte("node_modules"), 0o600); err != nil {
+		t.Fatalf("Failed to write project .crushignore: %v", err)
+	}
+
+	provider := &CrushProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("CrushProvider.Discover failed: %v", err)
+	}
+
+	// Expecting: Global Main, Global Providers, Project Hidden, Project Visible, Project Ignore
+	expectedCount := 5
+	if len(items) != expectedCount {
+		t.Errorf("Expected %d config items, got %d", expectedCount, len(items))
+	}
+}

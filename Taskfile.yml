@@ -22,7 +22,7 @@ tasks:
   lint:web:
     desc: Lint Web frontend (Biome)
     cmds:
-      - npx @biomejs/biome check frontend/
+      - npx @biomejs/biome check frontend/src frontend/vite.config.ts
 
   lint:
     desc: Run all linters
