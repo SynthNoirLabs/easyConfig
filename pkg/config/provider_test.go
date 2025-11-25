@@ -19,6 +19,10 @@ func (m *MockProvider) Discover(_ string) ([]Item, error) {
 	return m.items, nil
 }
 
+func (m *MockProvider) Create(_ Scope, _ string) (string, error) {
+	return "", nil
+}
+
 func TestDiscoveryService_DiscoverAll(t *testing.T) {
 	ds := NewDiscoveryService()
 	ds.providers = []Provider{} // Clear default providers for testing

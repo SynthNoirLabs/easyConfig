@@ -1,15 +1,16 @@
-import { Box, FileJson } from "lucide-react";
+import { Box, FileJson, Plus } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import "./Sidebar.css";
 import type { config } from "../../wailsjs/go/config/models";
+import "./Sidebar.css";
 
 interface SidebarProps {
   items: config.ConfigItem[];
   onSelect: (item: config.ConfigItem) => void;
+  onAdd: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ items, onSelect }) => {
+const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
   // Group items by provider
@@ -33,6 +34,9 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect }) => {
     <div className="sidebar">
       <div className="sidebar-header">
         <h2 className="sidebar-title">Configuration Files</h2>
+        <button className="btn-add" onClick={onAdd} title="Add Configuration">
+          <Plus size={18} />
+        </button>
       </div>
       <div className="sidebar-content">
         {Object.entries(groupedItems).map(([provider, providerItems]) => (

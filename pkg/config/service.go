@@ -53,6 +53,16 @@ func (s *DiscoveryService) DiscoverAll(projectPath string) ([]Item, error) {
 	return allConfigs, nil
 }
 
+// CreateConfig finds the provider and creates a new config file for the given scope
+func (s *DiscoveryService) CreateConfig(providerName string, scope Scope, projectPath string) (string, error) {
+	for _, p := range s.providers {
+		if p.Name() == providerName {
+			return p.Create(scope, projectPath)
+		}
+	}
+	return "", fmt.Errorf("provider not found: %s", providerName)
+}
+
 // Helper: GetUserHome returns the user's home directory safely
 func GetUserHome() string {
 	home, err := os.UserHomeDir()

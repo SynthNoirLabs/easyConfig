@@ -37,4 +37,9 @@ type Provider interface {
 	Name() string
 	// Discover searches for configs. projectPath can be empty if no project is open.
 	Discover(projectPath string) ([]Item, error)
+	// Create generates a new default configuration file for the given scope
+	// scope: "global" or "project"
+	// projectPath: required if scope is "project"
+	// Returns the path of the created file or error
+	Create(scope Scope, projectPath string) (string, error)
 }

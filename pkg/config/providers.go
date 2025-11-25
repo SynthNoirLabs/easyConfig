@@ -1,7 +1,11 @@
 package config
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
+
+	"easyConfig/pkg/util/paths"
 )
 
 // --- Claude Provider ---
@@ -12,9 +16,41 @@ func (p *ClaudeProvider) Name() string {
 	return "Claude Code"
 }
 
+func (p *ClaudeProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".claude", "settings.json")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, ".claude", "settings.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
+	home := paths.GetHomeDir()
 
 	// 1. Global Desktop Config
 	if home != "" {
@@ -45,61 +81,36 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 		}
 	}
 
-	// 3. System Settings (Linux, macOS, Windows)
-	sysSettingsLinux := "/etc/claude-code/managed-settings.json"
-	if FileExists(sysSettingsLinux) {
-		items = append(items, Item{
-			Provider: p.Name(),
-			Name:     "Managed Settings (Linux)",
-			FileName: "managed-settings.json",
-			Path:     sysSettingsLinux,
-			Scope:    ScopeSystem,
-			Format:   FormatJSON,
-			Exists:   true,
-		})
-	}
-
-	// macOS System Settings
-	sysSettingsMac := "/Library/Application Support/ClaudeCode/managed-settings.json"
-	if FileExists(sysSettingsMac) {
-		items = append(items, Item{
-			Provider: p.Name(),
-			Name:     "Managed Settings (macOS)",
-			FileName: "managed-settings.json",
-			Path:     sysSettingsMac,
-			Scope:    ScopeSystem,
-			Format:   FormatJSON,
-			Exists:   true,
-		})
-	}
-
-	// Windows System Settings
-	// Note: Go's filepath.Join handles OS separators, but for absolute Windows paths we usually need environment variables.
-	// Hardcoding common path for now, ideal solution would check runtime.GOOS and use os.Getenv("ProgramData")
-	sysSettingsWin := "C:\\ProgramData\\ClaudeCode\\managed-settings.json"
-	if FileExists(sysSettingsWin) {
-		items = append(items, Item{
-			Provider: p.Name(),
-			Name:     "Managed Settings (Windows)",
-			FileName: "managed-settings.json",
-			Path:     sysSettingsWin,
-			Scope:    ScopeSystem,
-			Format:   FormatJSON,
-			Exists:   true,
-		})
-	}
-
-	sysMCP := "/etc/claude-code/managed-mcp.json"
-	if FileExists(sysMCP) {
-		items = append(items, Item{
-			Provider: p.Name(),
-			Name:     "Managed MCP",
-			FileName: "managed-mcp.json",
-			Path:     sysMCP,
-			Scope:    ScopeSystem,
-			Format:   FormatJSON,
-			Exists:   true,
-		})
+	// 3. System Settings
+	// Linux /etc/claude-code/managed-settings.json
+	// macOS /Library/Application Support/ClaudeCode/managed-settings.json
+	// Windows C:\ProgramData\ClaudeCode\managed-settings.json
+	sysConfigDir := paths.GetConfigDir("ClaudeCode")
+	if sysConfigDir != "" {
+		sysSettingsPath := filepath.Join(sysConfigDir, "managed-settings.json")
+		if FileExists(sysSettingsPath) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Managed Settings",
+				FileName: "managed-settings.json",
+				Path:     sysSettingsPath,
+				Scope:    ScopeSystem,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+		sysMCPPath := filepath.Join(sysConfigDir, "managed-mcp.json")
+		if FileExists(sysMCPPath) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Managed MCP",
+				FileName: "managed-mcp.json",
+				Path:     sysMCPPath,
+				Scope:    ScopeSystem,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
 	}
 
 	// 4. Project Settings
@@ -156,14 +167,46 @@ func (p *OpenCodeProvider) Name() string {
 	return "OpenCode"
 }
 
+func (p *OpenCodeProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		configDir := paths.GetConfigDir("opencode")
+		if configDir == "" {
+			return "", fmt.Errorf("config directory not found")
+		}
+		path = filepath.Join(configDir, "opencode.json")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, "opencode.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *OpenCodeProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
 
 	// 1. Global Config
 	// Linux/macOS: ~/.config/opencode/opencode.json
-	if home != "" {
-		path := filepath.Join(home, ".config", "opencode", "opencode.json")
+	configDir := paths.GetConfigDir("opencode")
+	if configDir != "" {
+		path := filepath.Join(configDir, "opencode.json")
 		if FileExists(path) {
 			items = append(items, Item{
 				Provider: p.Name(),
@@ -217,14 +260,46 @@ func (p *CrushProvider) Name() string {
 	return "Crush CLI"
 }
 
+func (p *CrushProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		configDir := paths.GetConfigDir("crush")
+		if configDir == "" {
+			return "", fmt.Errorf("config directory not found")
+		}
+		path = filepath.Join(configDir, "crush.json")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, "crush.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
 
 	// 1. Global Config
-	if home != "" {
-		// Linux/macOS Main Config
-		pathMain := filepath.Join(home, ".config", "crush", "crush.json")
+	configDir := paths.GetConfigDir("crush")
+	if configDir != "" {
+		// Main Config
+		pathMain := filepath.Join(configDir, "crush.json")
 		if FileExists(pathMain) {
 			items = append(items, Item{
 				Provider: p.Name(),
@@ -237,29 +312,14 @@ func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
 			})
 		}
 
-		// Linux/macOS Providers Config
-		pathProviders := filepath.Join(home, ".config", "crush", "providers.json")
+		// Providers Config
+		pathProviders := filepath.Join(configDir, "providers.json")
 		if FileExists(pathProviders) {
 			items = append(items, Item{
 				Provider: p.Name(),
 				Name:     "Global Providers",
 				FileName: "providers.json",
 				Path:     pathProviders,
-				Scope:    ScopeGlobal,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
-		}
-
-		// Windows Config (Approximation without runtime.GOOS check logic here)
-		// %LOCALAPPDATA%\crush\crush.json -> usually C:\Users\<User>\AppData\Local\crush\crush.json
-		pathWin := filepath.Join(home, "AppData", "Local", "crush", "crush.json")
-		if FileExists(pathWin) {
-			items = append(items, Item{
-				Provider: p.Name(),
-				Name:     "Global Config (Windows)",
-				FileName: "crush.json",
-				Path:     pathWin,
 				Scope:    ScopeGlobal,
 				Format:   FormatJSON,
 				Exists:   true,
@@ -322,9 +382,38 @@ func (p *CopilotProvider) Name() string {
 	return "GitHub Copilot"
 }
 
+func (p *CopilotProvider) Create(scope Scope, _ string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".copilot", "mcp-config.json")
+	case ScopeProject:
+		return "", fmt.Errorf("project creation not supported for Copilot yet")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *CopilotProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
+	home := paths.GetHomeDir()
 
 	// 1. Global CLI Config
 	if home != "" {
@@ -368,12 +457,39 @@ func (p *OpenAIProvider) Name() string {
 	return "OpenAI"
 }
 
+func (p *OpenAIProvider) Create(scope Scope, _ string) (string, error) {
+	defaultContent := "version: 1\n"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		configDir := paths.GetConfigDir("openai")
+		if configDir == "" {
+			return "", fmt.Errorf("config directory not found")
+		}
+		path = filepath.Join(configDir, "config.yaml")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *OpenAIProvider) Discover(_ string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
 
-	if home != "" {
-		path := filepath.Join(home, ".config", "openai", "config.yaml")
+	configDir := paths.GetConfigDir("openai")
+	if configDir != "" {
+		path := filepath.Join(configDir, "config.yaml")
 		if FileExists(path) {
 			items = append(items, Item{
 				Provider: p.Name(),
@@ -397,9 +513,36 @@ func (p *JulesProvider) Name() string {
 	return "Jules"
 }
 
+func (p *JulesProvider) Create(scope Scope, _ string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".jules-mcp", "data.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *JulesProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
+	home := paths.GetHomeDir()
 
 	// 1. Global Data
 	if home != "" {
@@ -444,9 +587,49 @@ func (p *GeminiProvider) Name() string {
 	return "Gemini"
 }
 
+func (p *GeminiProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		// Standard location: ~/.gemini/settings.json
+		path = filepath.Join(home, ".gemini", "settings.json")
+
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required for project scope")
+		}
+		path = filepath.Join(projectPath, ".gemini", "settings.json")
+
+	default:
+		return "", fmt.Errorf("unsupported scope: %s", scope)
+	}
+
+	// Ensure directory exists
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Create file if it doesn't exist
+	if FileExists(path) {
+		return "", fmt.Errorf("file already exists: %s", path)
+	}
+
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to create file: %w", err)
+	}
+
+	return path, nil
+}
+
 func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
+	home := paths.GetHomeDir()
 
 	// 1. Global settings
 	if home != "" {
@@ -465,29 +648,32 @@ func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
 	}
 
 	// 2. System Settings (Linux)
-	sysDefaults := "/etc/gemini-cli/system-defaults.json"
-	if FileExists(sysDefaults) {
-		items = append(items, Item{
-			Provider: p.Name(),
-			Name:     "System Defaults",
-			FileName: "system-defaults.json",
-			Path:     sysDefaults,
-			Scope:    ScopeSystem,
-			Format:   FormatJSON,
-			Exists:   true,
-		})
-	}
-	sysOverrides := "/etc/gemini-cli/settings.json"
-	if FileExists(sysOverrides) {
-		items = append(items, Item{
-			Provider: p.Name(),
-			Name:     "System Overrides",
-			FileName: "settings.json",
-			Path:     sysOverrides,
-			Scope:    ScopeSystem,
-			Format:   FormatJSON,
-			Exists:   true,
-		})
+	sysConfigDir := paths.GetConfigDir("gemini-cli") // Use app name for GetConfigDir
+	if sysConfigDir != "" {
+		sysDefaults := filepath.Join(sysConfigDir, "system-defaults.json")
+		if FileExists(sysDefaults) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "System Defaults",
+				FileName: "system-defaults.json",
+				Path:     sysDefaults,
+				Scope:    ScopeSystem,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+		sysOverrides := filepath.Join(sysConfigDir, "settings.json")
+		if FileExists(sysOverrides) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "System Overrides",
+				FileName: "settings.json",
+				Path:     sysOverrides,
+				Scope:    ScopeSystem,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
 	}
 
 	// 3. Project settings
@@ -531,9 +717,41 @@ func (p *CodexProvider) Name() string {
 	return "Codex CLI"
 }
 
+func (p *CodexProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "# Codex Config\n"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".codex", "config.toml")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, ".codex", "config.toml")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *CodexProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := GetUserHome()
+	home := paths.GetHomeDir()
 
 	// 1. Global Config
 	if home != "" {
