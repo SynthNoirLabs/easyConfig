@@ -42,7 +42,7 @@ func (s *Service) Start(ctx context.Context) {
 // Close stops the watcher
 func (s *Service) Close() {
 	if s.watcher != nil {
-		s.watcher.Close()
+		_ = s.watcher.Close()
 	}
 }
 

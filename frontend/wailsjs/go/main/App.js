@@ -14,12 +14,20 @@ export function DiscoverConfigs(arg1) {
   return window['go']['main']['App']['DiscoverConfigs'](arg1);
 }
 
+export function FetchPopularServers() {
+  return window['go']['main']['App']['FetchPopularServers']();
+}
+
 export function FetchSchemas() {
   return window['go']['main']['App']['FetchSchemas']();
 }
 
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
+}
+
+export function InstallMCPPackage(arg1) {
+  return window['go']['main']['App']['InstallMCPPackage'](arg1);
 }
 
 export function ReadConfig(arg1) {

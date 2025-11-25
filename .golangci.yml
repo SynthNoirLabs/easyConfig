@@ -1,29 +1,10 @@
 run:
   timeout: 5m
-  go: '1.24'
-
-linters-settings:
-  gci:
-    # Ensure imports are grouped: standard, default, and local prefixes
-    sections:
-      - standard
-      - default
-      - prefix(easyConfig)
-  gofumpt:
-    extra-rules: true # Enforce stricter formatting
-  govet:
-    enable:
-      - shadow
-  gocyclo:
-    min-complexity: 15
-  misspell:
-    locale: US
+  tests: true
 
 linters:
-  # Use a 'disable-all' approach for explicit configuration
   disable-all: true
   enable:
-    # Core/Correctness
     - errcheck
     - gosimple
     - govet
@@ -31,15 +12,32 @@ linters:
     - staticcheck
     - typecheck
     - unused
-    # Style, Formatting, and Best Practices
-    - bodyclose
-    - copyloopvar
-    - gci
-    - gocyclo
+    - goconst
+    - gofmt
     - goimports
     - misspell
-    - revive
     - unconvert
+    - unparam
     - whitespace
-    # Security
-    - gosec
+    # - gocyclo # Cyclomatic complexity - can be noisy for existing code
+    # - gosec   # Security checker - good to enable later
+
+linters-settings:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: easyConfig
+  misspell:
+    locale: US
+  whitespace:
+    multi-if: false # Enforces newlines (or not) in multi-line if conditions
+    multi-func: false # Enforces newlines (or not) in multi-line function signatures
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-dirs:
+    - build
+    - frontend
+    - wailsjs

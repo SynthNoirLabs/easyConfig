@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,11 +12,16 @@ import (
 // DiscoveryService manages the discovery of configurations across multiple providers
 type DiscoveryService struct {
 	providers []Provider
+	logger    *slog.Logger
 }
 
 // NewDiscoveryService creates a new service with default providers
-func NewDiscoveryService() *DiscoveryService {
+func NewDiscoveryService(logger *slog.Logger) *DiscoveryService {
+	if logger == nil {
+		logger = slog.Default()
+	}
 	ds := &DiscoveryService{
+		logger: logger,
 		providers: []Provider{
 			&ClaudeProvider{},
 			&JulesProvider{},
@@ -47,7 +53,7 @@ func (s *DiscoveryService) DiscoverAll(projectPath string) ([]Item, error) {
 		items, err := p.Discover(projectPath)
 		if err != nil {
 			// We log error but continue to next provider
-			fmt.Printf("Error discovering for provider %s: %v\n", p.Name(), err)
+			s.logger.Error("Error discovering for provider", "provider", p.Name(), "error", err)
 			continue
 		}
 		allConfigs = append(allConfigs, items...)

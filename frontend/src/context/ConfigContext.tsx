@@ -1,6 +1,6 @@
 import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import type { config } from "../../wailsjs/go/config/models";
+import { config } from "../../wailsjs/go/models";
 import {
   DiscoverConfigs,
   ReadConfig,
@@ -10,7 +10,7 @@ import {
 } from "../../wailsjs/go/main/App";
 
 interface ConfigContextType {
-  configs: config.ConfigItem[];
+  configs: config.Item[];
   loading: boolean;
   error: string | null;
   refreshConfigs: () => Promise<void>;
@@ -24,7 +24,7 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [configs, setConfigs] = useState<config.ConfigItem[]>([]);
+  const [configs, setConfigs] = useState<config.Item[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

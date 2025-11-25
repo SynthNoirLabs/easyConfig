@@ -46,22 +46,33 @@ func (f *Fetcher) FetchAllSchemas(outputDir string) error {
 }
 
 func (f *Fetcher) fetchAndSave(url, outputDir, filename string) error {
-	resp, err := f.client.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf("failed to fetch URL: %w", err)
+		return fmt.Errorf("failed to fetch schema: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status: %s", resp.Status)
+		return fmt.Errorf("failed to fetch schema, status: %s", resp.Status)
 	}
 
 	outputPath := filepath.Join(outputDir, filename)
+
+	// Ensure directory exists
+	if err := os.MkdirAll(filepath.Dir(outputPath), 0o755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Create file
 	file, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {

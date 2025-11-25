@@ -3,14 +3,14 @@ import { RefreshCw, RotateCcw, Save, Code, LayoutTemplate } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner"; // Import sonner toast
-import type { config } from "../../wailsjs/go/config/models";
+import { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
 import "./ConfigEditor.css";
 import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
 import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
 
 interface ConfigEditorProps {
-  configItem: config.ConfigItem;
+  configItem: config.Item;
 }
 
 const getLanguage = (format: string) => {
