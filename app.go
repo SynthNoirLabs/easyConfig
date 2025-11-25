@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"sync"
 
 	"easyConfig/pkg/config"
 	"easyConfig/pkg/install"
+	"easyConfig/pkg/marketplaces"
 	"easyConfig/pkg/schema"
 	"easyConfig/pkg/util/paths"
 	"easyConfig/pkg/watcher"
@@ -18,6 +20,8 @@ type App struct {
 	discoveryService *config.DiscoveryService
 	watcherService   *watcher.Service
 	installer        *install.Installer
+	smitheryClient   *marketplaces.SmitheryClient
+	awesomeClient    *marketplaces.AwesomeClient
 }
 
 // NewApp creates a new App application struct
@@ -32,6 +36,8 @@ func (a *App) startup(ctx context.Context) {
 	a.discoveryService = config.NewDiscoveryService()
 	a.watcherService = watcher.NewService()
 	a.installer = install.NewInstaller()
+	a.smitheryClient = marketplaces.NewSmitheryClient()
+	a.awesomeClient = marketplaces.NewAwesomeClient()
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -129,4 +135,64 @@ func (a *App) InstallMCPPackage(packageName string) error {
 
 	// Install the package (with verification)
 	return a.installer.InstallPackage(a.ctx, packageName, configDir)
+}
+
+// FetchPopularServers fetches popular MCP servers from Smithery and Awesome lists
+func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var allPackages []marketplaces.MCPPackage
+	var errors []error
+
+	// Fetch from Smithery
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		pkgs, err := a.smitheryClient.FetchPopularServers()
+		mu.Lock()
+		defer mu.Unlock()
+		if err != nil {
+			errors = append(errors, fmt.Errorf("smithery error: %w", err))
+		} else {
+			allPackages = append(allPackages, pkgs...)
+		}
+	}()
+
+	// Fetch from Awesome Lists
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		pkgs, err := a.awesomeClient.FetchServers()
+		mu.Lock()
+		defer mu.Unlock()
+		if err != nil {
+			errors = append(errors, fmt.Errorf("awesome list error: %w", err))
+		} else {
+			allPackages = append(allPackages, pkgs...)
+		}
+	}()
+
+	wg.Wait()
+
+	// Deduplicate packages based on name
+	seen := make(map[string]bool)
+	uniquePackages := []marketplaces.MCPPackage{}
+	for _, pkg := range allPackages {
+		if !seen[pkg.Name] {
+			seen[pkg.Name] = true
+			uniquePackages = append(uniquePackages, pkg)
+		}
+	}
+
+	// If we have at least some packages, return them even if one source failed
+	if len(uniquePackages) > 0 {
+		return uniquePackages, nil
+	}
+
+	// If everything failed, return combined error
+	if len(errors) > 0 {
+		return nil, fmt.Errorf("failed to fetch servers: %v", errors)
+	}
+
+	return uniquePackages, nil
 }
