@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"easyConfig/pkg/config"
+	"easyConfig/pkg/schema"
+	"easyConfig/pkg/util/paths"
 	"easyConfig/pkg/watcher"
 )
 
@@ -67,6 +70,11 @@ func (a *App) ReadConfig(path string) (string, error) {
 	return a.discoveryService.ReadConfig(path)
 }
 
+// SaveConfig saves content to a configuration file
+func (a *App) SaveConfig(path, content string) error {
+	return a.discoveryService.SaveConfig(path, content)
+}
+
 // CreateConfig creates a new configuration file
 func (a *App) CreateConfig(providerName, scope, projectPath string) (string, error) {
 	// Convert string scope to config.Scope
@@ -80,4 +88,18 @@ func (a *App) CreateConfig(providerName, scope, projectPath string) (string, err
 		return "", fmt.Errorf("invalid scope: %s", scope)
 	}
 	return a.discoveryService.CreateConfig(providerName, cfgScope, projectPath)
+}
+
+// FetchSchemas downloads the latest configuration schemas for supported tools
+func (a *App) FetchSchemas() error {
+	// Use easyConfig's own config directory to store schemas
+	configDir := paths.GetConfigDir("easyConfig")
+	if configDir == "" {
+		// Fallback to local directory if standard path fails
+		configDir = "."
+	}
+	schemaDir := filepath.Join(configDir, "schemas")
+
+	fetcher := schema.NewFetcher()
+	return fetcher.FetchAllSchemas(schemaDir)
 }
