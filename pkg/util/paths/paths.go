@@ -21,7 +21,11 @@ func GetHomeDir() string {
 // For Windows, it returns %APPDATA%/<appName>.
 // For macOS, it returns ~/Library/Application Support/<appName>.
 func GetConfigDir(appName string) string {
-	switch runtime.GOOS {
+	return getConfigDirForOS(runtime.GOOS, appName)
+}
+
+func getConfigDirForOS(osName, appName string) string {
+	switch osName {
 	case "windows":
 		if appData := os.Getenv("APPDATA"); appData != "" {
 			return filepath.Join(appData, appName)

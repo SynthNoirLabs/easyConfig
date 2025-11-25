@@ -30,7 +30,7 @@ func TestGetHomeDir(t *testing.T) {
 	}
 }
 
-func TestGetConfigDir(t *testing.T) {
+func TestGetConfigDirForOS(t *testing.T) {
 	// Save original environment variables and restore after test
 	originalHome := os.Getenv("HOME")
 	originalXDGConfigHome := os.Getenv("XDG_CONFIG_HOME")
@@ -42,52 +42,75 @@ func TestGetConfigDir(t *testing.T) {
 	}()
 
 	testAppName := "testapp"
-
-	// Mock GetHomeDir for consistent testing
 	mockHome := "/tmp/mock_home"
 	os.Setenv("HOME", mockHome)
 
-	// Test case: Linux with XDG_CONFIG_HOME
-	if runtime.GOOS == "linux" {
-		mockXDGConfigHome := "/tmp/mock_xdg_config"
-		os.Setenv("XDG_CONFIG_HOME", mockXDGConfigHome)
-		expected := filepath.Join(mockXDGConfigHome, testAppName)
-		if configDir := GetConfigDir(testAppName); configDir != expected {
-			t.Errorf("Linux (XDG_CONFIG_HOME): got %s, want %s", configDir, expected)
-		}
-		os.Unsetenv("XDG_CONFIG_HOME") // Clean up for next test
+	tests := []struct {
+		name          string
+		osName        string
+		env           map[string]string
+		expectedPath  string
+		shouldContain string // For path separator differences
+	}{
+		{
+			name:   "Linux XDG_CONFIG_HOME",
+			osName: "linux",
+			env: map[string]string{
+				"XDG_CONFIG_HOME": "/tmp/xdg",
+			},
+			expectedPath: filepath.Join("/tmp/xdg", testAppName),
+		},
+		{
+			name:   "Linux Default",
+			osName: "linux",
+			env: map[string]string{
+				"XDG_CONFIG_HOME": "",
+			},
+			expectedPath: filepath.Join(mockHome, ".config", testAppName),
+		},
+		{
+			name:         "macOS Default",
+			osName:       "darwin",
+			env:          map[string]string{},
+			expectedPath: filepath.Join(mockHome, "Library", "Application Support", testAppName),
+		},
+		{
+			name:   "Windows APPDATA",
+			osName: "windows",
+			env: map[string]string{
+				"APPDATA": "/tmp/appdata",
+			},
+			expectedPath: filepath.Join("/tmp/appdata", testAppName),
+		},
 	}
 
-	// Test case: Linux without XDG_CONFIG_HOME (falls back to ~/.config)
-	if runtime.GOOS == "linux" {
-		os.Unsetenv("XDG_CONFIG_HOME")
-		expected := filepath.Join(mockHome, ".config", testAppName)
-		if configDir := GetConfigDir(testAppName); configDir != expected {
-			t.Errorf("Linux (no XDG_CONFIG_HOME): got %s, want %s", configDir, expected)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Set env vars
+			for k, v := range tt.env {
+				os.Setenv(k, v)
+			}
+
+			// Call internal helper
+			result := getConfigDirForOS(tt.osName, testAppName)
+
+			if result != tt.expectedPath {
+				t.Errorf("getConfigDirForOS(%s) = %s, want %s", tt.osName, result, tt.expectedPath)
+			}
+		})
+	}
+}
+
+func TestGetConfigDir(t *testing.T) {
+	// Simple smoke test for the public API to ensure it calls the internal one
+	// We just check it returns *something* reasonable for the current OS
+	dir := GetConfigDir("testapp")
+	if dir == "" {
+		// It might be empty if HOME is not set, but in test env usually HOME is set or we can set it
+		os.Setenv("HOME", "/tmp/test")
+		dir = GetConfigDir("testapp")
+		if dir == "" {
+			t.Error("GetConfigDir returned empty string even with HOME set")
 		}
 	}
-
-	// Test case: macOS
-	if runtime.GOOS == "darwin" {
-		expected := filepath.Join(mockHome, "Library", "Application Support", testAppName)
-		if configDir := GetConfigDir(testAppName); configDir != expected {
-			t.Errorf("macOS: got %s, want %s", configDir, expected)
-		}
-	}
-
-	// Test case: Windows
-	if runtime.GOOS == "windows" {
-		mockAppData := "/tmp/mock_appdata" // On Windows, APPDATA is usually system-defined
-		os.Setenv("APPDATA", mockAppData)
-		expected := filepath.Join(mockAppData, testAppName)
-		if configDir := GetConfigDir(testAppName); configDir != expected {
-			t.Errorf("Windows: got %s, want %s", configDir, expected)
-		}
-		os.Unsetenv("APPDATA")
-	}
-
-	// Test case: Unknown OS or no relevant env vars
-	// This scenario is hard to test directly without mocking runtime.GOOS,
-	// but the function should return "" in such cases.
-	// For now, we rely on the above tests covering specific OS paths.
 }
