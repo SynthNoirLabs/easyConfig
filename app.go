@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log/slog"
+	"os"
 	"path/filepath"
 
 	"easyConfig/pkg/config"
+	"easyConfig/pkg/marketplaces"
 	"easyConfig/pkg/schema"
 	"easyConfig/pkg/util/paths"
 	"easyConfig/pkg/watcher"
@@ -16,6 +20,7 @@ type App struct {
 	ctx              context.Context
 	discoveryService *config.DiscoveryService
 	watcherService   *watcher.Service
+	smitheryClient   *marketplaces.SmitheryClient
 }
 
 // NewApp creates a new App application struct
@@ -27,8 +32,11 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.discoveryService = config.NewDiscoveryService()
+	// Initialize logger (slog default is fine for now, or we can configure it)
+	logger := slog.Default()
+	a.discoveryService = config.NewDiscoveryService(logger)
 	a.watcherService = watcher.NewService()
+	a.smitheryClient = marketplaces.NewSmitheryClient()
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -111,4 +119,56 @@ func (a *App) FetchSchemas() error {
 
 	fetcher := schema.NewFetcher()
 	return fetcher.FetchAllSchemas(schemaDir)
+}
+
+// FetchPopularServers returns a list of popular MCP servers from Smithery
+func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
+	if a.smitheryClient == nil {
+		return nil, fmt.Errorf("smithery client not initialized")
+	}
+	return a.smitheryClient.FetchPopularServers()
+}
+
+// InstallMCPPackage installs an MCP server by creating a configuration file
+func (a *App) InstallMCPPackage(pkg marketplaces.MCPPackage) error {
+	// For now, we'll create a JSON config file in the easyConfig directory
+	// In a real scenario, this might involve `npm install` or `pip install`
+	// Here we just create a config file that references the server.
+
+	configDir := paths.GetConfigDir("easyConfig")
+	if configDir == "" {
+		return fmt.Errorf("failed to get config directory")
+	}
+
+	// Create mcp-servers directory if it doesn't exist
+	mcpDir := filepath.Join(configDir, "mcp-servers")
+	if err := os.MkdirAll(mcpDir, 0755); err != nil {
+		return fmt.Errorf("failed to create mcp-servers directory: %w", err)
+	}
+
+	filename := fmt.Sprintf("%s.json", pkg.Name)
+	filePath := filepath.Join(mcpDir, filename)
+
+	// Create a simple config structure for the MCP server
+	config := map[string]interface{}{
+		"mcpServers": map[string]interface{}{
+			pkg.Name: map[string]interface{}{
+				"command": "npx", // Assumption for now, or use pkg metadata if available
+				"args":    []string{"-y", pkg.Name},
+				"url":     pkg.URL,
+				"version": pkg.Version,
+			},
+		},
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal config: %w", err)
+	}
+
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return fmt.Errorf("failed to write config file: %w", err)
+	}
+
+	return nil
 }

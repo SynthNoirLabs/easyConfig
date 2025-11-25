@@ -2,13 +2,13 @@ import { Box, FileJson, Plus, Trash2 } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { config } from "../../wailsjs/go/config/models";
+import { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
 import "./Sidebar.css";
 
 interface SidebarProps {
-  items: config.ConfigItem[];
-  onSelect: (item: config.ConfigItem) => void;
+  items: config.Item[];
+  onSelect: (item: config.Item) => void;
   onAdd: () => void;
 }
 
@@ -25,15 +25,15 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
       acc[item.provider].push(item);
       return acc;
     },
-    {} as Record<string, config.ConfigItem[]>,
+    {} as Record<string, config.Item[]>,
   );
 
-  const handleItemClick = (item: config.ConfigItem) => {
+  const handleItemClick = (item: config.Item) => {
     setSelectedPath(item.path);
     onSelect(item);
   };
 
-  const handleDelete = async (e: React.MouseEvent, item: config.ConfigItem) => {
+  const handleDelete = async (e: React.MouseEvent, item: config.Item) => {
     e.stopPropagation();
     if (confirm(`Are you sure you want to delete ${item.name}?`)) {
       try {

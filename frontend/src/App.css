@@ -1,90 +1,76 @@
+#root {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.app-loading,
+.app-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: #a0aec0;
+}
+
 .app-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  height: 100%;
+  overflow: hidden;
 }
 
 .empty-state {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   height: 100%;
-  color: #666;
+  color: #718096;
   text-align: center;
-  padding: 40px;
 }
 
 .empty-state h2 {
-  margin: 0 0 12px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
+  margin-bottom: 10px;
+  color: #e2e8f0;
 }
 
-.empty-state p {
-  margin: 0;
-  font-size: 16px;
-  color: #888;
-}
-
-.config-details {
-  padding: 20px;
-}
-
-.config-title {
-  margin: 0 0 24px 0;
-  font-size: 28px;
-  font-weight: 600;
-  color: #333;
-}
-
-.config-meta {
+/* Sidebar Container & Nav */
+.sidebar-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-  margin-bottom: 24px;
+  height: 100%;
 }
 
-.config-meta-item {
+.sidebar-nav {
+  padding: 10px;
+  border-bottom: 1px solid #2d3748;
+}
+
+.nav-btn {
+  width: 100%;
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #a0aec0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 0.9rem;
 }
 
-.config-meta-label {
-  font-weight: 600;
-  color: #555;
-  min-width: 80px;
+.nav-btn:hover {
+  background-color: #2d3748;
+  color: #fff;
 }
 
-.config-meta-value {
-  color: #333;
-  font-family: "Courier New", monospace;
-  font-size: 14px;
-}
-
-.config-placeholder {
-  padding: 32px;
-  background-color: #fafafa;
-  border: 2px dashed #d0d0d0;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.config-placeholder p {
-  margin: 0 0 12px 0;
-  font-size: 16px;
-  color: #666;
-}
-
-.config-placeholder p:last-child {
-  margin-bottom: 0;
-}
-
-.config-placeholder-note {
-  font-size: 14px;
-  color: #999;
+.nav-btn.active {
+  background-color: #4299e1;
+  color: #fff;
 }

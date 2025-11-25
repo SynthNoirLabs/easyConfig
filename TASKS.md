@@ -44,4 +44,8 @@ This file serves as the Master Backlog. Agents (Jules, Claude, etc.) should look
 - [ ] **Auto-Schema Fetcher**: Scrape official docs/repos to update local references.
 - [ ] **Add Config Wizard**: Create new config files from templates via UI.
 - [ ] **Toast Notifications**: Replace alerts with non-blocking notifications.
-- [ ] **Cross-Platform Paths**: Refactor path logic into `pkg/util/paths`.
+- [x] **Cross-Platform Paths**: Refactor path logic into `pkg/util/paths`. (Completed)
+
+## 🧩 Phase 6: Specialized Configs
+- [ ] **Claude Extras**: Discover Subagents (`agents/*.md`), Hooks, and Custom Commands.
+- [ ] **Gemini Extensions**: Discover standalone extension configurations (if applicable).

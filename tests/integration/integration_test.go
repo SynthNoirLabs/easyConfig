@@ -38,7 +38,7 @@ func TestIntegration_Discovery(t *testing.T) {
 	createFile(t, filepath.Join(tempHome, ".codex", "config.toml"), "# config")
 
 	// 3. Run Discovery
-	ds := config.NewDiscoveryService()
+	ds := config.NewDiscoveryService(nil)
 	items, err := ds.DiscoverAll(tempProject)
 	if err != nil {
 		t.Fatalf("DiscoverAll failed: %v", err)
@@ -76,7 +76,7 @@ func TestIntegration_CLI_Interaction(t *testing.T) {
 	createFile(t, configPath, "theme = 'dark'\n")
 
 	// 2. easyConfig modifies the file
-	ds := config.NewDiscoveryService()
+	ds := config.NewDiscoveryService(nil)
 
 	// Verify read
 	content, err := ds.ReadConfig(configPath)
