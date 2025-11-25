@@ -14,13 +14,13 @@ export namespace config {
 
     constructor(source: any = {}) {
       if ("string" === typeof source) source = JSON.parse(source);
-      this.provider = source.provider;
-      this.name = source.name;
-      this.fileName = source.fileName;
-      this.path = source.path;
-      this.scope = source.scope;
-      this.format = source.format;
-      this.exists = source.exists;
+      this.provider = source["provider"];
+      this.name = source["name"];
+      this.fileName = source["fileName"];
+      this.path = source["path"];
+      this.scope = source["scope"];
+      this.format = source["format"];
+      this.exists = source["exists"];
     }
   }
 }

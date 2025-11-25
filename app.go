@@ -40,7 +40,17 @@ func (a *App) ReadConfig(path string) (string, error) {
 	return a.discoveryService.ReadConfig(path)
 }
 
-// SaveConfig saves content to a configuration file
-func (a *App) SaveConfig(path, content string) error {
-	return a.discoveryService.SaveConfig(path, content)
+// CreateConfig creates a new configuration file
+func (a *App) CreateConfig(providerName, scope, projectPath string) (string, error) {
+	// Convert string scope to config.Scope
+	var cfgScope config.Scope
+	switch scope {
+	case "global":
+		cfgScope = config.ScopeGlobal
+	case "project":
+		cfgScope = config.ScopeProject
+	default:
+		return "", fmt.Errorf("invalid scope: %s", scope)
+	}
+	return a.discoveryService.CreateConfig(providerName, cfgScope, projectPath)
 }
