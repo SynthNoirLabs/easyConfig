@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -23,6 +24,8 @@ func NewDiscoveryService() *DiscoveryService {
 			&CopilotProvider{},
 			&OpenAIProvider{},
 			&CodexProvider{},
+			&AiderProvider{},
+			&GooseProvider{},
 		},
 	}
 	return ds
@@ -67,6 +70,16 @@ func FileExists(path string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+// Helper: GetOS returns the name of the operating system
+func GetOS() string {
+	return runtime.GOOS
+}
+
+// Helper: GetUserAppData returns the user's app data directory
+func GetUserAppData() string {
+	return os.Getenv("APPDATA")
 }
 
 // ReadConfig reads the content of a configuration file at the given path.

@@ -117,6 +117,137 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 	return items, nil
 }
 
+// --- Aider Provider ---
+
+type AiderProvider struct{}
+
+func (p *AiderProvider) Name() string {
+	return "Aider"
+}
+
+func (p *AiderProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
+	home := GetUserHome()
+
+	// 1. Global Config
+	if home != "" {
+		path := filepath.Join(home, ".aider.conf.yml")
+		if FileExists(path) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Global Config",
+				FileName: ".aider.conf.yml",
+				Path:     path,
+				Scope:    ScopeGlobal,
+				Format:   FormatYAML,
+				Exists:   true,
+			})
+		}
+	}
+
+	// 2. Project specific files
+	if projectPath != "" {
+		// .aider.conf.yml
+		path := filepath.Join(projectPath, ".aider.conf.yml")
+		if FileExists(path) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Project Config",
+				FileName: ".aider.conf.yml",
+				Path:     path,
+				Scope:    ScopeProject,
+				Format:   FormatYAML,
+				Exists:   true,
+			})
+		}
+		// .env
+		pathEnv := filepath.Join(projectPath, ".env")
+		if FileExists(pathEnv) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Environment Vars",
+				FileName: ".env",
+				Path:     pathEnv,
+				Scope:    ScopeProject,
+				Format:   FormatTXT,
+				Exists:   true,
+			})
+		}
+		// .aiderignore
+		pathIgnore := filepath.Join(projectPath, ".aiderignore")
+		if FileExists(pathIgnore) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Ignore File",
+				FileName: ".aiderignore",
+				Path:     pathIgnore,
+				Scope:    ScopeProject,
+				Format:   FormatTXT,
+				Exists:   true,
+			})
+		}
+	}
+
+	return items, nil
+}
+
+// --- Goose Provider ---
+
+type GooseProvider struct{}
+
+func (p *GooseProvider) Name() string {
+	return "Goose"
+}
+
+func (p *GooseProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
+	home := GetUserHome()
+
+	// 1. Global Config
+	if home != "" {
+		// Platform-specific paths
+		var goosePath string
+		if GetOS() == "windows" {
+			appData := GetUserAppData()
+			if appData != "" {
+				goosePath = filepath.Join(appData, "Block", "goose", "config.yaml")
+			}
+		} else {
+			goosePath = filepath.Join(home, ".config", "goose", "config.yaml")
+		}
+
+		if goosePath != "" && FileExists(goosePath) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Global Config",
+				FileName: "config.yaml",
+				Path:     goosePath,
+				Scope:    ScopeGlobal,
+				Format:   FormatYAML,
+				Exists:   true,
+			})
+		}
+	}
+
+	// 2. Project hints file
+	if projectPath != "" {
+		path := filepath.Join(projectPath, ".goosehints")
+		if FileExists(path) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Hints File",
+				FileName: ".goosehints",
+				Path:     path,
+				Scope:    ScopeProject,
+				Format:   FormatTXT,
+				Exists:   true,
+			})
+		}
+	}
+
+	return items, nil
+}
+
 // --- Copilot Provider ---
 
 type CopilotProvider struct{}
