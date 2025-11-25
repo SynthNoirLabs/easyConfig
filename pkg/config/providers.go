@@ -797,6 +797,40 @@ func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
 				Exists:   true,
 			})
 		}
+
+		// Project Extensions (.gemini/extensions/*)
+		projectExtPath := filepath.Join(projectPath, ".gemini", "extensions", "*")
+		if matches, err := filepath.Glob(projectExtPath); err == nil {
+			for _, match := range matches {
+				items = append(items, Item{
+					Provider: p.Name(),
+					Name:     "Extension: " + filepath.Base(match),
+					FileName: filepath.Base(match),
+					Path:     match,
+					Scope:    ScopeProject,
+					Format:   FormatTXT, // Default to text, could be JSON/JS
+					Exists:   true,
+				})
+			}
+		}
+	}
+
+	// Global Extensions (~/.gemini/extensions/*)
+	if home != "" {
+		globalExtPath := filepath.Join(home, ".gemini", "extensions", "*")
+		if matches, err := filepath.Glob(globalExtPath); err == nil {
+			for _, match := range matches {
+				items = append(items, Item{
+					Provider: p.Name(),
+					Name:     "Extension: " + filepath.Base(match),
+					FileName: filepath.Base(match),
+					Path:     match,
+					Scope:    ScopeGlobal,
+					Format:   FormatTXT, // Default to text
+					Exists:   true,
+				})
+			}
+		}
 	}
 
 	return items, nil

@@ -218,6 +218,62 @@ func TestGeminiProvider_Discover(t *testing.T) {
 	}
 }
 
+func TestGeminiProvider_DiscoverExtensions(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Setup Global Extension
+	globalExtDir := filepath.Join(tempHome, ".gemini", "extensions")
+	if err := os.MkdirAll(globalExtDir, 0o755); err != nil {
+		t.Fatalf("Failed to create global extensions dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(globalExtDir, "my-ext.json"), []byte("{}"), 0o600); err != nil {
+		t.Fatalf("Failed to write global extension: %v", err)
+	}
+
+	// Setup Project Extension
+	projectExtDir := filepath.Join(tempProject, ".gemini", "extensions")
+	if err := os.MkdirAll(projectExtDir, 0o755); err != nil {
+		t.Fatalf("Failed to create project extensions dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(projectExtDir, "proj-ext.js"), []byte("console.log('hi')"), 0o600); err != nil {
+		t.Fatalf("Failed to write project extension: %v", err)
+	}
+
+	provider := &GeminiProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("GeminiProvider.Discover failed: %v", err)
+	}
+
+	// We expect existing config items (from standard Discover logic if dirs exist) PLUS our extensions.
+	// But since we only created extensions dirs here (and not settings.json), Discover will only find extensions.
+	// Wait, Discover checks for settings.json too. If those don't exist, it won't add them.
+	// So we strictly expect 2 extensions here.
+
+	globalFound := false
+	projectFound := false
+
+	for _, item := range items {
+		if item.Provider == "Gemini" && item.Scope == ScopeGlobal && item.Name == "Extension: my-ext.json" {
+			globalFound = true
+		}
+		if item.Provider == "Gemini" && item.Scope == ScopeProject && item.Name == "Extension: proj-ext.js" {
+			projectFound = true
+		}
+	}
+
+	if !globalFound {
+		t.Error("Expected to find global extension, but didn't")
+	}
+	if !projectFound {
+		t.Error("Expected to find project extension, but didn't")
+	}
+}
+
 func TestCodexProvider_Discover(t *testing.T) {
 	// Setup: Create temporary directories for testing
 	tempHome := t.TempDir()
