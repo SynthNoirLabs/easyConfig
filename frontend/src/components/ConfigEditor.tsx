@@ -1,5 +1,5 @@
 import Editor from "@monaco-editor/react";
-import { Save } from "lucide-react";
+import { RefreshCw, RotateCcw, Save } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner"; // Import sonner toast
@@ -30,6 +30,7 @@ const getLanguage = (format: string) => {
 const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const { readConfig, saveConfig } = useConfig();
   const [content, setContent] = useState<string>("");
+  const [originalContent, setOriginalContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
@@ -41,17 +42,18 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     try {
       const text = await readConfig(configItem.path);
       setContent(text);
+      setOriginalContent(text);
       setIsDirty(false);
     } catch (err) {
       console.error("Error loading file:", err);
-      toast.error("Failed to load file content."); // Use toast for error
+      toast.error("Failed to load file content.");
       setError(
         err instanceof Error ? err.message : "Failed to load configurations",
       );
       if (String(err).includes("window.go")) {
-        setContent(
-          `// Mock content for ${configItem.name}\n// Backend not connected.`,
-        );
+        const mock = `// Mock content for ${configItem.name}\n// Backend not connected.`;
+        setContent(mock);
+        setOriginalContent(mock);
         setIsDirty(false);
         setError(null);
       }
@@ -71,26 +73,41 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
         try {
           JSON.parse(content);
         } catch (_e) {
-          toast.error("Invalid JSON format. Please fix errors before saving."); // Use toast for error
+          toast.error("Invalid JSON format. Please fix errors before saving.");
           setIsSaving(false);
           return;
         }
       }
 
       await saveConfig(configItem.path, content);
+      setOriginalContent(content);
       setIsDirty(false);
-      toast.success("Configuration saved successfully!"); // Use toast for success
+      toast.success("Configuration saved successfully!");
     } catch (err) {
       console.error("Error saving file:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to save file."); // Use toast for error
+      toast.error(err instanceof Error ? err.message : "Failed to save file.");
     } finally {
       setIsSaving(false);
     }
   };
 
+  const handleReset = () => {
+    if (confirm("Discard unsaved changes?")) {
+      setContent(originalContent);
+      setIsDirty(false);
+    }
+  };
+
+  const handleReload = () => {
+    if (isDirty && !confirm("You have unsaved changes. Reloading will discard them. Continue?")) {
+      return;
+    }
+    loadFile();
+  };
+
   const handleEditorChange = (value: string | undefined) => {
     setContent(value || "");
-    setIsDirty(true);
+    setIsDirty(value !== originalContent);
   };
 
   return (
@@ -101,6 +118,25 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <span className="file-path">{configItem.path}</span>
         </div>
         <div className="editor-actions">
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleReset}
+            disabled={!isDirty || isLoading}
+            title="Reset to last saved"
+          >
+            <RotateCcw size={16} />
+          </button>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleReload}
+            disabled={isLoading}
+            title="Reload from disk"
+          >
+            <RefreshCw size={16} />
+          </button>
+          <div className="separator" />
           <button
             type="button"
             className="btn-save"

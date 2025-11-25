@@ -6,6 +6,10 @@ export function CreateConfig(arg1, arg2, arg3) {
   return window['go']['main']['App']['CreateConfig'](arg1, arg2, arg3);
 }
 
+export function DeleteConfig(arg1) {
+  return window['go']['main']['App']['DeleteConfig'](arg1);
+}
+
 export function DiscoverConfigs(arg1) {
   return window['go']['main']['App']['DiscoverConfigs'](arg1);
 }

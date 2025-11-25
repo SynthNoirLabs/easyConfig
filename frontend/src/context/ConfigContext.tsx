@@ -5,6 +5,8 @@ import {
   DiscoverConfigs,
   ReadConfig,
   SaveConfig,
+  CreateConfig,
+  DeleteConfig,
 } from "../../wailsjs/go/main/App";
 
 interface ConfigContextType {
@@ -14,6 +16,7 @@ interface ConfigContextType {
   refreshConfigs: () => Promise<void>;
   readConfig: (path: string) => Promise<string>;
   saveConfig: (path: string, content: string) => Promise<void>;
+  deleteConfig: (path: string) => Promise<void>;
 }
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
@@ -68,6 +71,16 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const deleteConfig = async (path: string): Promise<void> => {
+    try {
+      await DeleteConfig(path);
+      await fetchConfigs(); // Refresh list after delete
+    } catch (err) {
+      console.error("Failed to delete config:", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     fetchConfigs();
   }, [fetchConfigs]);
@@ -81,6 +94,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshConfigs: fetchConfigs,
         readConfig,
         saveConfig,
+        deleteConfig,
       }}
     >
       {children}

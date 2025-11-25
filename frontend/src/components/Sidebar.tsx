@@ -1,7 +1,9 @@
-import { Box, FileJson, Plus } from "lucide-react";
+import { Box, FileJson, Plus, Trash2 } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { toast } from "sonner";
 import type { config } from "../../wailsjs/go/config/models";
+import { useConfig } from "../context/ConfigContext";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -11,6 +13,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
+  const { deleteConfig } = useConfig();
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
   // Group items by provider
@@ -30,6 +33,22 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
     onSelect(item);
   };
 
+  const handleDelete = async (e: React.MouseEvent, item: config.ConfigItem) => {
+    e.stopPropagation();
+    if (confirm(`Are you sure you want to delete ${item.name}?`)) {
+      try {
+        await deleteConfig(item.path);
+        toast.success("Configuration deleted");
+        if (selectedPath === item.path) {
+          setSelectedPath(null);
+          // Optionally clear editor content via parent callback, but simpler to just deselect
+        }
+      } catch (err) {
+        toast.error("Failed to delete configuration");
+      }
+    }
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -47,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
             </div>
             <div className="sidebar-group-items">
               {providerItems.map((item) => (
-                <button
+                <div
                   key={item.path}
                   className={`sidebar-item ${selectedPath === item.path ? "sidebar-item-active" : ""}`}
                   onClick={() => handleItemClick(item)}
@@ -56,14 +75,23 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
                       handleItemClick(item);
                     }
                   }}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                 >
                   <FileJson size={16} className="sidebar-item-icon" />
                   <div className="sidebar-item-content">
                     <div className="sidebar-item-name">{item.name}</div>
                     <div className="sidebar-item-path">{item.path}</div>
                   </div>
-                </button>
+                  <button
+                    type="button"
+                    className="btn-delete"
+                    onClick={(e) => handleDelete(e, item)}
+                    title="Delete"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               ))}
             </div>
           </div>
