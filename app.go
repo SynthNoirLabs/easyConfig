@@ -5,12 +5,14 @@ import (
 	"fmt"
 
 	"easyConfig/pkg/config"
+	"easyConfig/pkg/watcher"
 )
 
 // App struct
 type App struct {
 	ctx              context.Context
 	discoveryService *config.DiscoveryService
+	watcherService   *watcher.Service
 }
 
 // NewApp creates a new App application struct
@@ -23,6 +25,17 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.discoveryService = config.NewDiscoveryService()
+	a.watcherService = watcher.NewService()
+	if a.watcherService != nil {
+		a.watcherService.Start(ctx)
+	}
+}
+
+// shutdown is called at application termination
+func (a *App) shutdown(_ context.Context) {
+	if a.watcherService != nil {
+		a.watcherService.Close()
+	}
 }
 
 // Greet returns a greeting for the given name
@@ -32,7 +45,21 @@ func (a *App) Greet(name string) string {
 
 // DiscoverConfigs returns all the discovered configurations
 func (a *App) DiscoverConfigs(projectPath string) ([]config.Item, error) {
-	return a.discoveryService.DiscoverAll(projectPath)
+	items, err := a.discoveryService.DiscoverAll(projectPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Watch all discovered files
+	if a.watcherService != nil {
+		for _, item := range items {
+			if item.Exists {
+				_ = a.watcherService.Add(item.Path)
+			}
+		}
+	}
+
+	return items, nil
 }
 
 // ReadConfig reads the content of a configuration file
