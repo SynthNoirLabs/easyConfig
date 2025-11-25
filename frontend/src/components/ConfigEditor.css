@@ -2,18 +2,18 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #ffffff;
-  color: #333;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .editor-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: #f5f5f5;
-  height: 50px;
+  padding: 0 var(--spacing-md);
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: var(--bg-secondary);
+  height: 56px;
   box-sizing: border-box;
 }
 
@@ -25,25 +25,26 @@
 .file-name {
   font-weight: 600;
   font-size: 14px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .file-path {
   font-size: 11px;
-  color: #666;
+  color: var(--text-secondary);
   margin-top: 2px;
+  font-family: monospace;
 }
 
 .editor-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-sm);
   align-items: center;
 }
 
 .separator {
   width: 1px;
   height: 24px;
-  background-color: #d0d0d0;
+  background-color: var(--border-subtle);
   margin: 0 4px;
 }
 
@@ -53,22 +54,24 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: transparent;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  color: #666;
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
 }
 
 .btn-secondary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background-color: var(--bg-secondary);
 }
 
 .btn-save {
@@ -77,21 +80,23 @@
   gap: 6px;
   padding: 0 16px;
   height: 32px;
-  background-color: #007acc;
+  background-color: var(--accent-primary);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .btn-save:hover:not(:disabled) {
-  background-color: #005f9e;
+  background-color: var(--accent-hover);
 }
 
 .btn-save:disabled {
-  background-color: #ccc;
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -99,7 +104,7 @@
   flex: 1;
   position: relative;
   width: 100%;
-  height: calc(100% - 50px);
+  height: calc(100% - 56px);
   overflow: hidden;
 }
 
@@ -109,10 +114,10 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  color: #666;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
 .editor-error {
-  color: #d32f2f;
+  color: var(--danger);
 }

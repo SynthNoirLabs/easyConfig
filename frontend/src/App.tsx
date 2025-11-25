@@ -7,13 +7,14 @@ import ConfigEditor from "./components/ConfigEditor";
 import Layout from "./components/Layout";
 import Sidebar from "./components/Sidebar";
 import Workflows from "./components/Workflows";
+import Marketplace from "./components/Marketplace";
 import { useConfig } from "./context/ConfigContext";
 
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
   const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<"configs" | "workflows">("configs");
+  const [currentView, setCurrentView] = useState<"configs" | "workflows" | "marketplace">("configs");
 
   const handleSelectConfig = (item: config.ConfigItem) => {
     setSelectedItem(item);
@@ -48,49 +49,42 @@ function AppContent() {
     );
   }
 
+  const renderContent = () => {
+    switch (currentView) {
+      case "workflows":
+        return <Workflows />;
+      case "marketplace":
+        return <Marketplace />; // We need to import this
+      case "configs":
+      default:
+        return selectedItem ? (
+          <ConfigEditor configItem={selectedItem} />
+        ) : (
+          <div className="empty-state">
+            <h2>Welcome to easyConfig</h2>
+            <p>Select a configuration file to edit, or explore workflows and marketplace.</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <>
-      <div className="app-nav">
-        <button 
-          className={`nav-item ${currentView === "configs" ? "active" : ""}`}
-          onClick={() => setCurrentView("configs")}
-        >
-          Configs
-        </button>
-        <button 
-          className={`nav-item ${currentView === "workflows" ? "active" : ""}`}
-          onClick={() => setCurrentView("workflows")}
-        >
-          Workflows
-        </button>
-      </div>
-
-      {currentView === "configs" ? (
-        <Layout
-          sidebar={
-            <Sidebar
-              items={configs}
-              onSelect={handleSelectConfig}
-              onAdd={handleOpenAddModal}
-            />
-          }
-        >
-          <div className="app-content">
-            {selectedItem ? (
-              <ConfigEditor configItem={selectedItem} />
-            ) : (
-              <div className="empty-state">
-                <h2>Welcome to easyConfig</h2>
-                <p>Select a configuration file from the sidebar to get started.</p>
-              </div>
-            )}
-          </div>
-        </Layout>
-      ) : (
-        <Layout sidebar={null}>
-           <Workflows />
-        </Layout>
-      )}
+      <Layout
+        sidebar={
+          <Sidebar
+            items={configs}
+            onSelect={handleSelectConfig}
+            onAdd={handleOpenAddModal}
+            currentView={currentView}
+            onViewChange={setCurrentView}
+          />
+        }
+      >
+        <div className="app-content">
+          {renderContent()}
+        </div>
+      </Layout>
 
       <AddConfigModal
         isOpen={isAddModalOpen}
