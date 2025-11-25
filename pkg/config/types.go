@@ -18,6 +18,7 @@ const (
 	FormatYAML Format = "yaml"
 	FormatTXT  Format = "text"
 	FormatMD   Format = "markdown"
+	FormatINI  Format = "ini"
 )
 
 // Item represents a discovered configuration file

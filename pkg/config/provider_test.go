@@ -463,3 +463,37 @@ func TestCrushProvider_Discover(t *testing.T) {
 		t.Errorf("Expected %d config items, got %d", expectedCount, len(items))
 	}
 }
+
+func TestGitProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global: ~/.gitconfig
+	if err := os.WriteFile(filepath.Join(tempHome, ".gitconfig"), []byte("[user]\nname=test"), 0o600); err != nil {
+		t.Fatalf("Failed to write global .gitconfig: %v", err)
+	}
+
+	// Project: .git/config
+	gitDir := filepath.Join(tempProject, ".git")
+	if err := os.MkdirAll(gitDir, 0o755); err != nil {
+		t.Fatalf("Failed to create .git dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(gitDir, "config"), []byte("[core]\nrepositoryformatversion=0"), 0o600); err != nil {
+		t.Fatalf("Failed to write project git config: %v", err)
+	}
+
+	provider := &GitProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("GitProvider.Discover failed: %v", err)
+	}
+
+	// Expecting: Global, Project
+	expectedCount := 2
+	if len(items) != expectedCount {
+		t.Errorf("Expected %d config items, got %d", expectedCount, len(items))
+	}
+}
