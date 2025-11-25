@@ -1,26 +1,23 @@
 import { Toaster, toast } from "sonner";
 import { useState } from "react";
 import "./App.css";
-import { config } from "../wailsjs/go/models";
+import type { config } from "../wailsjs/go/config/models";
 import AddConfigModal from "./components/AddConfigModal";
 import ConfigEditor from "./components/ConfigEditor";
 import Layout from "./components/Layout";
 import Sidebar from "./components/Sidebar";
+import Workflows from "./components/Workflows";
 import Marketplace from "./components/Marketplace";
 import { useConfig } from "./context/ConfigContext";
-import { ShoppingBag } from "lucide-react";
 
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
-  const [selectedItem, setSelectedItem] = useState<config.Item | null>(
-    null,
-  );
+  const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [view, setView] = useState<"editor" | "marketplace">("editor");
+  const [currentView, setCurrentView] = useState<"configs" | "workflows" | "marketplace">("configs");
 
-  const handleSelectConfig = (item: config.Item) => {
+  const handleSelectConfig = (item: config.ConfigItem) => {
     setSelectedItem(item);
-    setView("editor");
   };
 
   const handleOpenAddModal = () => {
@@ -52,40 +49,43 @@ function AppContent() {
     );
   }
 
+  const renderContent = () => {
+    switch (currentView) {
+      case "workflows":
+        return <Workflows />;
+      case "marketplace":
+        return <Marketplace />; // We need to import this
+      case "configs":
+      default:
+        return selectedItem ? (
+          <ConfigEditor configItem={selectedItem} />
+        ) : (
+          <div className="empty-state">
+            <h2>Welcome to easyConfig</h2>
+            <p>Select a configuration file to edit, or explore workflows and marketplace.</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <>
       <Layout
         sidebar={
-          <div className="sidebar-container">
-            <div className="sidebar-nav">
-               <button 
-                 className={`nav-btn ${view === "marketplace" ? "active" : ""}`}
-                 onClick={() => setView("marketplace")}
-               >
-                 <ShoppingBag size={16} /> Marketplace
-               </button>
-            </div>
-            <Sidebar
-              items={configs}
-              onSelect={handleSelectConfig}
-              onAdd={handleOpenAddModal}
-            />
-          </div>
+          <Sidebar
+            items={configs}
+            onSelect={handleSelectConfig}
+            onAdd={handleOpenAddModal}
+            currentView={currentView}
+            onViewChange={setCurrentView}
+          />
         }
       >
         <div className="app-content">
-          {view === "marketplace" ? (
-            <Marketplace />
-          ) : selectedItem ? (
-            <ConfigEditor configItem={selectedItem} />
-          ) : (
-            <div className="empty-state">
-              <h2>Welcome to easyConfig</h2>
-              <p>Select a configuration file from the sidebar to get started.</p>
-            </div>
-          )}
+          {renderContent()}
         </div>
       </Layout>
+
       <AddConfigModal
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}

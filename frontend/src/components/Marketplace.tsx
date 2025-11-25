@@ -1,79 +1,130 @@
-import type React from "react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { FetchPopularServers, InstallMCPPackage } from "../../wailsjs/go/main/App";
-import { marketplaces } from "../../wailsjs/go/models";
+import { Search, Download, Star, Server, ExternalLink } from "lucide-react";
 import "./Marketplace.css";
 
-const Marketplace: React.FC = () => {
-  const [packages, setPackages] = useState<marketplaces.MCPPackage[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+interface MCPPackage {
+  name: string;
+  description: string;
+  stars: number;
+  downloads: number;
+  author: string;
+  tags: string[];
+}
+
+export default function Marketplace() {
+  const [servers, setServers] = useState<MCPPackage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [installing, setInstalling] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadPackages = async () => {
-      try {
-        const data = await FetchPopularServers();
-        setPackages(data || []);
-      } catch (err) {
-        console.error("Failed to fetch packages:", err);
-        setError("Failed to load marketplace data.");
-        toast.error("Failed to load marketplace data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPackages();
+    loadServers();
   }, []);
 
-  const handleInstall = async (pkg: marketplaces.MCPPackage) => {
-    setInstalling(pkg.name);
-    toast.info(`Installing ${pkg.name}...`);
+  const loadServers = async () => {
     try {
-      await InstallMCPPackage(pkg);
+      const data = await FetchPopularServers();
+      // Map backend data to frontend interface if needed, or use directly
+      // Assuming backend returns compatible structure
+      setServers(data || []);
+    } catch (err) {
+      toast.error("Failed to load marketplace servers");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInstall = async (pkg: MCPPackage) => {
+    setInstalling(pkg.name);
+    try {
+      await InstallMCPPackage(pkg.name);
       toast.success(`Successfully installed ${pkg.name}`);
     } catch (err) {
-      console.error("Failed to install package:", err);
-      toast.error(`Failed to install ${pkg.name}`);
+      toast.error(`Failed to install ${pkg.name}: ${err}`);
     } finally {
       setInstalling(null);
     }
   };
 
-  if (loading) {
-    return <div className="marketplace-loading">Loading marketplace...</div>;
-  }
-
-  if (error) {
-    return <div className="marketplace-error">{error}</div>;
-  }
+  const filteredServers = servers.filter(s => 
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="marketplace">
-      <h2>MCP Marketplace</h2>
-      <div className="marketplace-grid">
-        {packages.map((pkg) => (
-          <div key={pkg.name} className="marketplace-card">
-            <h3>{pkg.name}</h3>
-            <p className="marketplace-desc">{pkg.description}</p>
-            <div className="marketplace-meta">
-              <span>v{pkg.version}</span>
-              <span>by {pkg.author}</span>
-            </div>
-            <button
-              className="btn-install"
-              onClick={() => handleInstall(pkg)}
-              disabled={installing === pkg.name}
-            >
-              {installing === pkg.name ? "Installing..." : "Install"}
-            </button>
-          </div>
-        ))}
+    <div className="marketplace-container">
+      <div className="marketplace-header">
+        <div>
+          <h2>MCP Marketplace</h2>
+          <p>Discover and install Model Context Protocol servers.</p>
+        </div>
+        <div className="search-box">
+          <Search size={18} className="search-icon" />
+          <input 
+            type="text" 
+            placeholder="Search servers..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
       </div>
+
+      {loading ? (
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Loading servers...</p>
+        </div>
+      ) : (
+        <div className="servers-grid">
+          {filteredServers.map((server, i) => (
+            <div key={i} className="server-card">
+              <div className="server-header">
+                <div className="server-icon">
+                  <Server size={24} />
+                </div>
+                <div className="server-meta">
+                  <h3>{server.name}</h3>
+                  <span className="server-author">by {server.author || "Unknown"}</span>
+                </div>
+              </div>
+              
+              <p className="server-desc">{server.description}</p>
+              
+              <div className="server-stats">
+                {server.stars > 0 && (
+                  <div className="stat" title="Stars">
+                    <Star size={14} />
+                    <span>{server.stars}</span>
+                  </div>
+                )}
+                {server.downloads > 0 && (
+                  <div className="stat" title="Downloads">
+                    <Download size={14} />
+                    <span>{server.downloads}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="server-tags">
+                {server.tags && server.tags.slice(0, 3).map(tag => (
+                  <span key={tag} className="tag">{tag}</span>
+                ))}
+              </div>
+
+              <button 
+                className="btn-install"
+                onClick={() => handleInstall(server)}
+                disabled={installing === server.name}
+              >
+                {installing === server.name ? "Installing..." : "Install"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
-};
-
-export default Marketplace;
+}

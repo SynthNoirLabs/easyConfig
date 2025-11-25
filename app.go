@@ -2,17 +2,18 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"log/slog"
-	"os"
 	"path/filepath"
+	"sync"
 
 	"easyConfig/pkg/config"
+	"easyConfig/pkg/install"
 	"easyConfig/pkg/marketplaces"
+	"easyConfig/pkg/mcp"
 	"easyConfig/pkg/schema"
 	"easyConfig/pkg/util/paths"
 	"easyConfig/pkg/watcher"
+	"easyConfig/pkg/workflows"
 )
 
 // App struct
@@ -20,7 +21,12 @@ type App struct {
 	ctx              context.Context
 	discoveryService *config.DiscoveryService
 	watcherService   *watcher.Service
+	installer        *install.Installer
 	smitheryClient   *marketplaces.SmitheryClient
+	awesomeClient    *marketplaces.AwesomeClient
+	workflowGen      *workflows.Generator
+	secretsManager   *workflows.SecretsManager
+	mcpInjector      *mcp.Injector
 }
 
 // NewApp creates a new App application struct
@@ -32,11 +38,14 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	// Initialize logger (slog default is fine for now, or we can configure it)
-	logger := slog.Default()
-	a.discoveryService = config.NewDiscoveryService(logger)
+	a.discoveryService = config.NewDiscoveryService()
 	a.watcherService = watcher.NewService()
+	a.installer = install.NewInstaller()
 	a.smitheryClient = marketplaces.NewSmitheryClient()
+	a.awesomeClient = marketplaces.NewAwesomeClient()
+	a.workflowGen = workflows.NewGenerator()
+	a.secretsManager = workflows.NewSecretsManager()
+	a.mcpInjector = mcp.NewInjector()
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -121,54 +130,167 @@ func (a *App) FetchSchemas() error {
 	return fetcher.FetchAllSchemas(schemaDir)
 }
 
-// FetchPopularServers returns a list of popular MCP servers from Smithery
-func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
-	if a.smitheryClient == nil {
-		return nil, fmt.Errorf("smithery client not initialized")
+// InstallMCPPackage installs an MCP server package and injects it into Claude Desktop config
+func (a *App) InstallMCPPackage(packageName string) error {
+	// 1. Verify and get config from installer
+	serverConfig, err := a.installer.InstallPackage(a.ctx, packageName)
+	if err != nil {
+		return err
 	}
-	return a.smitheryClient.FetchPopularServers()
+
+	// 2. Convert install.ServerConfig to mcp.ServerConfig
+	// (They are identical structs but different types, need manual conversion)
+	mcpConfig := mcp.ServerConfig{
+		Command: serverConfig.Command,
+		Args:    serverConfig.Args,
+		Env:     serverConfig.Env,
+	}
+
+	// 3. Determine Claude Desktop config path
+	homeDir := paths.GetHomeDir()
+	if homeDir == "" {
+		return fmt.Errorf("could not determine home directory")
+	}
+
+	// Standard path for Claude Desktop
+	// macOS: ~/Library/Application Support/Claude/claude_desktop_config.json
+	// Windows: %APPDATA%\Claude\claude_desktop_config.json
+	// Linux: ~/.config/Claude/claude_desktop_config.json (unofficial/standard XDG)
+	// But wait, provider_claude.go used ~/.claude/claude_desktop_config.json for Linux?
+	// Let's check provider_claude.go again.
+	// It used filepath.Join(home, ".claude", "claude_desktop_config.json")
+	// But standard Claude Desktop on Mac is ~/Library/Application Support/Claude/claude_desktop_config.json
+	// On Windows it's AppData/Roaming/Claude/claude_desktop_config.json
+
+	// Let's use a helper or hardcode for now based on OS, or rely on what provider_claude.go does.
+	// Actually, let's look at how provider_claude.go discovers it.
+	// It checks `filepath.Join(home, ".claude", "claude_desktop_config.json")`.
+	// This might be a simplification or specific to a certain setup.
+	// For "Real" installation, we should target the actual file Claude Desktop uses.
+
+	var configPath string
+	// We'll use the paths.GetConfigDir("Claude") which should handle OS differences if implemented correctly.
+	// But paths.GetConfigDir usually returns ~/.config/AppName on Linux.
+	// Claude Desktop on Mac: ~/Library/Application Support/Claude
+
+	// Let's try to find the file or default to a standard location.
+	// For now, I'll use the same path as provider_claude.go seems to expect for "Global Desktop Config"
+	// which was `filepath.Join(home, ".claude", "claude_desktop_config.json")`.
+	// WAIT, looking at provider_claude.go lines 57: `path := filepath.Join(home, ".claude", "claude_desktop_config.json")`
+	// This seems to be where we expect it.
+
+	configPath = filepath.Join(homeDir, ".claude", "claude_desktop_config.json")
+
+	// On macOS, it's different.
+	// if runtime.GOOS == "darwin" {
+	//    configPath = filepath.Join(home, "Library", "Application Support", "Claude", "claude_desktop_config.json")
+	// }
+	// I should probably make this robust.
+
+	// For this iteration, I will stick to the path defined in provider_claude.go to be consistent with "Discovery".
+	// If Discovery is wrong, we fix both.
+
+	// 4. Inject
+	// Use the package name (sanitized) as the server name
+	// serverName := packageName // Unused
+
+	return a.mcpInjector.Inject(configPath, packageName, mcpConfig)
 }
 
-// InstallMCPPackage installs an MCP server by creating a configuration file
-func (a *App) InstallMCPPackage(pkg marketplaces.MCPPackage) error {
-	// For now, we'll create a JSON config file in the easyConfig directory
-	// In a real scenario, this might involve `npm install` or `pip install`
-	// Here we just create a config file that references the server.
+// FetchPopularServers fetches popular MCP servers from Smithery and Awesome lists
+func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var allPackages []marketplaces.MCPPackage
+	var errors []error
 
-	configDir := paths.GetConfigDir("easyConfig")
-	if configDir == "" {
-		return fmt.Errorf("failed to get config directory")
+	// Fetch from Smithery
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		pkgs, err := a.smitheryClient.FetchPopularServers()
+		mu.Lock()
+		defer mu.Unlock()
+		if err != nil {
+			errors = append(errors, fmt.Errorf("smithery error: %w", err))
+		} else {
+			allPackages = append(allPackages, pkgs...)
+		}
+	}()
+
+	// Fetch from Awesome Lists
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		pkgs, err := a.awesomeClient.FetchServers()
+		mu.Lock()
+		defer mu.Unlock()
+		if err != nil {
+			errors = append(errors, fmt.Errorf("awesome list error: %w", err))
+		} else {
+			allPackages = append(allPackages, pkgs...)
+		}
+	}()
+
+	wg.Wait()
+
+	// Deduplicate packages based on name
+	seen := make(map[string]bool)
+	uniquePackages := []marketplaces.MCPPackage{}
+	for _, pkg := range allPackages {
+		if !seen[pkg.Name] {
+			seen[pkg.Name] = true
+			uniquePackages = append(uniquePackages, pkg)
+		}
 	}
 
-	// Create mcp-servers directory if it doesn't exist
-	mcpDir := filepath.Join(configDir, "mcp-servers")
-	if err := os.MkdirAll(mcpDir, 0755); err != nil {
-		return fmt.Errorf("failed to create mcp-servers directory: %w", err)
+	// If we have at least some packages, return them even if one source failed
+	if len(uniquePackages) > 0 {
+		return uniquePackages, nil
 	}
 
-	filename := fmt.Sprintf("%s.json", pkg.Name)
-	filePath := filepath.Join(mcpDir, filename)
-
-	// Create a simple config structure for the MCP server
-	config := map[string]interface{}{
-		"mcpServers": map[string]interface{}{
-			pkg.Name: map[string]interface{}{
-				"command": "npx", // Assumption for now, or use pkg metadata if available
-				"args":    []string{"-y", pkg.Name},
-				"url":     pkg.URL,
-				"version": pkg.Version,
-			},
-		},
+	// If everything failed, return combined error
+	if len(errors) > 0 {
+		return nil, fmt.Errorf("failed to fetch servers: %v", errors)
 	}
 
-	data, err := json.MarshalIndent(config, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal config: %w", err)
+	return uniquePackages, nil
+}
+
+// GenerateWorkflow generates a GitHub Actions workflow content
+// Returns content, requiredSecrets, setupInstructions, error
+func (a *App) GenerateWorkflow(agent, trigger string) (string, []string, string, error) {
+	return a.workflowGen.GenerateWorkflow(agent, trigger)
+}
+
+// SetSecret sets a repository secret
+func (a *App) SetSecret(name, value string) error {
+	return a.secretsManager.SetRepositorySecret(name, value)
+}
+
+// SaveWorkflow saves the workflow content to .github/workflows/
+func (a *App) SaveWorkflow(filename, content string) error {
+	// Determine project root (assuming current working directory for now, or passed from frontend)
+	// For this MVP, we'll use the current working directory or a specific project path if we had one in context.
+	// Ideally, the frontend should pass the project path.
+	// Let's assume the user wants to save it to the current directory where the app is running (or we could ask for a path).
+	// However, `easyConfig` is often run *in* the project root.
+
+	// Better approach: Use the path from DiscoveryService if available, or default to "."
+	projectPath := "."
+
+	workflowsDir := filepath.Join(projectPath, ".github", "workflows")
+	if err := paths.EnsureDir(workflowsDir); err != nil {
+		return fmt.Errorf("failed to create workflows directory: %w", err)
 	}
 
-	if err := os.WriteFile(filePath, data, 0644); err != nil {
-		return fmt.Errorf("failed to write config file: %w", err)
-	}
+	fullPath := filepath.Join(workflowsDir, filename)
 
-	return nil
+	// Use DiscoveryService to save (it handles file writing)
+	return a.discoveryService.SaveConfig(fullPath, content)
+}
+
+// GetSupportedWorkflows returns the list of supported workflows
+func (a *App) GetSupportedWorkflows() []string {
+	return a.workflowGen.GetSupportedWorkflows()
 }

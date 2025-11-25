@@ -1,4 +1,4 @@
-import { Box, FileJson, Plus, Trash2 } from "lucide-react";
+import { Box, FileJson, Plus, Trash2, LayoutGrid, Workflow, Store } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,9 +10,11 @@ interface SidebarProps {
   items: config.Item[];
   onSelect: (item: config.Item) => void;
   onAdd: () => void;
+  currentView: "configs" | "workflows" | "marketplace";
+  onViewChange: (view: "configs" | "workflows" | "marketplace") => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
+const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd, currentView, onViewChange }) => {
   const { deleteConfig } = useConfig();
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
@@ -30,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
 
   const handleItemClick = (item: config.Item) => {
     setSelectedPath(item.path);
+    onViewChange("configs"); // Switch to configs view when selecting a file
     onSelect(item);
   };
 
@@ -41,7 +44,6 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
         toast.success("Configuration deleted");
         if (selectedPath === item.path) {
           setSelectedPath(null);
-          // Optionally clear editor content via parent callback, but simpler to just deselect
         }
       } catch (err) {
         toast.error("Failed to delete configuration");
@@ -51,45 +53,67 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd }) => {
 
   return (
     <div className="sidebar">
+      <div className="sidebar-section">
+        <h3 className="sidebar-section-title">Menu</h3>
+        <div 
+          className={`sidebar-nav-item ${currentView === "configs" && !selectedPath ? "active" : ""}`}
+          onClick={() => {
+            onViewChange("configs");
+            setSelectedPath(null); // Deselect specific file to show dashboard/empty state
+          }}
+        >
+          <LayoutGrid size={18} />
+          <span>Dashboard</span>
+        </div>
+        <div 
+          className={`sidebar-nav-item ${currentView === "workflows" ? "active" : ""}`}
+          onClick={() => onViewChange("workflows")}
+        >
+          <Workflow size={18} />
+          <span>Workflows</span>
+        </div>
+        <div 
+          className={`sidebar-nav-item ${currentView === "marketplace" ? "active" : ""}`}
+          onClick={() => onViewChange("marketplace")}
+        >
+          <Store size={18} />
+          <span>Marketplace</span>
+        </div>
+      </div>
+
+      <div className="sidebar-divider" />
+
       <div className="sidebar-header">
-        <h2 className="sidebar-title">Configuration Files</h2>
-        <button className="btn-add" onClick={onAdd} title="Add Configuration">
-          <Plus size={18} />
+        <h2 className="sidebar-title">Configurations</h2>
+        <button className="btn-icon" onClick={onAdd} title="Add Configuration">
+          <Plus size={16} />
         </button>
       </div>
+      
       <div className="sidebar-content">
         {Object.entries(groupedItems).map(([provider, providerItems]) => (
           <div key={provider} className="sidebar-group">
             <div className="sidebar-group-header">
-              <Box size={16} className="sidebar-group-icon" />
               <span className="sidebar-group-title">{provider}</span>
             </div>
             <div className="sidebar-group-items">
               {providerItems.map((item) => (
                 <div
                   key={item.path}
-                  className={`sidebar-item ${selectedPath === item.path ? "sidebar-item-active" : ""}`}
+                  className={`sidebar-item ${selectedPath === item.path && currentView === "configs" ? "sidebar-item-active" : ""}`}
                   onClick={() => handleItemClick(item)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      handleItemClick(item);
-                    }
-                  }}
                   role="button"
                   tabIndex={0}
                 >
-                  <FileJson size={16} className="sidebar-item-icon" />
-                  <div className="sidebar-item-content">
-                    <div className="sidebar-item-name">{item.name}</div>
-                    <div className="sidebar-item-path">{item.path}</div>
-                  </div>
+                  <FileJson size={14} className="sidebar-item-icon" />
+                  <span className="sidebar-item-name">{item.name}</span>
                   <button
                     type="button"
-                    className="btn-delete"
+                    className="btn-delete-icon"
                     onClick={(e) => handleDelete(e, item)}
                     title="Delete"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={12} />
                   </button>
                 </div>
               ))}

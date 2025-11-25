@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -69,19 +70,22 @@ func (p *GitProvider) Discover(projectPath string) ([]Item, error) {
 		}
 	}
 
-	// 2. System Config (/etc/gitconfig)
-	// Note: Windows path differs, usually in Program Files, skipping for simplicity/Linux focus
-	sysPath := "/etc/gitconfig"
-	if FileExists(sysPath) {
-		items = append(items, Item{
-			Provider: p.Name(),
-			Name:     "System Config",
-			FileName: "gitconfig",
-			Path:     sysPath,
-			Scope:    ScopeSystem,
-			Format:   FormatINI,
-			Exists:   true,
-		})
+	// 2. System Config
+	// Windows path differs, usually in Program Files.
+	// We only check /etc/gitconfig on non-Windows systems for now.
+	if runtime.GOOS != "windows" {
+		sysPath := "/etc/gitconfig"
+		if FileExists(sysPath) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "System Config",
+				FileName: "gitconfig",
+				Path:     sysPath,
+				Scope:    ScopeSystem,
+				Format:   FormatINI,
+				Exists:   true,
+			})
+		}
 	}
 
 	// 3. Project Config (.git/config)

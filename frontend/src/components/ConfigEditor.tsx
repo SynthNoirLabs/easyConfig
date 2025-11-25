@@ -1,11 +1,13 @@
 import Editor from "@monaco-editor/react";
-import { RefreshCw, RotateCcw, Save } from "lucide-react";
+import { RefreshCw, RotateCcw, Save, Code, LayoutTemplate } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner"; // Import sonner toast
 import { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
 import "./ConfigEditor.css";
+import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
+import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
 
 interface ConfigEditorProps {
   configItem: config.Item;
@@ -35,6 +37,21 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<"code" | "form">("code");
+
+  // Determine if a specific editor is available
+  const hasSpecificEditor = 
+    (configItem.provider === "Claude Code" && configItem.fileName === "claude_desktop_config.json") ||
+    (configItem.provider === "OpenCode" && configItem.fileName === "opencode.json");
+
+  useEffect(() => {
+    // Default to form view if available
+    if (hasSpecificEditor) {
+      setViewMode("form");
+    } else {
+      setViewMode("code");
+    }
+  }, [configItem.provider, configItem.fileName, hasSpecificEditor]);
 
   const loadFile = useCallback(async () => {
     setIsLoading(true);
@@ -118,6 +135,27 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <span className="file-path">{configItem.path}</span>
         </div>
         <div className="editor-actions">
+          {hasSpecificEditor && (
+            <>
+              <div className="view-toggle">
+                <button
+                  className={`btn-toggle ${viewMode === "code" ? "active" : ""}`}
+                  onClick={() => setViewMode("code")}
+                  title="Code View"
+                >
+                  <Code size={16} />
+                </button>
+                <button
+                  className={`btn-toggle ${viewMode === "form" ? "active" : ""}`}
+                  onClick={() => setViewMode("form")}
+                  title="Form View"
+                >
+                  <LayoutTemplate size={16} />
+                </button>
+              </div>
+              <div className="separator" />
+            </>
+          )}
           <button
             type="button"
             className="btn-secondary"
@@ -154,6 +192,12 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <div className="editor-loading">Loading...</div>
         ) : error ? (
           <div className="editor-error">{error}</div>
+        ) : viewMode === "form" && hasSpecificEditor ? (
+          configItem.provider === "Claude Code" ? (
+            <ClaudeConfigEditor content={content} onChange={handleEditorChange} />
+          ) : (
+            <OpenCodeConfigEditor content={content} onChange={handleEditorChange} />
+          )
         ) : (
           <Editor
             height="100%"
