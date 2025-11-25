@@ -12,6 +12,7 @@ import (
 	"easyConfig/pkg/schema"
 	"easyConfig/pkg/util/paths"
 	"easyConfig/pkg/watcher"
+	"easyConfig/pkg/workflows"
 )
 
 // App struct
@@ -22,6 +23,7 @@ type App struct {
 	installer        *install.Installer
 	smitheryClient   *marketplaces.SmitheryClient
 	awesomeClient    *marketplaces.AwesomeClient
+	workflowGen      *workflows.Generator
 }
 
 // NewApp creates a new App application struct
@@ -38,6 +40,7 @@ func (a *App) startup(ctx context.Context) {
 	a.installer = install.NewInstaller()
 	a.smitheryClient = marketplaces.NewSmitheryClient()
 	a.awesomeClient = marketplaces.NewAwesomeClient()
+	a.workflowGen = workflows.NewGenerator()
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -195,4 +198,36 @@ func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
 	}
 
 	return uniquePackages, nil
+}
+
+// GenerateWorkflow generates a GitHub Actions workflow content
+func (a *App) GenerateWorkflow(agent, trigger string) (string, error) {
+	return a.workflowGen.GenerateWorkflow(agent, trigger)
+}
+
+// SaveWorkflow saves the workflow content to .github/workflows/
+func (a *App) SaveWorkflow(filename, content string) error {
+	// Determine project root (assuming current working directory for now, or passed from frontend)
+	// For this MVP, we'll use the current working directory or a specific project path if we had one in context.
+	// Ideally, the frontend should pass the project path.
+	// Let's assume the user wants to save it to the current directory where the app is running (or we could ask for a path).
+	// However, `easyConfig` is often run *in* the project root.
+
+	// Better approach: Use the path from DiscoveryService if available, or default to "."
+	projectPath := "."
+
+	workflowsDir := filepath.Join(projectPath, ".github", "workflows")
+	if err := paths.EnsureDir(workflowsDir); err != nil {
+		return fmt.Errorf("failed to create workflows directory: %w", err)
+	}
+
+	fullPath := filepath.Join(workflowsDir, filename)
+
+	// Use DiscoveryService to save (it handles file writing)
+	return a.discoveryService.SaveConfig(fullPath, content)
+}
+
+// GetSupportedWorkflows returns the list of supported workflows
+func (a *App) GetSupportedWorkflows() []string {
+	return a.workflowGen.GetSupportedWorkflows()
 }

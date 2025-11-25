@@ -1,0 +1,106 @@
+.workflows-container {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  padding: 20px;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.control-group label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.control-group select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.preview-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.preview-header {
+  display: flex;
+  gap: 10px;
+}
+
+.preview-header input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.code-preview {
+  flex: 1;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 13px;
+  resize: none;
+  line-height: 1.5;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-primary:disabled {
+  background-color: var(--border-color);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: var(--hover-color);
+}

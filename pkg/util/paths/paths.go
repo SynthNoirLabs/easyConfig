@@ -40,3 +40,8 @@ func GetConfigDir(appName string) string {
 	}
 	return "" // Fallback if no specific directory can be determined
 }
+
+// EnsureDir ensures that a directory exists, creating it if necessary.
+func EnsureDir(path string) error {
+	return os.MkdirAll(path, 0755)
+}
