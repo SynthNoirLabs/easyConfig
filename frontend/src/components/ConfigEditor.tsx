@@ -2,6 +2,7 @@ import Editor from "@monaco-editor/react";
 import { Save } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner"; // Import sonner toast
 import type { config } from "../../wailsjs/go/config/models";
 import { useConfig } from "../context/ConfigContext";
 import "./ConfigEditor.css";
@@ -43,8 +44,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
       setIsDirty(false);
     } catch (err) {
       console.error("Error loading file:", err);
+      toast.error("Failed to load file content."); // Use toast for error
       setError(
-        "Failed to load file content. Please check if the backend is running.",
+        err instanceof Error ? err.message : "Failed to load configurations",
       );
       if (String(err).includes("window.go")) {
         setContent(
@@ -65,12 +67,11 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Basic JSON validation
       if (configItem.format === "json") {
         try {
           JSON.parse(content);
         } catch (_e) {
-          alert("Invalid JSON format. Please fix errors before saving.");
+          toast.error("Invalid JSON format. Please fix errors before saving."); // Use toast for error
           setIsSaving(false);
           return;
         }
@@ -78,9 +79,10 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
 
       await saveConfig(configItem.path, content);
       setIsDirty(false);
+      toast.success("Configuration saved successfully!"); // Use toast for success
     } catch (err) {
       console.error("Error saving file:", err);
-      alert(`Failed to save file: ${err}`);
+      toast.error(err instanceof Error ? err.message : "Failed to save file."); // Use toast for error
     } finally {
       setIsSaving(false);
     }
