@@ -25,6 +25,7 @@ func NewDiscoveryService() *DiscoveryService {
 			&CodexProvider{},
 			&OpenCodeProvider{},
 			&CrushProvider{},
+			&GitProvider{},
 		},
 	}
 	return ds
