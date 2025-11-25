@@ -18,6 +18,9 @@ const PROVIDERS = [
   "OpenCode",
   "Crush CLI",
   "Jules",
+  "Git",
+  "Aider",
+  "Goose",
 ];
 
 const SCOPES = [

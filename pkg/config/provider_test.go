@@ -497,3 +497,59 @@ func TestGitProvider_Discover(t *testing.T) {
 		t.Errorf("Expected %d config items, got %d", expectedCount, len(items))
 	}
 }
+
+func TestAiderProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	tempProject := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global: ~/.aider.conf.yml
+	if err := os.WriteFile(filepath.Join(tempHome, ".aider.conf.yml"), []byte("model: gpt-4"), 0o600); err != nil {
+		t.Fatalf("Failed to write global aider config: %v", err)
+	}
+
+	// Project: .aider.conf.yml
+	if err := os.WriteFile(filepath.Join(tempProject, ".aider.conf.yml"), []byte("model: gpt-3.5"), 0o600); err != nil {
+		t.Fatalf("Failed to write project aider config: %v", err)
+	}
+
+	provider := &AiderProvider{}
+	items, err := provider.Discover(tempProject)
+	if err != nil {
+		t.Fatalf("AiderProvider.Discover failed: %v", err)
+	}
+
+	// Expecting: Global, Project
+	if len(items) != 2 {
+		t.Errorf("Expected 2 config items, got %d", len(items))
+	}
+}
+
+func TestGooseProvider_Discover(t *testing.T) {
+	tempHome := t.TempDir()
+	originalHome := os.Getenv("HOME")
+	t.Setenv("HOME", tempHome)
+	defer os.Setenv("HOME", originalHome)
+
+	// Global: ~/.config/goose/config.yaml (Linux default)
+	// Using .config structure as GetConfigDir defaults to XDG or ~/.config on Linux/Unix
+	configDir := filepath.Join(tempHome, ".config", "goose")
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		t.Fatalf("Failed to create goose config dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(configDir, "config.yaml"), []byte("version: 1"), 0o600); err != nil {
+		t.Fatalf("Failed to write global goose config: %v", err)
+	}
+
+	provider := &GooseProvider{}
+	items, err := provider.Discover("") // Project path irrelevant for global only
+	if err != nil {
+		t.Fatalf("GooseProvider.Discover failed: %v", err)
+	}
+
+	if len(items) != 1 {
+		t.Errorf("Expected 1 config item, got %d", len(items))
+	}
+}
