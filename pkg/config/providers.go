@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 
 	"easyConfig/pkg/util/paths"
@@ -12,6 +14,38 @@ type ClaudeProvider struct{}
 
 func (p *ClaudeProvider) Name() string {
 	return "Claude Code"
+}
+
+func (p *ClaudeProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".claude", "settings.json")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, ".claude", "settings.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
 }
 
 func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
@@ -133,6 +167,38 @@ func (p *OpenCodeProvider) Name() string {
 	return "OpenCode"
 }
 
+func (p *OpenCodeProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		configDir := paths.GetConfigDir("opencode")
+		if configDir == "" {
+			return "", fmt.Errorf("config directory not found")
+		}
+		path = filepath.Join(configDir, "opencode.json")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, "opencode.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *OpenCodeProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
 
@@ -192,6 +258,38 @@ type CrushProvider struct{}
 
 func (p *CrushProvider) Name() string {
 	return "Crush CLI"
+}
+
+func (p *CrushProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		configDir := paths.GetConfigDir("crush")
+		if configDir == "" {
+			return "", fmt.Errorf("config directory not found")
+		}
+		path = filepath.Join(configDir, "crush.json")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, "crush.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
 }
 
 func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
@@ -284,6 +382,35 @@ func (p *CopilotProvider) Name() string {
 	return "GitHub Copilot"
 }
 
+func (p *CopilotProvider) Create(scope Scope, _ string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".copilot", "mcp-config.json")
+	case ScopeProject:
+		return "", fmt.Errorf("project creation not supported for Copilot yet")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *CopilotProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
 	home := paths.GetHomeDir()
@@ -330,6 +457,33 @@ func (p *OpenAIProvider) Name() string {
 	return "OpenAI"
 }
 
+func (p *OpenAIProvider) Create(scope Scope, _ string) (string, error) {
+	defaultContent := "version: 1\n"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		configDir := paths.GetConfigDir("openai")
+		if configDir == "" {
+			return "", fmt.Errorf("config directory not found")
+		}
+		path = filepath.Join(configDir, "config.yaml")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
+}
+
 func (p *OpenAIProvider) Discover(_ string) ([]Item, error) {
 	var items []Item
 
@@ -357,6 +511,33 @@ type JulesProvider struct{}
 
 func (p *JulesProvider) Name() string {
 	return "Jules"
+}
+
+func (p *JulesProvider) Create(scope Scope, _ string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".jules-mcp", "data.json")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
 }
 
 func (p *JulesProvider) Discover(projectPath string) ([]Item, error) {
@@ -404,6 +585,46 @@ type GeminiProvider struct{}
 
 func (p *GeminiProvider) Name() string {
 	return "Gemini"
+}
+
+func (p *GeminiProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "{}"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		// Standard location: ~/.gemini/settings.json
+		path = filepath.Join(home, ".gemini", "settings.json")
+
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required for project scope")
+		}
+		path = filepath.Join(projectPath, ".gemini", "settings.json")
+
+	default:
+		return "", fmt.Errorf("unsupported scope: %s", scope)
+	}
+
+	// Ensure directory exists
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Create file if it doesn't exist
+	if FileExists(path) {
+		return "", fmt.Errorf("file already exists: %s", path)
+	}
+
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to create file: %w", err)
+	}
+
+	return path, nil
 }
 
 func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
@@ -494,6 +715,38 @@ type CodexProvider struct{}
 
 func (p *CodexProvider) Name() string {
 	return "Codex CLI"
+}
+
+func (p *CodexProvider) Create(scope Scope, projectPath string) (string, error) {
+	defaultContent := "# Codex Config\n"
+	var path string
+
+	switch scope {
+	case ScopeGlobal:
+		home := paths.GetHomeDir()
+		if home == "" {
+			return "", fmt.Errorf("home directory not found")
+		}
+		path = filepath.Join(home, ".codex", "config.toml")
+	case ScopeProject:
+		if projectPath == "" {
+			return "", fmt.Errorf("project path is required")
+		}
+		path = filepath.Join(projectPath, ".codex", "config.toml")
+	default:
+		return "", fmt.Errorf("unsupported scope")
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create dir: %w", err)
+	}
+	if FileExists(path) {
+		return "", fmt.Errorf("file exists: %s", path)
+	}
+	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
+		return "", fmt.Errorf("failed to write: %w", err)
+	}
+	return path, nil
 }
 
 func (p *CodexProvider) Discover(projectPath string) ([]Item, error) {
