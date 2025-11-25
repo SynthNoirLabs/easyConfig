@@ -75,6 +75,15 @@ func (a *App) SaveConfig(path, content string) error {
 	return a.discoveryService.SaveConfig(path, content)
 }
 
+// DeleteConfig deletes a configuration file
+func (a *App) DeleteConfig(path string) error {
+	// Stop watching before delete to avoid error logs
+	if a.watcherService != nil {
+		_ = a.watcherService.Remove(path)
+	}
+	return a.discoveryService.DeleteConfig(path)
+}
+
 // CreateConfig creates a new configuration file
 func (a *App) CreateConfig(providerName, scope, projectPath string) (string, error) {
 	// Convert string scope to config.Scope

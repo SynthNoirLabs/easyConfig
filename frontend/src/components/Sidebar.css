@@ -63,10 +63,15 @@
   padding: 8px 20px;
   cursor: pointer;
   transition: background-color 0.2s;
+  position: relative;
 }
 
 .sidebar-item:hover {
   background-color: #f0f0f0;
+}
+
+.sidebar-item:hover .btn-delete {
+  opacity: 1;
 }
 
 .sidebar-item.active {
@@ -84,6 +89,27 @@
 .item-name {
   font-size: 14px;
   color: #333;
+}
+
+.btn-delete {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-delete:hover {
+  color: #d32f2f;
+  background-color: rgba(211, 47, 47, 0.1);
 }
 
 .no-items {

@@ -66,6 +66,21 @@ func (s *DiscoveryService) CreateConfig(providerName string, scope Scope, projec
 	return "", fmt.Errorf("provider not found: %s", providerName)
 }
 
+// DeleteConfig removes a configuration file from disk
+func (s *DiscoveryService) DeleteConfig(path string) error {
+	// Verify it's a file and exists
+	if !FileExists(path) {
+		return fmt.Errorf("file not found or is a directory: %s", path)
+	}
+
+	// Remove the file
+	if err := os.Remove(path); err != nil {
+		return fmt.Errorf("failed to delete file: %w", err)
+	}
+
+	return nil
+}
+
 // Helper: GetUserHome returns the user's home directory safely
 func GetUserHome() string {
 	home, err := os.UserHomeDir()

@@ -8,6 +8,8 @@ export function CreateConfig(
   arg3: string,
 ): Promise<string>;
 
+export function DeleteConfig(arg1: string): Promise<void>;
+
 export function DiscoverConfigs(
   arg1: string,
 ): Promise<Array<config.ConfigItem>>;
