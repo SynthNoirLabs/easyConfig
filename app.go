@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"easyConfig/pkg/config"
+	"easyConfig/pkg/install"
 	"easyConfig/pkg/schema"
 	"easyConfig/pkg/util/paths"
 	"easyConfig/pkg/watcher"
@@ -16,6 +17,7 @@ type App struct {
 	ctx              context.Context
 	discoveryService *config.DiscoveryService
 	watcherService   *watcher.Service
+	installer        *install.Installer
 }
 
 // NewApp creates a new App application struct
@@ -29,6 +31,7 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.discoveryService = config.NewDiscoveryService()
 	a.watcherService = watcher.NewService()
+	a.installer = install.NewInstaller()
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -111,4 +114,19 @@ func (a *App) FetchSchemas() error {
 
 	fetcher := schema.NewFetcher()
 	return fetcher.FetchAllSchemas(schemaDir)
+}
+
+// InstallMCPPackage installs an MCP server package
+func (a *App) InstallMCPPackage(packageName string) error {
+	// Get user's home directory to store the config
+	homeDir := paths.GetHomeDir()
+	if homeDir == "" {
+		return fmt.Errorf("could not determine home directory")
+	}
+
+	// Store MCP configs in ~/.config/easyConfig/mcp/
+	configDir := filepath.Join(homeDir, ".config", "easyConfig", "mcp")
+
+	// Install the package (with verification)
+	return a.installer.InstallPackage(a.ctx, packageName, configDir)
 }
