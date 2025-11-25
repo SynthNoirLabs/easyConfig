@@ -17,7 +17,7 @@ repos:
 
   # Web Hooks (Biome)
   - repo: https://github.com/biomejs/biome
-    rev: v1.8.3
+    rev: v1.9.4
     hooks:
       - id: biome
         # Check and apply safe fixes automatically

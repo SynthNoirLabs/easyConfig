@@ -23,6 +23,8 @@ func NewDiscoveryService() *DiscoveryService {
 			&CopilotProvider{},
 			&OpenAIProvider{},
 			&CodexProvider{},
+			&OpenCodeProvider{},
+			&CrushProvider{},
 		},
 	}
 	return ds

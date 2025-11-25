@@ -155,8 +155,8 @@ jobs:
         with:
           build-name: 'easyConfig'
           build-platform: ${{ matrix.build.platform }}
-          wails-version: 'v2.9.2'
-          go-version: '1.23'
+          wails-version: 'v2.11.0'
+          go-version: '1.24'
           node-version: '18.x'
           package: true
 

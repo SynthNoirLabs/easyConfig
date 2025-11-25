@@ -1,3 +1,4 @@
+import Editor from "@monaco-editor/react";
 import { Save } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -8,6 +9,22 @@ import "./ConfigEditor.css";
 interface ConfigEditorProps {
   configItem: config.ConfigItem;
 }
+
+const getLanguage = (format: string) => {
+  switch (format.toLowerCase()) {
+    case "json":
+      return "json";
+    case "yaml":
+    case "yml":
+      return "yaml";
+    case "toml":
+      return "ini"; // TOML syntax highlighting is not built-in, INI is closest
+    case "ini":
+      return "ini";
+    default:
+      return "plaintext";
+  }
+};
 
 const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const { readConfig, saveConfig } = useConfig();
@@ -21,8 +38,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     setIsLoading(true);
     setError(null);
     try {
-      // In mock mode (browser), this might fail if ReadConfig isn't mocked in window.go
-      // Ideally we should handle that gracefully or use mock data
       const text = await readConfig(configItem.path);
       setContent(text);
       setIsDirty(false);
@@ -31,7 +46,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
       setError(
         "Failed to load file content. Please check if the backend is running.",
       );
-      // For demo purposes in browser environment without backend:
       if (String(err).includes("window.go")) {
         setContent(
           `// Mock content for ${configItem.name}\n// Backend not connected.`,
@@ -72,8 +86,8 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     }
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
+  const handleEditorChange = (value: string | undefined) => {
+    setContent(value || "");
     setIsDirty(true);
   };
 
@@ -103,11 +117,19 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
         ) : error ? (
           <div className="editor-error">{error}</div>
         ) : (
-          <textarea
-            className="editor-textarea"
+          <Editor
+            height="100%"
+            defaultLanguage="plaintext"
+            language={getLanguage(configItem.format)}
             value={content}
-            onChange={handleTextChange}
-            spellCheck={false}
+            theme="vs-dark"
+            onChange={handleEditorChange}
+            options={{
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              fontSize: 14,
+              automaticLayout: true,
+            }}
           />
         )}
       </div>

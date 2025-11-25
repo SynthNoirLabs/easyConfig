@@ -5,11 +5,15 @@ run:
 linters-settings:
   gci:
     # Ensure imports are grouped: standard, default, and local prefixes
-    local-prefixes: github.com/komod0/easyConfig
+    sections:
+      - standard
+      - default
+      - prefix(easyConfig)
   gofumpt:
     extra-rules: true # Enforce stricter formatting
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   gocyclo:
     min-complexity: 15
   misspell:
@@ -29,10 +33,9 @@ linters:
     - unused
     # Style, Formatting, and Best Practices
     - bodyclose
-    - exportloopref
+    - copyloopvar
     - gci
     - gocyclo
-    - gofumpt
     - goimports
     - misspell
     - revive

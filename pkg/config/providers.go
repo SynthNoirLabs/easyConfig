@@ -45,19 +45,50 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 		}
 	}
 
-	// 3. System Settings (Linux)
-	sysSettings := "/etc/claude-code/managed-settings.json"
-	if FileExists(sysSettings) {
+	// 3. System Settings (Linux, macOS, Windows)
+	sysSettingsLinux := "/etc/claude-code/managed-settings.json"
+	if FileExists(sysSettingsLinux) {
 		items = append(items, Item{
 			Provider: p.Name(),
-			Name:     "Managed Settings",
+			Name:     "Managed Settings (Linux)",
 			FileName: "managed-settings.json",
-			Path:     sysSettings,
+			Path:     sysSettingsLinux,
 			Scope:    ScopeSystem,
 			Format:   FormatJSON,
 			Exists:   true,
 		})
 	}
+
+	// macOS System Settings
+	sysSettingsMac := "/Library/Application Support/ClaudeCode/managed-settings.json"
+	if FileExists(sysSettingsMac) {
+		items = append(items, Item{
+			Provider: p.Name(),
+			Name:     "Managed Settings (macOS)",
+			FileName: "managed-settings.json",
+			Path:     sysSettingsMac,
+			Scope:    ScopeSystem,
+			Format:   FormatJSON,
+			Exists:   true,
+		})
+	}
+
+	// Windows System Settings
+	// Note: Go's filepath.Join handles OS separators, but for absolute Windows paths we usually need environment variables.
+	// Hardcoding common path for now, ideal solution would check runtime.GOOS and use os.Getenv("ProgramData")
+	sysSettingsWin := "C:\\ProgramData\\ClaudeCode\\managed-settings.json"
+	if FileExists(sysSettingsWin) {
+		items = append(items, Item{
+			Provider: p.Name(),
+			Name:     "Managed Settings (Windows)",
+			FileName: "managed-settings.json",
+			Path:     sysSettingsWin,
+			Scope:    ScopeSystem,
+			Format:   FormatJSON,
+			Exists:   true,
+		})
+	}
+
 	sysMCP := "/etc/claude-code/managed-mcp.json"
 	if FileExists(sysMCP) {
 		items = append(items, Item{
@@ -114,6 +145,172 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 		}
 	}
 
+	return items, nil
+}
+
+// --- OpenCode Provider ---
+
+type OpenCodeProvider struct{}
+
+func (p *OpenCodeProvider) Name() string {
+	return "OpenCode"
+}
+
+func (p *OpenCodeProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
+	home := GetUserHome()
+
+	// 1. Global Config
+	// Linux/macOS: ~/.config/opencode/opencode.json
+	if home != "" {
+		path := filepath.Join(home, ".config", "opencode", "opencode.json")
+		if FileExists(path) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Global Config",
+				FileName: "opencode.json",
+				Path:     path,
+				Scope:    ScopeGlobal,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+	}
+
+	// 2. Project Config
+	if projectPath != "" {
+		// opencode.json
+		pathProj := filepath.Join(projectPath, "opencode.json")
+		if FileExists(pathProj) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Project Config",
+				FileName: "opencode.json",
+				Path:     pathProj,
+				Scope:    ScopeProject,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+		// opencode.local.json (Secrets)
+		pathLocal := filepath.Join(projectPath, "opencode.local.json")
+		if FileExists(pathLocal) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Local Secrets",
+				FileName: "opencode.local.json",
+				Path:     pathLocal,
+				Scope:    ScopeProject,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+	}
+	return items, nil
+}
+
+// --- Crush Provider ---
+
+type CrushProvider struct{}
+
+func (p *CrushProvider) Name() string {
+	return "Crush CLI"
+}
+
+func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
+	var items []Item
+	home := GetUserHome()
+
+	// 1. Global Config
+	if home != "" {
+		// Linux/macOS Main Config
+		pathMain := filepath.Join(home, ".config", "crush", "crush.json")
+		if FileExists(pathMain) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Global Config",
+				FileName: "crush.json",
+				Path:     pathMain,
+				Scope:    ScopeGlobal,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+
+		// Linux/macOS Providers Config
+		pathProviders := filepath.Join(home, ".config", "crush", "providers.json")
+		if FileExists(pathProviders) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Global Providers",
+				FileName: "providers.json",
+				Path:     pathProviders,
+				Scope:    ScopeGlobal,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+
+		// Windows Config (Approximation without runtime.GOOS check logic here)
+		// %LOCALAPPDATA%\crush\crush.json -> usually C:\Users\<User>\AppData\Local\crush\crush.json
+		pathWin := filepath.Join(home, "AppData", "Local", "crush", "crush.json")
+		if FileExists(pathWin) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Global Config (Windows)",
+				FileName: "crush.json",
+				Path:     pathWin,
+				Scope:    ScopeGlobal,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+	}
+
+	// 2. Project Config
+	if projectPath != "" {
+		// .crush.json (Hidden)
+		pathHidden := filepath.Join(projectPath, ".crush.json")
+		if FileExists(pathHidden) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Project Config (Hidden)",
+				FileName: ".crush.json",
+				Path:     pathHidden,
+				Scope:    ScopeProject,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+
+		// crush.json (Visible)
+		pathVisible := filepath.Join(projectPath, "crush.json")
+		if FileExists(pathVisible) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Project Config",
+				FileName: "crush.json",
+				Path:     pathVisible,
+				Scope:    ScopeProject,
+				Format:   FormatJSON,
+				Exists:   true,
+			})
+		}
+
+		// .crushignore
+		pathIgnore := filepath.Join(projectPath, ".crushignore")
+		if FileExists(pathIgnore) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Ignore File",
+				FileName: ".crushignore",
+				Path:     pathIgnore,
+				Scope:    ScopeProject,
+				Format:   FormatTXT,
+				Exists:   true,
+			})
+		}
+	}
 	return items, nil
 }
 
