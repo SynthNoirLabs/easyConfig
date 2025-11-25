@@ -39,6 +39,9 @@ This file serves as the Master Backlog. Agents (Jules, Claude, etc.) should look
 - [x] **Config Editor**: Create a text editor component to view/edit config content.
 
 ## 🚀 Phase 5: Advanced Features
-- [ ] **MCP Injector**: Logic to parse `mcpServers` block and inject a new server entry.
-- [ ] **File Watcher**: Auto-reload configs when changed on disk (fsnotify).
+- [ ] **MCP Injector**: Logic to parse `mcpServers` block and inject a new server entry. (In Progress - Issue #34)
+- [ ] **File Watcher**: Auto-reload configs when changed on disk (fsnotify). (In Progress - Issue #35)
 - [ ] **Auto-Schema Fetcher**: Scrape official docs/repos to update local references.
+- [ ] **Add Config Wizard**: Create new config files from templates via UI.
+- [ ] **Toast Notifications**: Replace alerts with non-blocking notifications.
+- [ ] **Cross-Platform Paths**: Refactor path logic into `pkg/util/paths`.
