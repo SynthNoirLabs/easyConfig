@@ -1,3 +1,4 @@
+import { Toaster } from "sonner";
 import { useState } from "react";
 import "./App.css";
 import type { config } from "../wailsjs/go/config/models";
@@ -49,7 +50,12 @@ function AppContent() {
 }
 
 function App() {
-  return <AppContent />;
+  return (
+    <>
+      <Toaster richColors />
+      <AppContent />
+    </>
+  );
 }
 
 export default App;
