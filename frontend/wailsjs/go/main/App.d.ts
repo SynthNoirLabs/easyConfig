@@ -12,6 +12,8 @@ export function DiscoverConfigs(
   arg1: string,
 ): Promise<Array<config.ConfigItem>>;
 
+export function FetchSchemas(): Promise<void>;
+
 export function Greet(arg1: string): Promise<string>;
 
 export function ReadConfig(arg1: string): Promise<string>;

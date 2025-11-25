@@ -10,6 +10,10 @@ export function DiscoverConfigs(arg1) {
   return window['go']['main']['App']['DiscoverConfigs'](arg1);
 }
 
+export function FetchSchemas() {
+  return window['go']['main']['App']['FetchSchemas']();
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
