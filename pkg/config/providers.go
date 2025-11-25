@@ -154,6 +154,40 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 				Exists:   true,
 			})
 		}
+
+		// Project Subagents (.claude/agents/*.md)
+		projectSubagentsPath := filepath.Join(projectPath, ".claude", "agents", "*.md")
+		if matches, err := filepath.Glob(projectSubagentsPath); err == nil {
+			for _, match := range matches {
+				items = append(items, Item{
+					Provider: p.Name(),
+					Name:     "Subagent: " + filepath.Base(match),
+					FileName: filepath.Base(match),
+					Path:     match,
+					Scope:    ScopeProject,
+					Format:   FormatMD,
+					Exists:   true,
+				})
+			}
+		}
+	}
+
+	// Global Subagents (~/.claude/agents/*.md)
+	if home != "" {
+		globalSubagentsPath := filepath.Join(home, ".claude", "agents", "*.md")
+		if matches, err := filepath.Glob(globalSubagentsPath); err == nil {
+			for _, match := range matches {
+				items = append(items, Item{
+					Provider: p.Name(),
+					Name:     "Subagent: " + filepath.Base(match),
+					FileName: filepath.Base(match),
+					Path:     match,
+					Scope:    ScopeGlobal,
+					Format:   FormatMD,
+					Exists:   true,
+				})
+			}
+		}
 	}
 
 	return items, nil

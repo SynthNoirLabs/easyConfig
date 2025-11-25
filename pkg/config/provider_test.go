@@ -527,29 +527,54 @@ func TestAiderProvider_Discover(t *testing.T) {
 	}
 }
 
-func TestGooseProvider_Discover(t *testing.T) {
+func TestClaudeProvider_DiscoverSubagents(t *testing.T) {
 	tempHome := t.TempDir()
+	tempProject := t.TempDir()
 	originalHome := os.Getenv("HOME")
 	t.Setenv("HOME", tempHome)
 	defer os.Setenv("HOME", originalHome)
 
-	// Global: ~/.config/goose/config.yaml (Linux default)
-	// Using .config structure as GetConfigDir defaults to XDG or ~/.config on Linux/Unix
-	configDir := filepath.Join(tempHome, ".config", "goose")
-	if err := os.MkdirAll(configDir, 0o755); err != nil {
-		t.Fatalf("Failed to create goose config dir: %v", err)
+	// Setup Global Subagent
+	globalAgentDir := filepath.Join(tempHome, ".claude", "agents")
+	if err := os.MkdirAll(globalAgentDir, 0o755); err != nil {
+		t.Fatalf("Failed to create global agent dir: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(configDir, "config.yaml"), []byte("version: 1"), 0o600); err != nil {
-		t.Fatalf("Failed to write global goose config: %v", err)
+	if err := os.WriteFile(filepath.Join(globalAgentDir, "my-global-agent.md"), []byte("---"), 0o600); err != nil {
+		t.Fatalf("Failed to write global subagent: %v", err)
 	}
 
-	provider := &GooseProvider{}
-	items, err := provider.Discover("") // Project path irrelevant for global only
+	// Setup Project Subagent
+	projectAgentDir := filepath.Join(tempProject, ".claude", "agents")
+	if err := os.MkdirAll(projectAgentDir, 0o755); err != nil {
+		t.Fatalf("Failed to create project agent dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(projectAgentDir, "my-project-agent.md"), []byte("---"), 0o600); err != nil {
+		t.Fatalf("Failed to write project subagent: %v", err)
+	}
+
+	provider := &ClaudeProvider{}
+	items, err := provider.Discover(tempProject)
 	if err != nil {
-		t.Fatalf("GooseProvider.Discover failed: %v", err)
+		t.Fatalf("ClaudeProvider.Discover failed: %v", err)
 	}
 
-	if len(items) != 1 {
-		t.Errorf("Expected 1 config item, got %d", len(items))
+	// Expecting at least existing configs + 2 subagents
+	// The exact number depends on other discoveries, but we check for subagents explicitly
+	globalSubagentFound := false
+	projectSubagentFound := false
+	for _, item := range items {
+		if item.Provider == "Claude Code" && item.Scope == ScopeGlobal && item.Name == "Subagent: my-global-agent.md" {
+			globalSubagentFound = true
+		}
+		if item.Provider == "Claude Code" && item.Scope == ScopeProject && item.Name == "Subagent: my-project-agent.md" {
+			projectSubagentFound = true
+		}
+	}
+
+	if !globalSubagentFound {
+		t.Error("Expected to find global subagent, but didn't")
+	}
+	if !projectSubagentFound {
+		t.Error("Expected to find project subagent, but didn't")
 	}
 }
