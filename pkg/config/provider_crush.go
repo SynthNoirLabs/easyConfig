@@ -50,6 +50,13 @@ func (p *CrushProvider) Create(scope Scope, projectPath string) (string, error) 
 
 func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
+	seen := map[string]bool{}
+	add := func(it Item) {
+		if !seen[it.Path] {
+			items = append(items, it)
+			seen[it.Path] = true
+		}
+	}
 
 	// 1. Global Config
 	configDir := paths.GetConfigDir("crush")
@@ -57,7 +64,7 @@ func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
 		// Main Config
 		pathMain := filepath.Join(configDir, "crush.json")
 		if FileExists(pathMain) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Global Config",
 				FileName: "crush.json",
@@ -71,7 +78,7 @@ func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
 		// Providers Config
 		pathProviders := filepath.Join(configDir, "providers.json")
 		if FileExists(pathProviders) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Global Providers",
 				FileName: "providers.json",
@@ -85,44 +92,29 @@ func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
 
 	// 2. Project Config
 	if projectPath != "" {
-		// .crush.json (Hidden)
-		pathHidden := filepath.Join(projectPath, ".crush.json")
-		if FileExists(pathHidden) {
-			items = append(items, Item{
+		paths, _ := fastWalk(projectPath, 4, func(path string, d os.DirEntry) bool {
+			if d.IsDir() {
+				return false
+			}
+			base := filepath.Base(path)
+			return base == "crush.json" || base == ".crush.json" || base == ".crushignore"
+		})
+		for _, pth := range paths {
+			name := "Project Config"
+			format := FormatJSON
+			if filepath.Base(pth) == ".crushignore" {
+				name = "Ignore File"
+				format = FormatTXT
+			} else if filepath.Base(pth) == ".crush.json" {
+				name = "Project Config (Hidden)"
+			}
+			add(Item{
 				Provider: p.Name(),
-				Name:     "Project Config (Hidden)",
-				FileName: ".crush.json",
-				Path:     pathHidden,
+				Name:     name,
+				FileName: filepath.Base(pth),
+				Path:     pth,
 				Scope:    ScopeProject,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
-		}
-
-		// crush.json (Visible)
-		pathVisible := filepath.Join(projectPath, "crush.json")
-		if FileExists(pathVisible) {
-			items = append(items, Item{
-				Provider: p.Name(),
-				Name:     "Project Config",
-				FileName: "crush.json",
-				Path:     pathVisible,
-				Scope:    ScopeProject,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
-		}
-
-		// .crushignore
-		pathIgnore := filepath.Join(projectPath, ".crushignore")
-		if FileExists(pathIgnore) {
-			items = append(items, Item{
-				Provider: p.Name(),
-				Name:     "Ignore File",
-				FileName: ".crushignore",
-				Path:     pathIgnore,
-				Scope:    ScopeProject,
-				Format:   FormatTXT,
+				Format:   format,
 				Exists:   true,
 			})
 		}

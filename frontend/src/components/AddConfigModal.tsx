@@ -1,6 +1,7 @@
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CreateConfig } from "../../wailsjs/go/main/App";
+import { useConfig } from "../context/ConfigContext";
 import "./AddConfigModal.css";
 
 interface AddConfigModalProps {
@@ -9,7 +10,7 @@ interface AddConfigModalProps {
   onSuccess: () => void;
 }
 
-const PROVIDERS = [
+const DEFAULT_PROVIDERS = [
   "Claude Code",
   "Gemini",
   "OpenAI",
@@ -33,10 +34,25 @@ const AddConfigModal: React.FC<AddConfigModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const [provider, setProvider] = useState(PROVIDERS[0]);
+  const { configs } = useConfig();
+  const providerOptions = useMemo(() => {
+    const discovered = Array.from(new Set(configs.map((c) => c.provider)));
+    const combined = [...DEFAULT_PROVIDERS, ...discovered];
+    return Array.from(new Set(combined));
+  }, [configs]);
+
+  const [provider, setProvider] = useState(
+    providerOptions[0] ?? DEFAULT_PROVIDERS[0],
+  );
   const [scope, setScope] = useState(SCOPES[0].value);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!providerOptions.includes(provider)) {
+      setProvider(providerOptions[0] ?? DEFAULT_PROVIDERS[0]);
+    }
+  }, [providerOptions, provider]);
 
   if (!isOpen) return null;
 
@@ -64,7 +80,7 @@ const AddConfigModal: React.FC<AddConfigModalProps> = ({
       <div className="modal-content">
         <div className="modal-header">
           <h3>Add Configuration</h3>
-          <button className="btn-close" onClick={onClose}>
+          <button type="button" className="btn-close" onClick={onClose}>
             &times;
           </button>
         </div>
@@ -79,7 +95,7 @@ const AddConfigModal: React.FC<AddConfigModalProps> = ({
                 value={provider}
                 onChange={(e) => setProvider(e.target.value)}
               >
-                {PROVIDERS.map((p) => (
+                {providerOptions.map((p) => (
                   <option key={p} value={p}>
                     {p}
                   </option>

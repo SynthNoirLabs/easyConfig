@@ -1,0 +1,6 @@
+provider=codex
+fetched_at=2025-11-30
+urls:
+  - https://developers.openai.com/codex/local-config/
+  - https://developers.openai.com/codex/cli/reference/
+  - https://developers.openai.com/codex/cli/features/

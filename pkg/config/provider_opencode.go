@@ -50,48 +50,84 @@ func (p *OpenCodeProvider) Create(scope Scope, projectPath string) (string, erro
 
 func (p *OpenCodeProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
+	seen := map[string]bool{}
+	add := func(it Item) {
+		if !seen[it.Path] {
+			items = append(items, it)
+			seen[it.Path] = true
+		}
+	}
 
 	// 1. Global Config
 	// Linux/macOS: ~/.config/opencode/opencode.json
 	configDir := paths.GetConfigDir("opencode")
 	if configDir != "" {
-		path := filepath.Join(configDir, "opencode.json")
-		if FileExists(path) {
-			items = append(items, Item{
-				Provider: p.Name(),
-				Name:     "Global Config",
-				FileName: "opencode.json",
-				Path:     path,
-				Scope:    ScopeGlobal,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
+		for _, fname := range []string{"opencode.json", "opencode.jsonc"} {
+			path := filepath.Join(configDir, fname)
+			if FileExists(path) {
+				add(Item{
+					Provider: p.Name(),
+					Name:     "Global Config",
+					FileName: fname,
+					Path:     path,
+					Scope:    ScopeGlobal,
+					Format:   FormatJSON,
+					Exists:   true,
+				})
+			}
+		}
+	}
+
+	// 1b. OPENCODE_CONFIG env override
+	if cfgEnv := os.Getenv("OPENCODE_CONFIG"); cfgEnv != "" && FileExists(cfgEnv) {
+		add(Item{
+			Provider: p.Name(),
+			Name:     "Env Config",
+			FileName: filepath.Base(cfgEnv),
+			Path:     cfgEnv,
+			Scope:    ScopeGlobal,
+			Format:   FormatJSON,
+			Exists:   true,
+		})
+	}
+
+	// 1c. OPENCODE_CONFIG_DIR custom dir
+	if cfgDirEnv := os.Getenv("OPENCODE_CONFIG_DIR"); cfgDirEnv != "" {
+		for _, fname := range []string{"opencode.json", "opencode.jsonc"} {
+			path := filepath.Join(cfgDirEnv, fname)
+			if FileExists(path) {
+				add(Item{
+					Provider: p.Name(),
+					Name:     "Custom Config",
+					FileName: fname,
+					Path:     path,
+					Scope:    ScopeGlobal,
+					Format:   FormatJSON,
+					Exists:   true,
+				})
+			}
 		}
 	}
 
 	// 2. Project Config
 	if projectPath != "" {
-		// opencode.json
-		pathProj := filepath.Join(projectPath, "opencode.json")
-		if FileExists(pathProj) {
-			items = append(items, Item{
+		paths, _ := fastWalk(projectPath, 4, func(path string, d os.DirEntry) bool {
+			if d.IsDir() {
+				return false
+			}
+			base := filepath.Base(path)
+			return base == "opencode.json" || base == "opencode.jsonc" || base == "opencode.local.json"
+		})
+		for _, pth := range paths {
+			name := "Project Config"
+			if filepath.Base(pth) == "opencode.local.json" {
+				name = "Local Secrets"
+			}
+			add(Item{
 				Provider: p.Name(),
-				Name:     "Project Config",
-				FileName: "opencode.json",
-				Path:     pathProj,
-				Scope:    ScopeProject,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
-		}
-		// opencode.local.json (Secrets)
-		pathLocal := filepath.Join(projectPath, "opencode.local.json")
-		if FileExists(pathLocal) {
-			items = append(items, Item{
-				Provider: p.Name(),
-				Name:     "Local Secrets",
-				FileName: "opencode.local.json",
-				Path:     pathLocal,
+				Name:     name,
+				FileName: filepath.Base(pth),
+				Path:     pth,
 				Scope:    ScopeProject,
 				Format:   FormatJSON,
 				Exists:   true,

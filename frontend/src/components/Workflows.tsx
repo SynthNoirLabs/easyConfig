@@ -1,58 +1,70 @@
-import { useState, useEffect } from "react";
+import {
+  ArrowRight,
+  Bot,
+  Check,
+  Code2,
+  Github,
+  Search,
+  Terminal,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { GenerateWorkflow, SaveWorkflow, GetSupportedWorkflows, SetSecret } from "../../wailsjs/go/main/App";
-import { Bot, Terminal, Code2, Github, Check, ArrowRight } from "lucide-react";
+import {
+  ListWorkflowTemplates,
+  SaveWorkflow,
+  SetSecret,
+} from "../../wailsjs/go/main/App";
+import type { workflows } from "../../wailsjs/go/models";
 import "./Workflows.css";
 
 export default function Workflows() {
-  const [agents, setAgents] = useState<string[]>([]);
-  const [selectedAgent, setSelectedAgent] = useState("");
-  const [selectedTrigger, setSelectedTrigger] = useState("");
-  const [generatedContent, setGeneratedContent] = useState("");
+  const [templates, setTemplates] = useState<workflows.Template[]>([]);
+  const [filter, setFilter] = useState("");
+  const [selected, setSelected] = useState<workflows.Template | null>(null);
   const [filename, setFilename] = useState("");
-  
-  const [requiredSecrets, setRequiredSecrets] = useState<string[]>([]);
-  const [setupInstructions, setSetupInstructions] = useState("");
   const [secretValues, setSecretValues] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    loadSupportedWorkflows();
+  const requiredSecrets = selected?.requiredSecrets ?? [];
+  const setupInstructions = selected?.setupInstructions ?? "";
+  const generatedContent = selected?.content ?? "";
+
+  const loadTemplates = useCallback(async () => {
+    try {
+      const data = await ListWorkflowTemplates();
+      setTemplates(data);
+    } catch (_err) {
+      toast.error("Failed to load workflow templates");
+    }
   }, []);
 
-  const loadSupportedWorkflows = async () => {
-    try {
-      const workflows = await GetSupportedWorkflows();
-      setAgents(workflows);
-    } catch (err) {
-      toast.error("Failed to load supported workflows");
-    }
-  };
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
 
-  const handleGenerate = async (agent: string, trigger: string) => {
-    try {
-      const [content, secrets, instructions] = await GenerateWorkflow(agent, trigger);
-      setGeneratedContent(content);
-      setRequiredSecrets(secrets || []);
-      setSetupInstructions(instructions || "");
-      setSecretValues({}); 
-      
-      const agentLower = agent.toLowerCase();
-      const triggerLower = trigger.toLowerCase();
-      setFilename(`${agentLower}-${triggerLower}.yml`);
-      
-      toast.success("Workflow generated!");
-    } catch (err) {
-      toast.error("Failed to generate workflow: " + err);
-    }
+  const filtered = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    if (!q) return templates;
+    return templates.filter((t) =>
+      [t.name, t.description, t.agent, t.trigger, ...(t.tags || [])]
+        .filter(Boolean)
+        .some((v) => v.toLowerCase().includes(q)),
+    );
+  }, [filter, templates]);
+
+  const handleSelect = (tmpl: workflows.Template) => {
+    setSelected(tmpl);
+    setFilename(tmpl.defaultFilename || `${tmpl.id}.yml`);
+    setSecretValues({});
   };
 
   const handleSave = async () => {
+    if (!selected) return;
     if (!filename || !generatedContent) return;
     try {
       await SaveWorkflow(filename, generatedContent);
       toast.success(`Saved to .github/workflows/${filename}`);
     } catch (err) {
-      toast.error("Failed to save workflow: " + err);
+      toast.error(`Failed to save workflow: ${err}`);
     }
   };
 
@@ -65,88 +77,105 @@ export default function Workflows() {
     try {
       await SetSecret(secretName, value);
       toast.success(`Secret ${secretName} set successfully!`);
-      setSecretValues(prev => ({ ...prev, [secretName]: "" }));
+      setSecretValues((prev) => ({ ...prev, [secretName]: "" }));
     } catch (err) {
       toast.error(`Failed to set secret: ${err}`);
     }
   };
 
-  const parseOptions = () => {
-      return agents.map(a => {
-          const match = a.match(/(.+) \((.+)\)/);
-          if (match) {
-              return { label: a, agent: match[1], trigger: match[2] };
-          }
-          return { label: a, agent: a, trigger: "Manual" };
-      });
-  };
-
-  const options = parseOptions();
-
-  // Icons mapping
   const getIcon = (name: string) => {
-    if (name.includes("Claude")) return <Bot size={24} />;
-    if (name.includes("Jules")) return <Terminal size={24} />;
-    if (name.includes("Codex")) return <Code2 size={24} />;
-    if (name.includes("Copilot")) return <Github size={24} />;
+    if (name.toLowerCase().includes("claude")) return <Bot size={24} />;
+    if (name.toLowerCase().includes("jules")) return <Terminal size={24} />;
+    if (name.toLowerCase().includes("codex")) return <Code2 size={24} />;
+    if (name.toLowerCase().includes("copilot")) return <Github size={24} />;
     return <Bot size={24} />;
   };
 
   return (
     <div className="workflows-container">
       <div className="workflows-header">
-        <h2>Workflow Generator</h2>
-        <p>Automate your AI agents with GitHub Actions CI/CD pipelines.</p>
+        <div>
+          <h2>Workflow Gallery</h2>
+          <p>Pick a template, preview, and drop it into .github/workflows.</p>
+        </div>
+        <div className="search-box">
+          <Search size={18} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search by agent, trigger, or tag"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="search-input"
+          />
+        </div>
       </div>
 
-      {!generatedContent ? (
+      {!selected ? (
         <div className="agents-grid">
-          {options.map((opt, i) => (
-            <div 
-              key={i} 
+          {filtered.map((tmpl) => (
+            <button
+              type="button"
+              key={tmpl.id}
               className="agent-card"
-              onClick={() => {
-                setSelectedAgent(opt.agent);
-                setSelectedTrigger(opt.trigger);
-                handleGenerate(opt.agent, opt.trigger);
-              }}
+              onClick={() => handleSelect(tmpl)}
+              aria-label={`Select ${tmpl.name}`}
             >
-              <div className="agent-icon">
-                {getIcon(opt.agent)}
-              </div>
+              <div className="agent-icon">{getIcon(tmpl.agent)}</div>
               <div className="agent-info">
-                <h3>{opt.agent}</h3>
-                <span className="trigger-badge">{opt.trigger} Trigger</span>
+                <h3>{tmpl.name}</h3>
+                <span className="trigger-badge">{tmpl.trigger} trigger</span>
+                <p className="agent-desc">{tmpl.description}</p>
+                <div className="agent-tags">
+                  {tmpl.tags?.slice(0, 3).map((tag) => (
+                    <span key={tag} className="tag-chip">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
               <div className="agent-arrow">
                 <ArrowRight size={20} />
               </div>
-            </div>
+            </button>
           ))}
+          {filtered.length === 0 && (
+            <div className="empty-state">
+              <h3>No templates match that search</h3>
+              <p>Try a different keyword or clear the filter.</p>
+            </div>
+          )}
         </div>
       ) : (
         <div className="workflow-workspace">
-          <button className="btn-back" onClick={() => setGeneratedContent("")}>
-            ← Back to Agents
+          <button
+            type="button"
+            className="btn-back"
+            onClick={() => setSelected(null)}
+          >
+            ← Back to Gallery
           </button>
-          
+
           <div className="workflow-content">
             <div className="preview-section">
               <div className="preview-header">
-                <input 
-                  type="text" 
-                  value={filename} 
+                <input
+                  type="text"
+                  value={filename}
                   onChange={(e) => setFilename(e.target.value)}
                   className="input"
                 />
-                <button className="btn btn-primary" onClick={handleSave}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleSave}
+                >
                   <Check size={16} /> Save to Project
                 </button>
               </div>
-              <textarea 
-                className="code-preview" 
-                value={generatedContent} 
-                readOnly 
+              <textarea
+                className="code-preview"
+                value={generatedContent}
+                readOnly
               />
             </div>
 
@@ -161,21 +190,34 @@ export default function Workflows() {
               {requiredSecrets.length > 0 && (
                 <div className="secrets-box">
                   <h4>Required Secrets</h4>
-                  <p className="secrets-hint">Set these secrets in your repository.</p>
-                  
+                  <p className="secrets-hint">
+                    Set these secrets in your repository.
+                  </p>
+
                   <div className="secrets-list">
-                    {requiredSecrets.map(secret => (
+                    {requiredSecrets.map((secret) => (
                       <div key={secret} className="secret-item">
-                        <label>{secret}</label>
+                        <label
+                          htmlFor={`secret-${secret.replace(/[^a-zA-Z0-9_-]/g, "-")}`}
+                        >
+                          {secret}
+                        </label>
                         <div className="secret-input-group">
-                          <input 
-                            type="password" 
+                          <input
+                            id={`secret-${secret.replace(/[^a-zA-Z0-9_-]/g, "-")}`}
+                            type="password"
                             placeholder="Enter value..."
                             value={secretValues[secret] || ""}
-                            onChange={(e) => setSecretValues(prev => ({ ...prev, [secret]: e.target.value }))}
+                            onChange={(e) =>
+                              setSecretValues((prev) => ({
+                                ...prev,
+                                [secret]: e.target.value,
+                              }))
+                            }
                             className="input"
                           />
-                          <button 
+                          <button
+                            type="button"
                             className="btn btn-primary btn-sm"
                             onClick={() => handleSetSecret(secret)}
                           >

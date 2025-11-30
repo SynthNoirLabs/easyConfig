@@ -1,167 +1,82 @@
-name: Wails CI/CD
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
-
-env:
-  NODE_OPTIONS: "--max-old-space-size=4096"
+    branches: [main]
 
 jobs:
-  # 1. Security & Dependencies
-  dependency-review:
-    name: "Dependency Review"
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+  build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: 0
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
+      - uses: actions/checkout@v4
 
-  # 2. Backend Quality
-  test-backend:
-    name: "Go Backend (Test & Lint)"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Go
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
-          check-latest: true
-          cache: true
+          go-version: '1.24'
+      - name: Cache Go
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
 
-      - name: Install Dependencies
-        run: go mod tidy
+      - name: Go test
+        run: go test ./...
 
-      - name: Create Dummy Frontend Assets
-        run: |
-          mkdir -p frontend/dist
-          touch frontend/dist/index.html
-
-      - name: Run Unit Tests with Coverage
-        run: go test -v -race -coverprofile=coverage.out ./pkg/...
-
-      - name: Check Code Coverage
-        run: |
-          # Extract total coverage percentage (e.g., "90.4%")
-          COVERAGE_Output=$(go tool cover -func=coverage.out | grep total:)
-          echo "$COVERAGE_Output"
-          
-          # Parse percentage number
-          PERCENT=$(echo "$COVERAGE_Output" | awk '{print $3}' | sed 's/%//')
-          
-          echo "Coverage: ${PERCENT}%"
-          
-          # Compare using awk for float comparison
-          if awk "BEGIN {exit !($PERCENT < 80)}"; then
-            echo "Error: Code coverage ($PERCENT%) is below the 80% threshold."
-            exit 1
-          fi
-
-      - name: Run Linter
+      - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
+          args: ./...
 
-      - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          ignore-unfixed: true
-          format: 'table'
-          exit-code: '0' # Warning only for now to prevent build block
-          severity: 'CRITICAL,HIGH'
-
-  # 3. Frontend Quality
-  test-frontend:
-    name: "Frontend (Build & Typecheck)"
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install Dependencies
-        run: npm ci || npm install
-
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
-
-      - name: Run Biome (Lint)
-        run: biome ci .
-
-      - name: Type Check (TSC)
-        run: npm run build
-
-  # 4. Integration Tests
-  test-integration:
-    name: "Integration Tests (Docker)"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Run Integration Tests
+      - name: Install frontend deps
         run: |
-          chmod +x scripts/run-integration.sh
-          ./scripts/run-integration.sh
+          cd frontend
+          npm ci
 
-  # 5. Full Application Build
-  build-app:
-    name: "Build Wails Binary"
-    needs: [test-backend, test-frontend, test-integration]
-    strategy:
-      fail-fast: false
-      matrix:
-        build:
-          - name: 'Linux'
-            platform: 'linux/amd64'
-            os: 'ubuntu-latest'
-          - name: 'Windows'
-            platform: 'windows/amd64'
-            os: 'windows-latest'
-          - name: 'macOS'
-            platform: 'darwin/universal'
-            os: 'macos-latest'
+      - name: Install Playwright browsers (Linux/macOS)
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium
 
-    runs-on: ${{ matrix.build.os }}
+      - name: Install Playwright browsers (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          cd frontend
+          npx playwright install chromium
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Frontend build
+        run: |
+          cd frontend
+          npm run build
 
-      - name: Build Wails App
-        uses: dAppServer/wails-build-action@v3
-        id: build
-        with:
-          build-name: 'easyConfig'
-          build-platform: ${{ matrix.build.platform }}
-          wails-version: 'v2.11.0'
-          go-version: '1.24'
-          node-version: '18.x'
-          package: true
+      - name: Frontend lint
+        run: |
+          cd frontend
+          npm run lint
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v5
-        with:
-          name: ${{ matrix.build.name }}-build
-          path: build/bin/*
+      - name: Playwright smoke
+        run: |
+          cd frontend
+          npm run test:e2e

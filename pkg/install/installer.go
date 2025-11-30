@@ -77,16 +77,21 @@ func (i *Installer) VerifyPythonPackage(ctx context.Context, packageName string)
 
 	// Try uvx first
 	cmd := exec.CommandContext(ctx, "uvx", packageName, "--help")
-	output, err := cmd.CombinedOutput()
-	if err == nil {
+	firstOutput, firstErr := cmd.CombinedOutput()
+	if firstErr == nil {
 		return nil
 	}
 
 	// Fallback to uv tool run
 	cmd = exec.CommandContext(ctx, "uv", "tool", "run", packageName, "--help")
-	output, err = cmd.CombinedOutput()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("package verification failed: %w (output: %s)", err, string(output))
+		return fmt.Errorf(
+			"package verification failed: %w (uvx output: %s, uv output: %s)",
+			err,
+			string(firstOutput),
+			string(output),
+		)
 	}
 	return nil
 }

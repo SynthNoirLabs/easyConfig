@@ -21,6 +21,7 @@ func TestWatcherService(t *testing.T) {
 	if service == nil {
 		t.Fatal("Failed to create service")
 	}
+	service.SetEmitter(func(context.Context, string, ...interface{}) {})
 	defer service.Close()
 
 	// Test Add
@@ -53,6 +54,7 @@ func TestWatcherService_AddNonExistent(t *testing.T) {
 	if service == nil {
 		t.Fatal("Failed to create service")
 	}
+	service.SetEmitter(func(context.Context, string, ...interface{}) {})
 	defer service.Close()
 
 	// Try to watch a non-existent file
@@ -67,6 +69,7 @@ func TestWatcherService_StartAndClose(t *testing.T) {
 	if service == nil {
 		t.Fatal("Failed to create service")
 	}
+	service.SetEmitter(func(context.Context, string, ...interface{}) {})
 
 	// Create a context that we can cancel
 	ctx, cancel := context.WithCancel(context.Background())

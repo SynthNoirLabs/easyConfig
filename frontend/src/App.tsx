@@ -1,22 +1,25 @@
-import { Toaster, toast } from "sonner";
 import { useState } from "react";
+import { Toaster, toast } from "sonner";
 import "./App.css";
-import type { config } from "../wailsjs/go/config/models";
+import type { config } from "../wailsjs/go/models";
 import AddConfigModal from "./components/AddConfigModal";
 import ConfigEditor from "./components/ConfigEditor";
+import Docs from "./components/Docs";
 import Layout from "./components/Layout";
+import Marketplace from "./components/Marketplace";
 import Sidebar from "./components/Sidebar";
 import Workflows from "./components/Workflows";
-import Marketplace from "./components/Marketplace";
 import { useConfig } from "./context/ConfigContext";
 
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
-  const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<config.Item | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<"configs" | "workflows" | "marketplace">("configs");
+  const [currentView, setCurrentView] = useState<
+    "configs" | "workflows" | "marketplace" | "docs"
+  >("configs");
 
-  const handleSelectConfig = (item: config.ConfigItem) => {
+  const handleSelectConfig = (item: config.Item) => {
     setSelectedItem(item);
   };
 
@@ -55,14 +58,18 @@ function AppContent() {
         return <Workflows />;
       case "marketplace":
         return <Marketplace />; // We need to import this
-      case "configs":
+      case "docs":
+        return <Docs />;
       default:
         return selectedItem ? (
           <ConfigEditor configItem={selectedItem} />
         ) : (
           <div className="empty-state">
             <h2>Welcome to easyConfig</h2>
-            <p>Select a configuration file to edit, or explore workflows and marketplace.</p>
+            <p>
+              Select a configuration file to edit, or explore workflows and
+              marketplace.
+            </p>
           </div>
         );
     }
@@ -81,9 +88,7 @@ function AppContent() {
           />
         }
       >
-        <div className="app-content">
-          {renderContent()}
-        </div>
+        <div className="app-content">{renderContent()}</div>
       </Layout>
 
       <AddConfigModal
