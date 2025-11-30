@@ -1,0 +1,7 @@
+provider=gemini
+fetched_at=2025-11-30
+urls:
+  - https://geminicli.com/docs/cli/configuration/
+  - https://geminicli.com/docs/cli/settings/
+  - https://geminicli.com/docs/extensions/
+  - https://gemini-cli-docs.pages.dev/cli/configuration

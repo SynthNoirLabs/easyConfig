@@ -1,13 +1,20 @@
 import type React from "react";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { config } from "../../wailsjs/go/models";
 import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { toast } from "sonner";
+import {
+  DeleteConfig,
   DiscoverConfigs,
   ReadConfig,
   SaveConfig,
-  CreateConfig,
-  DeleteConfig,
 } from "../../wailsjs/go/main/App";
+import type { config } from "../../wailsjs/go/models";
+import { EventsOn } from "../../wailsjs/runtime/runtime";
 
 interface ConfigContextType {
   configs: config.Item[];
@@ -39,6 +46,11 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Failed to load configs:", err);
       setError(
         err instanceof Error ? err.message : "Failed to load configurations",
+      );
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Failed to load configurations. Check backend logs.",
       );
       // Mock data for development if Wails is not available (e.g. in browser)
       if (
@@ -83,6 +95,14 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchConfigs();
+    const off = EventsOn("config:changed", () => {
+      // optimistic immediate feedback
+      toast.info("Configuration changed on disk. Refreshing…");
+      void fetchConfigs();
+    });
+    return () => {
+      off();
+    };
   }, [fetchConfigs]);
 
   return (

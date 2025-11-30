@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log/slog"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -38,7 +41,8 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.discoveryService = config.NewDiscoveryService()
+	logger := slog.Default()
+	a.discoveryService = config.NewDiscoveryService(logger)
 	a.watcherService = watcher.NewService()
 	a.installer = install.NewInstaller()
 	a.smitheryClient = marketplaces.NewSmitheryClient()
@@ -130,20 +134,58 @@ func (a *App) FetchSchemas() error {
 	return fetcher.FetchAllSchemas(schemaDir)
 }
 
-// InstallMCPPackage installs an MCP server package and injects it into Claude Desktop config
-func (a *App) InstallMCPPackage(packageName string) error {
-	// 1. Verify and get config from installer
-	serverConfig, err := a.installer.InstallPackage(a.ctx, packageName)
-	if err != nil {
-		return err
+// InstallMCPPackage installs an MCP server by creating a configuration file
+func (a *App) InstallMCPPackage(pkgJSON string) error {
+	var pkg marketplaces.MCPPackage
+	if err := json.Unmarshal([]byte(pkgJSON), &pkg); err != nil {
+		return fmt.Errorf("failed to unmarshal package json: %w", err)
 	}
 
-	// 2. Convert install.ServerConfig to mcp.ServerConfig
-	// (They are identical structs but different types, need manual conversion)
+	// For now, we'll create a JSON config file in the easyConfig directory
+	// In a real scenario, this might involve `npm install` or `pip install`
+	// Here we just create a config file that references the server.
+
+	configDir := paths.GetConfigDir("easyConfig")
+	if configDir == "" {
+		return fmt.Errorf("failed to get config directory")
+	}
+
+	// Create mcp-servers directory if it doesn't exist
+	mcpDir := filepath.Join(configDir, "mcp-servers")
+	if err := os.MkdirAll(mcpDir, 0755); err != nil {
+		return fmt.Errorf("failed to create mcp-servers directory: %w", err)
+	}
+
+	filename := fmt.Sprintf("%s.json", pkg.Name)
+	filePath := filepath.Join(mcpDir, filename)
+
+	// Create a simple config structure for the MCP server
+	config := map[string]interface{}{
+		"mcpServers": map[string]interface{}{
+			pkg.Name: map[string]interface{}{
+				"command": "npx", // Assumption for now, or use pkg metadata if available
+				"args":    []string{"-y", pkg.Name},
+				"url":     pkg.URL,
+				"version": pkg.Version,
+			},
+		},
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal config: %w", err)
+	}
+
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return fmt.Errorf("failed to write config file: %w", err)
+	}
+
+	// 2. Inject into Claude Desktop Config
+	// Construct the MCP config for injection
 	mcpConfig := mcp.ServerConfig{
-		Command: serverConfig.Command,
-		Args:    serverConfig.Args,
-		Env:     serverConfig.Env,
+		Command: "npx",
+		Args:    []string{"-y", pkg.Name},
+		Env:     map[string]string{}, // Add env vars if needed
 	}
 
 	// 3. Determine Claude Desktop config path
@@ -168,7 +210,6 @@ func (a *App) InstallMCPPackage(packageName string) error {
 	// This might be a simplification or specific to a certain setup.
 	// For "Real" installation, we should target the actual file Claude Desktop uses.
 
-	var configPath string
 	// We'll use the paths.GetConfigDir("Claude") which should handle OS differences if implemented correctly.
 	// But paths.GetConfigDir usually returns ~/.config/AppName on Linux.
 	// Claude Desktop on Mac: ~/Library/Application Support/Claude
@@ -179,7 +220,7 @@ func (a *App) InstallMCPPackage(packageName string) error {
 	// WAIT, looking at provider_claude.go lines 57: `path := filepath.Join(home, ".claude", "claude_desktop_config.json")`
 	// This seems to be where we expect it.
 
-	configPath = filepath.Join(homeDir, ".claude", "claude_desktop_config.json")
+	configPath := filepath.Join(homeDir, ".claude", "claude_desktop_config.json")
 
 	// On macOS, it's different.
 	// if runtime.GOOS == "darwin" {
@@ -192,7 +233,7 @@ func (a *App) InstallMCPPackage(packageName string) error {
 
 	// 4. Inject
 	// Use the package name (sanitized) as the server name
-	// serverName := packageName // Unused
+	packageName := pkg.Name
 
 	return a.mcpInjector.Inject(configPath, packageName, mcpConfig)
 }
@@ -258,8 +299,8 @@ func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
 }
 
 // GenerateWorkflow generates a GitHub Actions workflow content
-// Returns content, requiredSecrets, setupInstructions, error
-func (a *App) GenerateWorkflow(agent, trigger string) (string, []string, string, error) {
+// Returns WorkflowResponse, error
+func (a *App) GenerateWorkflow(agent, trigger string) (*workflows.WorkflowResponse, error) {
 	return a.workflowGen.GenerateWorkflow(agent, trigger)
 }
 
@@ -295,7 +336,50 @@ func (a *App) GetSupportedWorkflows() []string {
 	return a.workflowGen.GetSupportedWorkflows()
 }
 
+// ListWorkflowTemplates returns workflow templates with metadata/content
+func (a *App) ListWorkflowTemplates() []workflows.Template {
+	return a.workflowGen.ListTemplates()
+}
+
+// Profile operations
+func (a *App) ListProfiles() ([]config.ProfileSummary, error) {
+	return a.discoveryService.ListProfiles()
+}
+
+func (a *App) SaveProfile(name string) error {
+	return a.discoveryService.SaveProfile(name, ".")
+}
+
+func (a *App) ApplyProfile(name string) ([]string, error) {
+	return a.discoveryService.ApplyProfile(name)
+}
+
+func (a *App) DeleteProfile(name string) error {
+	return a.discoveryService.DeleteProfile(name)
+}
+
 // GetProviderStatuses returns the health status of all registered providers.
 func (a *App) GetProviderStatuses() []config.ProviderStatus {
 	return a.discoveryService.GetProviderStatuses()
+}
+
+// ListDocs returns the locally synced documentation pages grouped by provider.
+// It scans docs/vendor/<provider>/latest and reports available .md/.html pages.
+func (a *App) ListDocs() ([]config.DocsProvider, error) {
+	root, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("get working dir: %w", err)
+	}
+	return config.ListDocsFromRoot(root)
+}
+
+// ReadDoc returns the contents of a local doc page.
+// provider: provider name (e.g. "claude"), slug: base filename, format: "md" or "html".
+// If the requested format is not available, it falls back to the other one.
+func (a *App) ReadDoc(provider, slug, format string) (string, error) {
+	root, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("get working dir: %w", err)
+	}
+	return config.ReadDocFromRoot(root, provider, slug, format)
 }

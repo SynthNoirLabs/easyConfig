@@ -1,0 +1,4 @@
+provider=opencode
+fetched_at=2025-11-30
+urls:
+  - https://opencode.ai/docs/config/

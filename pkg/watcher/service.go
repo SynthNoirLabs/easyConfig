@@ -17,6 +17,7 @@ type Service struct {
 	watcher *fsnotify.Watcher
 	watched map[string]bool
 	mu      sync.Mutex
+	emit    func(context.Context, string, ...interface{})
 }
 
 // NewService creates a new watcher service
@@ -30,6 +31,7 @@ func NewService() *Service {
 	return &Service{
 		watcher: w,
 		watched: make(map[string]bool),
+		emit:    runtime.EventsEmit,
 	}
 }
 
@@ -37,6 +39,11 @@ func NewService() *Service {
 func (s *Service) Start(ctx context.Context) {
 	s.ctx = ctx
 	go s.watchLoop()
+}
+
+// SetEmitter allows overriding the event emitter (useful for tests).
+func (s *Service) SetEmitter(emitter func(context.Context, string, ...interface{})) {
+	s.emit = emitter
 }
 
 // Close stops the watcher
@@ -115,8 +122,8 @@ func (s *Service) watchLoop() {
 				// Emit event to frontend
 				// We send the absolute path so frontend can match it
 				absPath, err := filepath.Abs(event.Name)
-				if err == nil {
-					runtime.EventsEmit(s.ctx, "config:changed", absPath)
+				if err == nil && s.emit != nil && s.ctx != nil {
+					s.emit(s.ctx, "config:changed", absPath)
 				}
 			}
 		case err, ok := <-s.watcher.Errors:

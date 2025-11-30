@@ -1,0 +1,4 @@
+# Codex CLI configuration
+https://developers.openai.com/codex/local-config/
+https://developers.openai.com/codex/cli/reference/
+https://developers.openai.com/codex/cli/features/

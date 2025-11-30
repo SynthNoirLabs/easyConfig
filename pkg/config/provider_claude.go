@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"easyConfig/pkg/util/paths"
@@ -52,12 +53,19 @@ func (p *ClaudeProvider) Create(scope Scope, projectPath string) (string, error)
 func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
 	home := paths.GetHomeDir()
+	seen := make(map[string]bool)
+	add := func(it Item) {
+		if !seen[it.Path] {
+			items = append(items, it)
+			seen[it.Path] = true
+		}
+	}
 
 	// 1. Global Desktop Config
 	if home != "" {
 		path := filepath.Join(home, ".claude", "claude_desktop_config.json")
 		if FileExists(path) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Desktop Config",
 				FileName: "claude_desktop_config.json",
@@ -70,7 +78,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 		// 2. Global CLI Settings
 		pathCLI := filepath.Join(home, ".claude", "settings.json")
 		if FileExists(pathCLI) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "CLI Settings",
 				FileName: "settings.json",
@@ -79,6 +87,84 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 				Format:   FormatJSON,
 				Exists:   true,
 			})
+		}
+		// OS config dir (macOS ~/Library/Application Support/Claude, Win %APPDATA%/Claude, Linux ~/.config/Claude)
+		if cfgDir := paths.GetConfigDir("Claude"); cfgDir != "" {
+			pathDesktop := filepath.Join(cfgDir, "claude_desktop_config.json")
+			if FileExists(pathDesktop) {
+				add(Item{
+					Provider: p.Name(),
+					Name:     "Desktop Config",
+					FileName: "claude_desktop_config.json",
+					Path:     pathDesktop,
+					Scope:    ScopeGlobal,
+					Format:   FormatJSON,
+					Exists:   true,
+				})
+			}
+		}
+
+		// Global memory file
+		globalMemory := filepath.Join(home, ".claude", "CLAUDE.md")
+		if FileExists(globalMemory) {
+			add(Item{
+				Provider: p.Name(),
+				Name:     "Global Memory",
+				FileName: "CLAUDE.md",
+				Path:     globalMemory,
+				Scope:    ScopeGlobal,
+				Format:   FormatMD,
+				Exists:   true,
+			})
+		}
+
+		// Global commands/agents/hooks under ~/.claude
+		if globalPaths, _ := fastWalk(filepath.Join(home, ".claude"), 4, func(path string, d os.DirEntry) bool {
+			if d.IsDir() {
+				return false
+			}
+			if !strings.HasSuffix(strings.ToLower(d.Name()), ".md") {
+				return false
+			}
+			return strings.Contains(path, string(filepath.Separator)+"commands"+string(filepath.Separator)) ||
+				strings.Contains(path, string(filepath.Separator)+"agents"+string(filepath.Separator)) ||
+				strings.Contains(path, string(filepath.Separator)+"hooks"+string(filepath.Separator))
+		}); len(globalPaths) > 0 {
+			for _, gp := range globalPaths {
+				base := filepath.Base(gp)
+				switch {
+				case strings.Contains(gp, string(filepath.Separator)+"commands"+string(filepath.Separator)):
+					add(Item{
+						Provider: p.Name(),
+						Name:     "Command: " + base,
+						FileName: base,
+						Path:     gp,
+						Scope:    ScopeGlobal,
+						Format:   FormatMD,
+						Exists:   true,
+					})
+				case strings.Contains(gp, string(filepath.Separator)+"hooks"+string(filepath.Separator)):
+					add(Item{
+						Provider: p.Name(),
+						Name:     "Hook: " + base,
+						FileName: base,
+						Path:     gp,
+						Scope:    ScopeGlobal,
+						Format:   FormatMD,
+						Exists:   true,
+					})
+				default:
+					add(Item{
+						Provider: p.Name(),
+						Name:     "Subagent: " + base,
+						FileName: base,
+						Path:     gp,
+						Scope:    ScopeGlobal,
+						Format:   FormatMD,
+						Exists:   true,
+					})
+				}
+			}
 		}
 	}
 
@@ -90,7 +176,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 	if sysConfigDir != "" {
 		sysSettingsPath := filepath.Join(sysConfigDir, "managed-settings.json")
 		if FileExists(sysSettingsPath) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Managed Settings",
 				FileName: "managed-settings.json",
@@ -102,7 +188,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 		}
 		sysMCPPath := filepath.Join(sysConfigDir, "managed-mcp.json")
 		if FileExists(sysMCPPath) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Managed MCP",
 				FileName: "managed-mcp.json",
@@ -116,10 +202,10 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 
 	// 4. Project Settings
 	if projectPath != "" {
-		// settings.json
+		// settings.json (direct lookups)
 		pathProj := filepath.Join(projectPath, ".claude", "settings.json")
 		if FileExists(pathProj) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Project Settings",
 				FileName: "settings.json",
@@ -132,7 +218,7 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 		// settings.local.json
 		pathLocal := filepath.Join(projectPath, ".claude", "settings.local.json")
 		if FileExists(pathLocal) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Local Settings",
 				FileName: "settings.local.json",
@@ -142,10 +228,10 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 				Exists:   true,
 			})
 		}
-		// CLAUDE.md
+		// CLAUDE.md (root)
 		pathMemory := filepath.Join(projectPath, "CLAUDE.md")
 		if FileExists(pathMemory) {
-			items = append(items, Item{
+			add(Item{
 				Provider: p.Name(),
 				Name:     "Memory File",
 				FileName: "CLAUDE.md",
@@ -155,36 +241,118 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 				Exists:   true,
 			})
 		}
-
-		// Subagents (agents/*.md)
-		agentsPath := filepath.Join(projectPath, "agents", "*.md")
-		if matches, err := filepath.Glob(agentsPath); err == nil {
-			for _, match := range matches {
-				items = append(items, Item{
-					Provider: p.Name(),
-					Name:     "Subagent: " + filepath.Base(match),
-					FileName: filepath.Base(match),
-					Path:     match,
-					Scope:    ScopeProject,
-					Format:   FormatMD,
-					Exists:   true,
-				})
-			}
+		// CLAUDE.local.md (project-local memory)
+		pathMemoryLocal := filepath.Join(projectPath, "CLAUDE.local.md")
+		if FileExists(pathMemoryLocal) {
+			add(Item{
+				Provider: p.Name(),
+				Name:     "Local Memory",
+				FileName: "CLAUDE.local.md",
+				Path:     pathMemoryLocal,
+				Scope:    ScopeProject,
+				Format:   FormatMD,
+				Exists:   true,
+			})
 		}
 
-		// Custom Commands (.claude/commands/*.md)
-		commandsPath := filepath.Join(projectPath, ".claude", "commands", "*.md")
-		if matches, err := filepath.Glob(commandsPath); err == nil {
-			for _, match := range matches {
-				items = append(items, Item{
+		// Deep scan (fast, with exclusions) for Claude files, commands, agents, hooks.
+		matches, _ := fastWalk(projectPath, 6, func(path string, d os.DirEntry) bool {
+			if d.IsDir() {
+				return false
+			}
+			lower := strings.ToLower(d.Name())
+			if lower == "claude.md" || lower == "claude.local.md" {
+				return true
+			}
+			if strings.HasSuffix(lower, ".md") &&
+				(strings.Contains(path, string(filepath.Separator)+".claude"+string(filepath.Separator)+"commands"+string(filepath.Separator)) ||
+					strings.Contains(path, string(filepath.Separator)+".claude"+string(filepath.Separator)+"agents"+string(filepath.Separator)) ||
+					strings.Contains(path, string(filepath.Separator)+".claude"+string(filepath.Separator)+"hooks"+string(filepath.Separator)) ||
+					strings.Contains(path, string(filepath.Separator)+"agents"+string(filepath.Separator))) {
+				return true
+			}
+			if (lower == "settings.json" || lower == "settings.local.json") &&
+				strings.Contains(path, string(filepath.Separator)+".claude"+string(filepath.Separator)) {
+				return true
+			}
+			return false
+		})
+
+		for _, match := range matches {
+			name := filepath.Base(match)
+			switch strings.ToLower(name) {
+			case "claude.md":
+				add(Item{
 					Provider: p.Name(),
-					Name:     "Command: " + filepath.Base(match),
-					FileName: filepath.Base(match),
+					Name:     "Memory File",
+					FileName: "CLAUDE.md",
 					Path:     match,
 					Scope:    ScopeProject,
 					Format:   FormatMD,
 					Exists:   true,
 				})
+			case "claude.local.md":
+				add(Item{
+					Provider: p.Name(),
+					Name:     "Local Memory",
+					FileName: "CLAUDE.local.md",
+					Path:     match,
+					Scope:    ScopeProject,
+					Format:   FormatMD,
+					Exists:   true,
+				})
+			case "settings.json":
+				add(Item{
+					Provider: p.Name(),
+					Name:     "Project Settings",
+					FileName: "settings.json",
+					Path:     match,
+					Scope:    ScopeProject,
+					Format:   FormatJSON,
+					Exists:   true,
+				})
+			case "settings.local.json":
+				add(Item{
+					Provider: p.Name(),
+					Name:     "Local Settings",
+					FileName: "settings.local.json",
+					Path:     match,
+					Scope:    ScopeProject,
+					Format:   FormatJSON,
+					Exists:   true,
+				})
+			default:
+				if strings.Contains(match, string(filepath.Separator)+"commands"+string(filepath.Separator)) {
+					add(Item{
+						Provider: p.Name(),
+						Name:     "Command: " + filepath.Base(match),
+						FileName: filepath.Base(match),
+						Path:     match,
+						Scope:    ScopeProject,
+						Format:   FormatMD,
+						Exists:   true,
+					})
+				} else if strings.Contains(match, string(filepath.Separator)+"hooks"+string(filepath.Separator)) {
+					add(Item{
+						Provider: p.Name(),
+						Name:     "Hook: " + filepath.Base(match),
+						FileName: filepath.Base(match),
+						Path:     match,
+						Scope:    ScopeProject,
+						Format:   FormatMD,
+						Exists:   true,
+					})
+				} else {
+					add(Item{
+						Provider: p.Name(),
+						Name:     "Subagent: " + filepath.Base(match),
+						FileName: filepath.Base(match),
+						Path:     match,
+						Scope:    ScopeProject,
+						Format:   FormatMD,
+						Exists:   true,
+					})
+				}
 			}
 		}
 	}
@@ -193,6 +361,12 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 }
 
 func (p *ClaudeProvider) CheckStatus() ProviderStatus {
+	const (
+		msgHomeMissing = "Home directory not found."
+		msgConfigOK    = "Configuration files found. (Authentication not yet verified)."
+		msgCliMissing  = "Global CLI settings not found. Use 'Create' to set one up."
+	)
+
 	status := ProviderStatus{
 		ProviderName: p.Name(),
 		LastChecked:  time.Now().Format(time.RFC3339),
@@ -203,7 +377,7 @@ func (p *ClaudeProvider) CheckStatus() ProviderStatus {
 	home := paths.GetHomeDir()
 	if home == "" {
 		status.Health = StatusUnhealthy
-		status.StatusMessage = "Home directory not found."
+		status.StatusMessage = msgHomeMissing
 		return status
 	}
 
@@ -213,10 +387,10 @@ func (p *ClaudeProvider) CheckStatus() ProviderStatus {
 
 	if !FileExists(cliSettingsPath) {
 		status.Health = StatusUnhealthy
-		status.StatusMessage = "Global CLI settings not found. Use 'Create' to set one up."
+		status.StatusMessage = msgCliMissing
 	} else {
 		status.Health = StatusHealthy
-		status.StatusMessage = "Configuration files found. (Authentication not yet verified)."
+		status.StatusMessage = msgConfigOK
 	}
 
 	return status

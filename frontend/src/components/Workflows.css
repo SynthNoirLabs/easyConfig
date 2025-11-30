@@ -17,6 +17,27 @@
   color: var(--text-secondary);
 }
 
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  min-width: 280px;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: transparent;
+}
+
 .agents-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -36,6 +57,15 @@
   gap: 16px;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  outline: none;
+}
+
+.agent-card:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .agent-card:hover {
@@ -77,6 +107,28 @@
   background-color: var(--bg-tertiary);
   padding: 2px 8px;
   border-radius: var(--radius-full);
+}
+
+.agent-desc {
+  margin: 6px 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.agent-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.tag-chip {
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
 }
 
 .agent-arrow {
@@ -152,7 +204,7 @@
   border: 1px solid var(--border-subtle);
   background-color: #1e1e1e;
   color: #e2e8f0;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", monospace;
   font-size: 13px;
   resize: none;
   line-height: 1.6;

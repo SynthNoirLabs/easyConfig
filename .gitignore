@@ -34,3 +34,4 @@ Thumbs.db
 .gemini/
 .jules/
 gha-creds-*.json
+frontend/test-results/

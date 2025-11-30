@@ -34,6 +34,15 @@
   transition: all 0.2s;
   font-weight: 500;
   font-size: 14px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-nav-item:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .sidebar-nav-item:hover {
@@ -60,6 +69,27 @@
   justify-content: space-between;
   padding: 0 var(--spacing-sm);
   margin-bottom: var(--spacing-xs);
+}
+
+.profiles-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 var(--spacing-sm) var(--spacing-md);
+}
+
+.profile-select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-primary);
+}
+
+.profile-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .sidebar-title {
@@ -96,6 +126,22 @@
   gap: var(--spacing-md);
 }
 
+.sidebar-scope {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.sidebar-scope-header {
+  padding: 0 var(--spacing-sm);
+}
+
+.sidebar-scope-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 .sidebar-group {
   display: flex;
   flex-direction: column;
@@ -122,14 +168,31 @@
 .sidebar-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   padding: 6px 12px;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  cursor: pointer;
   transition: all 0.2s;
   font-size: 13px;
   position: relative;
+}
+
+.sidebar-item-main {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar-item-main:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .sidebar-item:hover {
@@ -147,10 +210,31 @@
 }
 
 .sidebar-item-name {
-  flex: 1;
+  flex: 1 1 auto;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sidebar-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+}
+
+.btn-ghost:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .btn-delete-icon {

@@ -1,0 +1,701 @@
+<!DOCTYPE html><html lang="en"> <head><!-- Global Metadata --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/png" href="/favicon.png"><meta name="generator" content="Astro v5.13.2"><link rel="preload" href="/fonts/OpenAISans-Regular.woff" as="font" type="font/woff" crossorigin><link rel="preload" href="/fonts/OpenAISans-Bold.woff" as="font" type="font/woff" crossorigin><!-- Canonical URL --><link rel="canonical" href="https://developers.openai.com/codex/cli/features/"><!-- Primary Meta Tags --><title>Codex CLI features</title><meta name="title" content="Codex CLI features"><meta name="description" content="Deep dives on the interactive terminal, model controls, approvals, scripting, and more."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://developers.openai.com/codex/cli/features/"><meta property="og:title" content="Codex CLI features"><meta property="og:description" content="Deep dives on the interactive terminal, model controls, approvals, scripting, and more."><meta property="og:image" content="https://developers.openai.com/open-graph.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://developers.openai.com/codex/cli/features/"><meta name="twitter:title" content="Codex CLI features"><meta name="twitter:description" content="Deep dives on the interactive terminal, model controls, approvals, scripting, and more."><meta name="twitter:image" content="https://developers.openai.com/open-graph.png"><!-- Sitemap --><link rel="sitemap" href="/sitemap-index.xml"><!-- RSS Feed --><link rel="alternate" type="application/rss+xml" title="Codex CLI features" href="https://developers.openai.com/rss.xml"><!-- Global Scripts --><script src="/js/theme.js"></script><script src="/js/scroll.js"></script><script src="/js/animate.js"></script><script defer src="/js/copy.js"></script><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.DZnDNxNb.js"></script><script type="module">document.addEventListener("astro:before-swap",e=>[...e.newDocument.head.querySelectorAll('link[as="font"]')].forEach(o=>o.remove()));</script><link rel="stylesheet" href="/_astro/index.D6TYuRjt.css">
+<style>.cursor-blink[data-astro-cid-76h4scq2]{display:inline-block;min-width:.65ch;padding:0 .05ch;animation:cli-cursor-blink 1.4s steps(2,start) infinite}[data-astro-cid-76h4scq2][data-cli-terminal-preview] pre[data-astro-cid-76h4scq2]{-ms-overflow-style:none;scrollbar-width:none}[data-astro-cid-76h4scq2][data-cli-terminal-preview] pre[data-astro-cid-76h4scq2]::-webkit-scrollbar{display:none}@keyframes cli-cursor-blink{0%,45%{background:#fff;color:#374151}55%,to{background:transparent;color:inherit}}html{scroll-behavior:smooth}.article-container.prose h2,.article-container.prose h3,.article-container.prose h4,.article-container.prose h5,.article-container.prose h6{scroll-margin-top:110px}.article-container.prose h2:target button[data-anchor-id],.article-container.prose h3:target button[data-anchor-id],.article-container.prose h4:target button[data-anchor-id],.article-container.prose h5:target button[data-anchor-id],.article-container.prose h6:target button[data-anchor-id]{opacity:1}
+</style></head> <body class="overflow-x-hidden"> <header id="header" class="fixed top-0 w-full h-16 z-50 bg-white dark:bg-black border-b border-gray-100 dark:border-gray-800" data-astro-cid-3ef6ksr2> <div class="flex items-center h-full px-4 md:px-8 md:grid md:grid-cols-[auto,1fr,auto] md:gap-6" data-astro-cid-3ef6ksr2> <!-- Logo --> <a href="/" class="flex items-center font-semibold" data-astro-cid-3ef6ksr2> <img src="/OpenAI_Developers.svg" alt="OpenAI Developers" class="h-4 w-44 md:h-5 dark:invert" data-astro-cid-3ef6ksr2> </a> <!-- Links --> <nav class="hidden md:flex items-center justify-center gap-1" data-astro-cid-3ef6ksr2> <div class="relative group" data-astro-cid-3ef6ksr2> <a href="/resources" class="flex items-center gap-1 text-sm px-2.5 py-1 rounded-lg text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900" data-astro-cid-3ef6ksr2> Resources  </a>  </div><div class="relative group" data-astro-cid-3ef6ksr2> <a href="/codex" class="flex items-center gap-1 text-sm px-2.5 py-1 rounded-lg text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-800" data-astro-cid-3ef6ksr2> Codex  </a>  </div><div class="relative group" data-astro-cid-3ef6ksr2> <a href="/chatgpt" class="flex items-center gap-1 text-sm px-2.5 py-1 rounded-lg text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900" aria-haspopup="menu" data-astro-cid-3ef6ksr2> ChatGPT <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-500 dark:text-gray-400 " data-astro-cid-3ef6ksr2="true" ><path d="M11.2929 16.2929C11.6834 16.6834 12.3166 16.6834 12.7071 16.2929L18.7071 10.2929C19.0976 9.90237 19.0976 9.26921 18.7071 8.87868C18.3166 8.48816 17.6834 8.48816 17.2929 8.87868L12 14.1716L6.70711 8.87868C6.31658 8.48816 5.68342 8.48816 5.29289 8.87868C4.90237 9.26921 4.90237 9.90237 5.29289 10.2929L11.2929 16.2929Z" fill="currentColor"></path></svg> </a> <div class="invisible opacity-0 absolute left-0 top-full z-50 mt-2 min-w-full w-max transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 before:content-[''] before:absolute before:-top-2 before:left-0 before:right-0 before:h-2" role="menu" data-astro-cid-3ef6ksr2> <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md ring-1 ring-black/5 dark:border-gray-800 dark:bg-gray-900 dark:ring-white/10" data-astro-cid-3ef6ksr2> <a role="menuitem" href="/apps-sdk" class="block px-4 py-3 text-sm text-gray-900 transition-colors hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800" data-astro-cid-3ef6ksr2> <div class="space-y-1" data-astro-cid-3ef6ksr2> <div class="font-medium" data-astro-cid-3ef6ksr2>Apps SDK</div> <div class="text-sm text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Build apps to extend ChatGPT </div> </div> </a><a role="menuitem" href="/commerce" class="block px-4 py-3 text-sm text-gray-900 transition-colors hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800" data-astro-cid-3ef6ksr2> <div class="space-y-1" data-astro-cid-3ef6ksr2> <div class="font-medium" data-astro-cid-3ef6ksr2>Agentic Commerce</div> <div class="text-sm text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Build commerce flows in ChatGPT </div> </div> </a> </div> </div> </div><div class="relative group" data-astro-cid-3ef6ksr2> <a href="/blog" class="flex items-center gap-1 text-sm px-2.5 py-1 rounded-lg text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900" data-astro-cid-3ef6ksr2> Blog  </a>  </div>  </nav> <!-- Search, Theme Toggle, Mobile Menu --> <div class="ml-auto md:w-44 flex items-center space-x-4 md:space-x-5 md:ml-0 md:justify-self-end" data-astro-cid-3ef6ksr2> <button type="button" data-header-search-button aria-expanded="false" class="hidden md:flex items-center gap-2 rounded-lg px-2 py-1 text-sm text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-200 dark:hover:text-gray-100" data-astro-cid-3ef6ksr2> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 " data-astro-cid-3ef6ksr2="true" ><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> <span class="hidden lg:inline" data-astro-cid-3ef6ksr2>Search</span> <span class="hidden xl:inline text-xs text-gray-400 dark:text-gray-500 mt-0.5" data-astro-cid-3ef6ksr2>⌘K</span> </button> <button id="header-theme-button" aria-label="Toggle light and dark theme" class="hidden md:flex text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 transition-colors" data-astro-cid-3ef6ksr2> <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" class="block dark:hidden w-4 h-4 " data-astro-cid-3ef6ksr2="true" ><path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C11.5523 0 12 0.447715 12 1V3C12 3.55228 11.5523 4 11 4C10.4477 4 10 3.55228 10 3V1C10 0.447715 10.4477 0 11 0ZM3.22183 3.22183C3.61235 2.8313 4.24551 2.8313 4.63604 3.22183L6.05025 4.63604C6.44078 5.02656 6.44078 5.65973 6.05025 6.05025C5.65973 6.44078 5.02656 6.44078 4.63604 6.05025L3.22183 4.63604C2.8313 4.24551 2.8313 3.61235 3.22183 3.22183ZM18.7782 3.22183C19.1687 3.61235 19.1687 4.24551 18.7782 4.63604L17.364 6.05025C16.9734 6.44078 16.3403 6.44078 15.9497 6.05025C15.5592 5.65973 15.5592 5.02656 15.9497 4.63604L17.364 3.22183C17.7545 2.8313 18.3876 2.8313 18.7782 3.22183ZM11 8C9.34315 8 8 9.34315 8 11C8 12.6569 9.34315 14 11 14C12.6569 14 14 12.6569 14 11C14 9.34315 12.6569 8 11 8ZM6 11C6 8.23858 8.23858 6 11 6C13.7614 6 16 8.23858 16 11C16 13.7614 13.7614 16 11 16C8.23858 16 6 13.7614 6 11ZM0 11C0 10.4477 0.447715 10 1 10H3C3.55228 10 4 10.4477 4 11C4 11.5523 3.55228 12 3 12H1C0.447715 12 0 11.5523 0 11ZM18 11C18 10.4477 18.4477 10 19 10H21C21.5523 10 22 10.4477 22 11C22 11.5523 21.5523 12 21 12H19C18.4477 12 18 11.5523 18 11ZM6.05025 15.9497C6.44078 16.3403 6.44078 16.9734 6.05025 17.364L4.63604 18.7782C4.24551 19.1687 3.61235 19.1687 3.22183 18.7782C2.8313 18.3876 2.8313 17.7545 3.22183 17.364L4.63604 15.9497C5.02656 15.5592 5.65973 15.5592 6.05025 15.9497ZM15.9497 15.9497C16.3403 15.5592 16.9734 15.5592 17.364 15.9497L18.7782 17.364C19.1687 17.7545 19.1687 18.3876 18.7782 18.7782C18.3877 19.1687 17.7545 19.1687 17.364 18.7782L15.9497 17.364C15.5592 16.9734 15.5592 16.3403 15.9497 15.9497ZM11 18C11.5523 18 12 18.4477 12 19V21C12 21.5523 11.5523 22 11 22C10.4477 22 10 21.5523 10 21V19C10 18.4477 10.4477 18 11 18Z" fill="currentColor"></path></svg> <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="hidden dark:block w-4 h-4 " data-astro-cid-3ef6ksr2="true" ><path d="M10.7836 0.470481C10.9676 0.765118 10.9855 1.13415 10.8309 1.44525C10.2994 2.51497 10 3.7211 10 5.00001C10 9.41829 13.5817 13 18 13L18.0575 12.9998C18.4049 12.9974 18.7287 13.1754 18.9127 13.47C19.0968 13.7647 19.1147 14.1337 18.9601 14.4448C17.325 17.7352 13.9279 20 10 20C4.47715 20 0 15.5229 0 10C0 4.50107 4.43841 0.038857 9.92838 0.000268937C10.2758 -0.00217271 10.5995 0.175844 10.7836 0.470481ZM8.40989 2.15803C4.75344 2.8954 2 6.12619 2 10C2 14.4183 5.58172 18 10 18C12.587 18 14.8886 16.7721 16.3516 14.8648C11.6131 14.0789 8 9.96139 8 5.00001C8 4.01361 8.1431 3.05953 8.40989 2.15803Z" fill="currentColor"></path></svg> </button> <!-- Mobile Menu Button --> <button id="header-drawer-button" type="button" aria-label="Toggle menu" aria-controls="drawer" aria-expanded="false" class="md:hidden relative right-1 text-gray-700 hover:text-gray-900 transition-colors" data-astro-cid-3ef6ksr2> <svg width="18" height="10" viewBox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-700 hover:text-gray-900 dark:text-gray-200 dark:hover:text-gray-100 transition-colors " data-astro-cid-3ef6ksr2="true" ><path d="M0 1C0 0.447715 0.447715 0 1 0H17C17.5523 0 18 0.447715 18 1C18 1.55228 17.5523 2 17 2H1C0.447715 2 0 1.55228 0 1ZM0 9C0 8.44772 0.447715 8 1 8H11C11.5523 8 12 8.44772 12 9C12 9.55229 11.5523 10 11 10H1C0.447715 10 0 9.55229 0 9Z" fill="currentColor"></path></svg> </button> </div> </div> </header> <div id="header-search-overlay" role="dialog" aria-modal="true" aria-labelledby="header-search-title" aria-hidden="true" data-open="false" class="fixed inset-0 z-[60] hidden items-start justify-center px-4 pt-24 pb-12 md:pt-28" data-astro-cid-3ef6ksr2> <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity dark:bg-black/70" data-header-search-dismiss data-astro-cid-3ef6ksr2></div> <div class="relative z-10 w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 dark:bg-gray-900 dark:ring-white/10" data-header-search-panel data-astro-cid-3ef6ksr2> <div data-header-search-toolbar class="flex items-center justify-between border-b border-gray-100 px-4 py-4 dark:border-gray-800 md:px-6" data-astro-cid-3ef6ksr2> <h2 id="header-search-title" class="text-sm font-semibold text-gray-900 dark:text-gray-100" data-astro-cid-3ef6ksr2>
+Search the docs
+</h2> <div class="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500" data-astro-cid-3ef6ksr2> <div class="hidden sm:flex items-center gap-1 rounded-md border border-gray-200 px-2 py-1 font-medium dark:border-gray-700" data-astro-cid-3ef6ksr2> <span class="font-mono" data-astro-cid-3ef6ksr2>⌘</span> <span class="font-mono" data-astro-cid-3ef6ksr2>K</span> <span class="font-mono text-gray-300 dark:text-gray-600" data-astro-cid-3ef6ksr2>/</span> <span class="font-mono" data-astro-cid-3ef6ksr2>Ctrl</span> <span class="font-mono" data-astro-cid-3ef6ksr2>K</span> </div> <button type="button" data-header-search-close class="items-center gap-2 rounded-md px-2 py-1 text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 md:flex" data-astro-cid-3ef6ksr2>
+Close
+</button> </div> </div> <div data-header-search-body class="px-4 py-5 md:px-6 md:py-6" data-astro-cid-3ef6ksr2> <div id="header-site-search" class="pagefind-header-ui pagefind-desktop-ui pagefind-init" data-pagefind-ui data-bundle-path="/pagefind/" data-ui-options="{&#34;showImages&#34;:false,&#34;showSubResults&#34;:false,&#34;translations&#34;:{&#34;placeholder&#34;:&#34;Search the site&#34;,&#34;zeroResults&#34;:&#34;No matches yet. Try a different keyword.&#34;}}"></div> <script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.tZYucdM2.js"></script> </div> </div> </div> <div id="drawer" data-default-tab-id="mobile-nav-tab-1" class="fixed inset-0 z-40 flex flex-col bg-white dark:bg-black transform translate-x-full transition-transform duration-300 md:hidden" data-astro-cid-3ef6ksr2> <div class="flex flex-col h-full w-full" data-astro-cid-3ef6ksr2> <div class="px-6 pt-6 w-full mt-16" data-astro-cid-3ef6ksr2> <span id="mobile-nav-primary-label" class="sr-only" data-astro-cid-3ef6ksr2>Primary navigation</span> <div class="relative" data-astro-cid-3ef6ksr2> <button type="button" id="mobile-nav-trigger" class="flex w-full items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-900 transition-colors duration-150 hover:border-gray-300 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 data-[open=true]:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-gray-600 dark:hover:bg-gray-800 dark:focus-visible:outline-gray-600 dark:data-[open=true]:border-gray-600" data-mobile-nav-trigger aria-haspopup="listbox" aria-expanded="false" aria-controls="mobile-nav-dropdown" aria-labelledby="mobile-nav-primary-label mobile-nav-trigger-value" data-astro-cid-3ef6ksr2> <span id="mobile-nav-trigger-value" data-mobile-nav-label class="flex-1 truncate text-left" data-astro-cid-3ef6ksr2> Codex </span> <span data-mobile-nav-chevron class="flex h-5 w-5 shrink-0 items-center justify-center text-gray-500 transition-transform duration-200 data-[open=true]:rotate-180 data-[open=true]:text-gray-700 dark:text-gray-400 dark:data-[open=true]:text-gray-200" data-astro-cid-3ef6ksr2> <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 " aria-hidden="true" data-astro-cid-3ef6ksr2="true" ><path d="M11.2929 16.2929C11.6834 16.6834 12.3166 16.6834 12.7071 16.2929L18.7071 10.2929C19.0976 9.90237 19.0976 9.26921 18.7071 8.87868C18.3166 8.48816 17.6834 8.48816 17.2929 8.87868L12 14.1716L6.70711 8.87868C6.31658 8.48816 5.68342 8.48816 5.29289 8.87868C4.90237 9.26921 4.90237 9.90237 5.29289 10.2929L11.2929 16.2929Z" fill="currentColor"></path></svg> </span> </button> <div id="mobile-nav-dropdown" role="listbox" aria-labelledby="mobile-nav-primary-label" tabindex="-1" class="absolute left-0 right-0 top-full z-50 mt-2 max-h-[60vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-1 shadow-xl shadow-gray-900/10 ring-1 ring-black/5 opacity-0 scale-95 origin-top transition duration-150 ease-out data-[open=true]:opacity-100 data-[open=true]:scale-100 dark:border-gray-700 dark:bg-gray-900 dark:ring-white/10" data-mobile-nav-dropdown hidden data-astro-cid-3ef6ksr2> <button type="button" role="option" data-mobile-nav-option data-tab-id="mobile-nav-tab-0" data-has-nav="true" data-href="/resources" data-label="Resources" data-selected="false" aria-selected="false" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium leading-5 text-gray-700 transition-colors duration-150 data-[selected=true]:bg-gray-100 data-[selected=true]:text-gray-900 data-[selected=true]:shadow-inner hover:bg-gray-50 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 dark:text-gray-200 dark:data-[selected=true]:bg-gray-800 dark:data-[selected=true]:text-white dark:data-[selected=true]:shadow-inner dark:hover:bg-gray-800 dark:hover:text-gray-100 dark:focus-visible:outline-gray-600" data-astro-cid-3ef6ksr2> <span class="flex-1 truncate" data-astro-cid-3ef6ksr2>Resources</span> <span data-mobile-nav-option-indicator data-selected="false" class="h-2.5 w-2.5 rounded-full border border-gray-200 bg-transparent transition duration-150 data-[selected=true]:border-transparent data-[selected=true]:bg-gray-500 dark:border-gray-700 dark:data-[selected=true]:bg-gray-300" aria-hidden="true" data-astro-cid-3ef6ksr2></span> </button><button type="button" role="option" data-mobile-nav-option data-tab-id="mobile-nav-tab-1" data-has-nav="true" data-href="/codex" data-label="Codex" data-selected="true" aria-selected="true" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium leading-5 text-gray-700 transition-colors duration-150 data-[selected=true]:bg-gray-100 data-[selected=true]:text-gray-900 data-[selected=true]:shadow-inner hover:bg-gray-50 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 dark:text-gray-200 dark:data-[selected=true]:bg-gray-800 dark:data-[selected=true]:text-white dark:data-[selected=true]:shadow-inner dark:hover:bg-gray-800 dark:hover:text-gray-100 dark:focus-visible:outline-gray-600" data-astro-cid-3ef6ksr2> <span class="flex-1 truncate" data-astro-cid-3ef6ksr2>Codex</span> <span data-mobile-nav-option-indicator data-selected="true" class="h-2.5 w-2.5 rounded-full border border-gray-200 bg-transparent transition duration-150 data-[selected=true]:border-transparent data-[selected=true]:bg-gray-500 dark:border-gray-700 dark:data-[selected=true]:bg-gray-300" aria-hidden="true" data-astro-cid-3ef6ksr2></span> </button><button type="button" role="option" data-mobile-nav-option data-tab-id="mobile-nav-tab-2" data-has-nav="true" data-href="/chatgpt" data-label="ChatGPT" data-selected="false" aria-selected="false" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium leading-5 text-gray-700 transition-colors duration-150 data-[selected=true]:bg-gray-100 data-[selected=true]:text-gray-900 data-[selected=true]:shadow-inner hover:bg-gray-50 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 dark:text-gray-200 dark:data-[selected=true]:bg-gray-800 dark:data-[selected=true]:text-white dark:data-[selected=true]:shadow-inner dark:hover:bg-gray-800 dark:hover:text-gray-100 dark:focus-visible:outline-gray-600" data-astro-cid-3ef6ksr2> <span class="flex-1 truncate" data-astro-cid-3ef6ksr2>ChatGPT</span> <span data-mobile-nav-option-indicator data-selected="false" class="h-2.5 w-2.5 rounded-full border border-gray-200 bg-transparent transition duration-150 data-[selected=true]:border-transparent data-[selected=true]:bg-gray-500 dark:border-gray-700 dark:data-[selected=true]:bg-gray-300" aria-hidden="true" data-astro-cid-3ef6ksr2></span> </button><button type="button" role="option" data-mobile-nav-option data-tab-id="mobile-nav-tab-3" data-has-nav="true" data-href="/blog" data-label="Blog" data-selected="false" aria-selected="false" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium leading-5 text-gray-700 transition-colors duration-150 data-[selected=true]:bg-gray-100 data-[selected=true]:text-gray-900 data-[selected=true]:shadow-inner hover:bg-gray-50 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 dark:text-gray-200 dark:data-[selected=true]:bg-gray-800 dark:data-[selected=true]:text-white dark:data-[selected=true]:shadow-inner dark:hover:bg-gray-800 dark:hover:text-gray-100 dark:focus-visible:outline-gray-600" data-astro-cid-3ef6ksr2> <span class="flex-1 truncate" data-astro-cid-3ef6ksr2>Blog</span> <span data-mobile-nav-option-indicator data-selected="false" class="h-2.5 w-2.5 rounded-full border border-gray-200 bg-transparent transition duration-150 data-[selected=true]:border-transparent data-[selected=true]:bg-gray-500 dark:border-gray-700 dark:data-[selected=true]:bg-gray-300" aria-hidden="true" data-astro-cid-3ef6ksr2></span> </button> </div> </div> </div> <div class="flex-1 w-full overflow-y-auto px-6 py-4 space-y-6" data-mobile-nav-panels data-astro-cid-3ef6ksr2> <div data-mobile-search data-astro-cid-3ef6ksr2> <div id="header-mobile-search" class="pagefind-header-ui pagefind-mobile-ui pagefind-init" data-pagefind-ui data-bundle-path="/pagefind/" data-ui-options="{&#34;showImages&#34;:false,&#34;showSubResults&#34;:false,&#34;translations&#34;:{&#34;placeholder&#34;:&#34;Search the site&#34;,&#34;zeroResults&#34;:&#34;No matches yet. Try a different keyword.&#34;}}"></div>   </div> <div id="mobile-nav-panel-0" data-mobile-nav-content data-tab-id="mobile-nav-tab-0" hidden class="space-y-6 pb-8" data-astro-cid-3ef6ksr2> <div class="space-y-3" data-astro-cid-3ef6ksr2>  <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/resources" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Home  </a> </li><li> <a href="/changelog" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Changelog  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Categories </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/resources/code" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Code  </a> </li><li> <a href="/resources/cookbooks" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Cookbooks  </a> </li><li> <a href="/resources/guides" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Guides  </a> </li><li> <a href="/resources/videos" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Videos  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Topics </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/resources/agents" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Agents  </a> </li><li> <a href="/resources/audio" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Audio &amp; Voice  </a> </li><li> <a href="/resources/imagegen" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Image generation  </a> </li><li> <a href="/resources/videogen" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Video generation  </a> </li><li> <a href="/resources/tools" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Tools  </a> </li><li> <a href="/resources/cua" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Computer use  </a> </li><li> <a href="/resources/fine-tuning" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Fine-tuning  </a> </li><li> <a href="/resources/scaling" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Scaling  </a> </li> </ul> </div> </div><div id="mobile-nav-panel-1" data-mobile-nav-content data-tab-id="mobile-nav-tab-1" class="space-y-6 pb-8" data-astro-cid-3ef6ksr2> <div class="space-y-3" data-astro-cid-3ef6ksr2>  <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/codex" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Home  </a> </li><li> <a href="/codex/quickstart" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Quickstart  </a> </li><li> <a href="/codex/concepts" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Concepts  </a> </li><li> <a href="/codex/models" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Models  </a> </li><li> <a href="/codex/pricing" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Pricing  </a> </li><li> <a href="/codex/changelog" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Changelog  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Codex CLI </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/codex/cli" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Overview  </a> </li><li> <a href="/codex/cli/features" class="px-3 py-2 rounded-lg transition-colors block text-gray-900 bg-gray-100 dark:text-white dark:bg-gray-800 " data-mobile-nav-link> Features  </a> </li><li> <a href="/codex/cli/reference" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> CLI Reference  </a> </li><li> <a href="/codex/local-config#cli" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Configuration  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Codex IDE Extension </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/codex/ide" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Set up your IDE  </a> </li><li> <a href="/codex/local-config#ide" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Configuration  </a> </li><li> <a href="/codex/ide/cloud-tasks" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> IDE → Cloud tasks  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Codex Cloud </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/codex/cloud" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Delegate to Codex  </a> </li><li> <a href="/codex/cloud/environments" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Environments  </a> </li><li> <a href="/codex/cloud/code-review" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Code Review  </a> </li><li> <a href="/codex/cloud/internet-access" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Internet Access  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Codex SDK </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/codex/sdk" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Overview  </a> </li><li> <a href="/codex/sdk#typescript-library" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> TypeScript  </a> </li><li> <a href="/codex/sdk#github-action" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> GitHub Action  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Guides </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/codex/guides/agents-sdk" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Agents SDK  </a> </li><li> <a href="/codex/prompting" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Prompting Codex  </a> </li><li> <a href="/codex/guides/slash-commands" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Slash commands  </a> </li><li> <a href="/codex/guides/agents-md" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Custom instructions with AGENTS.md  </a> </li><li> <a href="/codex/mcp" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Model Context Protocol (MCP)  </a> </li><li> <a href="/codex/autofix-ci" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Autofix CI  </a> </li><li> <a href="/codex/guides/build-ai-native-engineering-team" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Build AI-Native Teams  </a> </li><li> <a href="/codex/enterprise" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Enterprise Admin  </a> </li><li> <a href="/codex/security" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Security Admin  </a> </li><li> <a href="/codex/windows" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Windows  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Integrations </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/codex/integrations/slack" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Slack  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Resources </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="https://agents.md" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 flex items-center justify-between gap-2" target="_blank" rel="noopener noreferrer" data-mobile-nav-link> AGENTS.md <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 inline-block ml-1 text-gray-600 dark:text-gray-300 " ><path d="M10.2426 0.757385C10.7949 0.757385 11.2426 1.2051 11.2426 1.75738V8.82845C11.2426 9.38074 10.7949 9.82845 10.2426 9.82845C9.69035 9.82845 9.24264 9.38074 9.24264 8.82845V4.1716L2.46446 10.9498C2.07394 11.3403 1.44077 11.3403 1.05025 10.9498C0.659724 10.5592 0.659723 9.92608 1.05025 9.53556L7.82842 2.75739H3.17157C2.61928 2.75739 2.17157 2.30967 2.17157 1.75738C2.17157 1.2051 2.61928 0.757385 3.17157 0.757385H10.2426Z" fill="currentColor"></path></svg> </a> </li><li> <a href="https://github.com/openai/codex" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 flex items-center justify-between gap-2" target="_blank" rel="noopener noreferrer" data-mobile-nav-link> Codex on GitHub <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 inline-block ml-1 text-gray-600 dark:text-gray-300 " ><path d="M10.2426 0.757385C10.7949 0.757385 11.2426 1.2051 11.2426 1.75738V8.82845C11.2426 9.38074 10.7949 9.82845 10.2426 9.82845C9.69035 9.82845 9.24264 9.38074 9.24264 8.82845V4.1716L2.46446 10.9498C2.07394 11.3403 1.44077 11.3403 1.05025 10.9498C0.659724 10.5592 0.659723 9.92608 1.05025 9.53556L7.82842 2.75739H3.17157C2.61928 2.75739 2.17157 2.30967 2.17157 1.75738C2.17157 1.2051 2.61928 0.757385 3.17157 0.757385H10.2426Z" fill="currentColor"></path></svg> </a> </li> </ul> </div> </div><div id="mobile-nav-panel-2" data-mobile-nav-content data-tab-id="mobile-nav-tab-2" hidden class="space-y-6 pb-8" data-astro-cid-3ef6ksr2> <div class="space-y-3" data-astro-cid-3ef6ksr2>  <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/apps-sdk" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Apps SDK  </a> </li><li> <a href="/commerce" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Agentic Commerce  </a> </li> </ul> </div> </div><div id="mobile-nav-panel-3" data-mobile-nav-content data-tab-id="mobile-nav-tab-3" hidden class="space-y-6 pb-8" data-astro-cid-3ef6ksr2> <div class="space-y-3" data-astro-cid-3ef6ksr2>  <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/blog" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> All posts  </a> </li> </ul> </div><div class="space-y-3" data-astro-cid-3ef6ksr2> <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400" data-astro-cid-3ef6ksr2> Recent </h3> <ul class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-200 w-full"> <li> <a href="/blog/what-makes-a-great-chatgpt-app" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> What makes a great ChatGPT app  </a> </li><li> <a href="/blog/codex-for-documentation-dagster" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Using Codex for education at Dagster Labs  </a> </li><li> <a href="/blog/codex-at-devday" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> How Codex ran OpenAI DevDay 2025  </a> </li><li> <a href="/blog/responses-api" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Why we built the Responses API  </a> </li><li> <a href="/blog/realtime-api" class="px-3 py-2 rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-mobile-nav-link> Developer notes on the Realtime API  </a> </li> </ul> </div> </div> </div> <div class="w-full px-6 py-6 border-t border-gray-100 dark:border-gray-800" data-astro-cid-3ef6ksr2> <div class="flex flex-wrap items-center justify-between gap-4 text-sm text-gray-700 dark:text-gray-300" data-astro-cid-3ef6ksr2> <div class="flex flex-wrap items-center gap-4" data-astro-cid-3ef6ksr2>  </div> <button id="drawer-theme-button" type="button" aria-label="Toggle light and dark theme" class="text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-2" data-astro-cid-3ef6ksr2> <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" class="block dark:hidden w-6 h-6 " data-astro-cid-3ef6ksr2="true" ><path fill-rule="evenodd" clip-rule="evenodd" d="M11 0C11.5523 0 12 0.447715 12 1V3C12 3.55228 11.5523 4 11 4C10.4477 4 10 3.55228 10 3V1C10 0.447715 10.4477 0 11 0ZM3.22183 3.22183C3.61235 2.8313 4.24551 2.8313 4.63604 3.22183L6.05025 4.63604C6.44078 5.02656 6.44078 5.65973 6.05025 6.05025C5.65973 6.44078 5.02656 6.44078 4.63604 6.05025L3.22183 4.63604C2.8313 4.24551 2.8313 3.61235 3.22183 3.22183ZM18.7782 3.22183C19.1687 3.61235 19.1687 4.24551 18.7782 4.63604L17.364 6.05025C16.9734 6.44078 16.3403 6.44078 15.9497 6.05025C15.5592 5.65973 15.5592 5.02656 15.9497 4.63604L17.364 3.22183C17.7545 2.8313 18.3876 2.8313 18.7782 3.22183ZM11 8C9.34315 8 8 9.34315 8 11C8 12.6569 9.34315 14 11 14C12.6569 14 14 12.6569 14 11C14 9.34315 12.6569 8 11 8ZM6 11C6 8.23858 8.23858 6 11 6C13.7614 6 16 8.23858 16 11C16 13.7614 13.7614 16 11 16C8.23858 16 6 13.7614 6 11ZM0 11C0 10.4477 0.447715 10 1 10H3C3.55228 10 4 10.4477 4 11C4 11.5523 3.55228 12 3 12H1C0.447715 12 0 11.5523 0 11ZM18 11C18 10.4477 18.4477 10 19 10H21C21.5523 10 22 10.4477 22 11C22 11.5523 21.5523 12 21 12H19C18.4477 12 18 11.5523 18 11ZM6.05025 15.9497C6.44078 16.3403 6.44078 16.9734 6.05025 17.364L4.63604 18.7782C4.24551 19.1687 3.61235 19.1687 3.22183 18.7782C2.8313 18.3876 2.8313 17.7545 3.22183 17.364L4.63604 15.9497C5.02656 15.5592 5.65973 15.5592 6.05025 15.9497ZM15.9497 15.9497C16.3403 15.5592 16.9734 15.5592 17.364 15.9497L18.7782 17.364C19.1687 17.7545 19.1687 18.3876 18.7782 18.7782C18.3877 19.1687 17.7545 19.1687 17.364 18.7782L15.9497 17.364C15.5592 16.9734 15.5592 16.3403 15.9497 15.9497ZM11 18C11.5523 18 12 18.4477 12 19V21C12 21.5523 11.5523 22 11 22C10.4477 22 10 21.5523 10 21V19C10 18.4477 10.4477 18 11 18Z" fill="currentColor"></path></svg> <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="hidden dark:block w-6 h-6 " data-astro-cid-3ef6ksr2="true" ><path d="M10.7836 0.470481C10.9676 0.765118 10.9855 1.13415 10.8309 1.44525C10.2994 2.51497 10 3.7211 10 5.00001C10 9.41829 13.5817 13 18 13L18.0575 12.9998C18.4049 12.9974 18.7287 13.1754 18.9127 13.47C19.0968 13.7647 19.1147 14.1337 18.9601 14.4448C17.325 17.7352 13.9279 20 10 20C4.47715 20 0 15.5229 0 10C0 4.50107 4.43841 0.038857 9.92838 0.000268937C10.2758 -0.00217271 10.5995 0.175844 10.7836 0.470481ZM8.40989 2.15803C4.75344 2.8954 2 6.12619 2 10C2 14.4183 5.58172 18 10 18C12.587 18 14.8886 16.7721 16.3516 14.8648C11.6131 14.0789 8 9.96139 8 5.00001C8 4.01361 8.1431 3.05953 8.40989 2.15803Z" fill="currentColor"></path></svg> </button> </div> </div> </div> </div>  <script>
+  function initializeMobileNavigation() {
+    const drawer = document.getElementById("drawer");
+    const drawerButton = document.getElementById("header-drawer-button");
+
+    if (
+      !drawer ||
+      !drawerButton ||
+      drawer.dataset.mobileNavInitialized === "true"
+    ) {
+      return;
+    }
+
+    const navTrigger = drawer.querySelector("[data-mobile-nav-trigger]");
+    const navLabel = drawer.querySelector("[data-mobile-nav-label]");
+    const navChevron = drawer.querySelector("[data-mobile-nav-chevron]");
+    const navDropdown = drawer.querySelector("[data-mobile-nav-dropdown]");
+    const navOptionElements = Array.from(
+      drawer.querySelectorAll("[data-mobile-nav-option]")
+    );
+    const navLinkElements = Array.from(
+      drawer.querySelectorAll("[data-mobile-nav-link]")
+    );
+    const tabPanels = Array.from(
+      drawer.querySelectorAll("[data-mobile-nav-content]")
+    );
+
+    let dropdownOpen = false;
+    let activeTabId =
+      drawer.dataset.defaultTabId ||
+      navOptionElements.find((option) => option.dataset.selected === "true")
+        ?.dataset.tabId ||
+      tabPanels[0]?.getAttribute("data-tab-id") ||
+      navOptionElements[0]?.dataset.tabId ||
+      null;
+
+    const updateSelectedOption = (tabId) => {
+      let selectedLabel = "";
+
+      navOptionElements.forEach((option) => {
+        const isSelected = option.dataset.tabId === tabId;
+        option.dataset.selected = isSelected ? "true" : "false";
+        option.setAttribute("aria-selected", isSelected ? "true" : "false");
+
+        const indicator = option.querySelector(
+          "[data-mobile-nav-option-indicator]"
+        );
+        if (indicator instanceof HTMLElement) {
+          indicator.dataset.selected = isSelected ? "true" : "false";
+        }
+
+        if (isSelected && !selectedLabel) {
+          selectedLabel =
+            option.dataset.label || option.textContent?.trim() || "";
+        }
+      });
+
+      if (!selectedLabel && navOptionElements[0]) {
+        selectedLabel =
+          navOptionElements[0].dataset.label ||
+          navOptionElements[0].textContent?.trim() ||
+          "";
+      }
+
+      if (selectedLabel) {
+        if (navLabel instanceof HTMLElement) {
+          navLabel.textContent = selectedLabel;
+        }
+        if (navTrigger instanceof HTMLElement) {
+          navTrigger.setAttribute("title", selectedLabel);
+        }
+      }
+    };
+
+    const setDropdownState = (open) => {
+      dropdownOpen = open;
+
+      if (navTrigger instanceof HTMLButtonElement) {
+        navTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+        navTrigger.dataset.open = open ? "true" : "false";
+      }
+
+      if (navChevron instanceof HTMLElement) {
+        navChevron.dataset.open = open ? "true" : "false";
+      }
+
+      if (navDropdown instanceof HTMLElement) {
+        navDropdown.dataset.open = open ? "true" : "false";
+        navDropdown.setAttribute("aria-hidden", open ? "false" : "true");
+
+        if (open) {
+          navDropdown.removeAttribute("hidden");
+        } else {
+          navDropdown.setAttribute("hidden", "true");
+        }
+      }
+    };
+
+    const closeDropdown = () => {
+      if (dropdownOpen) {
+        setDropdownState(false);
+      }
+    };
+
+    const focusSelectedOption = () => {
+      const selectedOption =
+        navOptionElements.find(
+          (option) => option.dataset.selected === "true"
+        ) || navOptionElements[0];
+
+      selectedOption?.focus();
+    };
+
+    const activateTab = (tabId) => {
+      if (!tabId) return;
+      activeTabId = tabId;
+      updateSelectedOption(tabId);
+
+      tabPanels.forEach((panel) => {
+        const isActive = panel.getAttribute("data-tab-id") === tabId;
+        if (isActive) {
+          panel.removeAttribute("hidden");
+        } else {
+          panel.setAttribute("hidden", "true");
+        }
+      });
+    };
+
+    const closeDrawer = () => {
+      closeDropdown();
+      drawer.classList.remove("open");
+      drawerButton.classList.remove("open");
+      drawerButton.setAttribute("aria-expanded", "false");
+    };
+
+    const openDrawer = () => {
+      drawer.classList.add("open");
+      drawerButton.classList.add("open");
+      drawerButton.setAttribute("aria-expanded", "true");
+      closeDropdown();
+      if (activeTabId) {
+        activateTab(activeTabId);
+      }
+    };
+
+    const toggleDrawer = () => {
+      if (drawer.classList.contains("open")) {
+        closeDrawer();
+      } else {
+        openDrawer();
+      }
+    };
+
+    const handleOptionSelection = (option) => {
+      const hasNav = option.dataset.hasNav === "true";
+      const href = option.dataset.href;
+      const tabId = option.dataset.tabId;
+
+      if (!tabId) {
+        closeDropdown();
+        return;
+      }
+
+      if (!hasNav && href) {
+        updateSelectedOption(tabId);
+        closeDropdown();
+        closeDrawer();
+        window.location.href = href;
+        return;
+      }
+
+      activateTab(tabId);
+      closeDropdown();
+      if (navTrigger instanceof HTMLButtonElement) {
+        navTrigger.focus();
+      }
+    };
+
+    const handleDocumentClick = (event) => {
+      if (!dropdownOpen) return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+
+      if (
+        navDropdown instanceof HTMLElement &&
+        navTrigger instanceof HTMLElement
+      ) {
+        if (!navDropdown.contains(target) && !navTrigger.contains(target)) {
+          closeDropdown();
+        }
+      } else if (!drawer.contains(target)) {
+        closeDropdown();
+      }
+    };
+
+    drawerButton.addEventListener("click", toggleDrawer);
+
+    if (navTrigger instanceof HTMLButtonElement) {
+      navTrigger.addEventListener("click", () => {
+        const willOpen = !dropdownOpen;
+        setDropdownState(willOpen);
+        if (willOpen) {
+          window.requestAnimationFrame(() => {
+            focusSelectedOption();
+          });
+        }
+      });
+
+      navTrigger.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          if (!dropdownOpen) {
+            setDropdownState(true);
+          }
+          window.requestAnimationFrame(() => {
+            focusSelectedOption();
+          });
+        } else if (
+          event.key === "Enter" ||
+          event.key === " " ||
+          event.key === "Space" ||
+          event.key === "Spacebar"
+        ) {
+          event.preventDefault();
+          const willOpen = !dropdownOpen;
+          setDropdownState(willOpen);
+          if (willOpen) {
+            window.requestAnimationFrame(() => {
+              focusSelectedOption();
+            });
+          }
+        } else if (event.key === "Escape" && dropdownOpen) {
+          event.preventDefault();
+          closeDropdown();
+        }
+      });
+    }
+
+    navOptionElements.forEach((option) => {
+      option.addEventListener("click", () => {
+        handleOptionSelection(option);
+      });
+
+      option.addEventListener("keydown", (event) => {
+        if (!navOptionElements.length) return;
+
+        const currentIndex = navOptionElements.indexOf(option);
+
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          const nextIndex = (currentIndex + 1) % navOptionElements.length;
+          navOptionElements[nextIndex]?.focus();
+        } else if (event.key === "ArrowUp") {
+          event.preventDefault();
+          const prevIndex =
+            (currentIndex - 1 + navOptionElements.length) %
+            navOptionElements.length;
+          navOptionElements[prevIndex]?.focus();
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          navOptionElements[0]?.focus();
+        } else if (event.key === "End") {
+          event.preventDefault();
+          navOptionElements[navOptionElements.length - 1]?.focus();
+        } else if (
+          event.key === "Enter" ||
+          event.key === " " ||
+          event.key === "Space" ||
+          event.key === "Spacebar"
+        ) {
+          event.preventDefault();
+          handleOptionSelection(option);
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          closeDropdown();
+          if (navTrigger instanceof HTMLButtonElement) {
+            navTrigger.focus();
+          }
+        } else if (event.key === "Tab") {
+          closeDropdown();
+        }
+      });
+    });
+
+    document.addEventListener("click", handleDocumentClick);
+
+    navLinkElements.forEach((link) => {
+      link.addEventListener("click", () => {
+        closeDrawer();
+      });
+    });
+
+    const mobileSearch = drawer.querySelector("[data-mobile-search]");
+    mobileSearch?.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target instanceof Element) {
+        const anchor = target.closest("a[href]");
+        if (anchor) {
+          closeDrawer();
+        }
+      }
+    });
+
+    mobileSearch?.addEventListener("focusin", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement) || target.type !== "text") {
+        return;
+      }
+      closeDrawer();
+      window.requestAnimationFrame(() => {
+        if (document.activeElement === target) {
+          target.blur();
+        }
+        document.dispatchEvent(
+          new CustomEvent("header:open-search", {
+            detail: {
+              trigger: target,
+              variant: "mobile",
+            },
+          })
+        );
+      });
+    });
+
+    drawer.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (dropdownOpen) {
+          event.stopPropagation();
+          closeDropdown();
+          if (navTrigger instanceof HTMLButtonElement) {
+            navTrigger.focus();
+          }
+          return;
+        }
+
+        closeDrawer();
+        drawerButton.focus();
+      }
+    });
+
+    drawer.dataset.mobileNavInitialized = "true";
+    if (activeTabId) {
+      activateTab(activeTabId);
+    } else if (navOptionElements[0]?.dataset.tabId) {
+      updateSelectedOption(navOptionElements[0].dataset.tabId);
+    }
+  }
+
+  function initializeHeaderSearch() {
+    const overlay = document.getElementById("header-search-overlay");
+    const searchButtons = Array.from(
+      document.querySelectorAll("[data-header-search-button]")
+    );
+
+    if (!overlay || overlay.dataset.searchInitialized === "true") {
+      return;
+    }
+
+    const closeButtons = overlay.querySelectorAll("[data-header-search-close]");
+    const dismissTarget = overlay.querySelector("[data-header-search-dismiss]");
+    const panel = overlay.querySelector("[data-header-search-panel]");
+    const overlayMobileClass = "header-search-overlay--mobile";
+    const panelMobileClass = "header-search-panel--mobile";
+    let lastTrigger = null;
+    let lastVariant = null;
+
+    const setExpandedState = (isOpen) => {
+      const expanded = isOpen ? "true" : "false";
+      searchButtons.forEach((button) => {
+        button.setAttribute("aria-expanded", expanded);
+        button.setAttribute("data-active", expanded);
+      });
+      overlay.dataset.open = expanded;
+      overlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    };
+
+    const focusSearchInput = () => {
+      window.requestAnimationFrame(() => {
+        const input = overlay.querySelector(
+          '[data-pagefind-ui] input[type="text"]'
+        );
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      });
+    };
+
+    const openOverlay = (trigger, options = {}) => {
+      lastTrigger = trigger ?? document.activeElement;
+      const variant = options.variant ?? null;
+      lastVariant = typeof variant === "string" ? variant : null;
+      overlay.classList.remove("hidden");
+      overlay.classList.add("flex");
+      const isMobileVariant = lastVariant === "mobile";
+      if (isMobileVariant) {
+        overlay.dataset.variant = "mobile";
+      } else {
+        delete overlay.dataset.variant;
+      }
+      overlay.classList.toggle(overlayMobileClass, isMobileVariant);
+      panel?.classList.toggle(panelMobileClass, isMobileVariant);
+      document.documentElement.classList.add("has-header-search-open");
+      setExpandedState(true);
+      focusSearchInput();
+    };
+
+    const closeOverlay = () => {
+      overlay.classList.add("hidden");
+      overlay.classList.remove("flex");
+      document.documentElement.classList.remove("has-header-search-open");
+      overlay.classList.remove(overlayMobileClass);
+      panel?.classList.remove(panelMobileClass);
+      delete overlay.dataset.variant;
+      setExpandedState(false);
+      if (lastTrigger instanceof HTMLElement) {
+        if (
+          lastVariant === "mobile" &&
+          typeof lastTrigger.blur === "function"
+        ) {
+          lastTrigger.blur();
+        } else if (lastVariant !== "mobile") {
+          lastTrigger.focus();
+        }
+      }
+      lastTrigger = null;
+      lastVariant = null;
+    };
+
+    searchButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        openOverlay(button);
+      });
+    });
+
+    closeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        closeOverlay();
+      });
+    });
+
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) {
+        closeOverlay();
+      }
+    });
+
+    dismissTarget?.addEventListener("click", closeOverlay);
+
+    const handleKeydown = (event) => {
+      const key = "key" in event ? event.key : undefined;
+      const isShortcut =
+        !!key && key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey);
+
+      if (isShortcut) {
+        event.preventDefault();
+        openOverlay(searchButtons[0] ?? null);
+        return;
+      }
+
+      if (key === "Escape" && overlay.dataset.open === "true") {
+        event.preventDefault();
+        closeOverlay();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeydown);
+
+    document.addEventListener("header:open-search", (event) => {
+      const detail =
+        event instanceof CustomEvent && typeof event.detail === "object"
+          ? event.detail
+          : {};
+      const trigger =
+        detail && detail.trigger instanceof HTMLElement ? detail.trigger : null;
+      openOverlay(trigger, detail);
+    });
+
+    document.addEventListener("astro:before-swap", () => {
+      if (overlay.dataset.open === "true") {
+        closeOverlay();
+      }
+    });
+
+    overlay.dataset.searchInitialized = "true";
+  }
+
+  const handleAfterSwap = () => {
+    initializeMobileNavigation();
+    initializeHeaderSearch();
+  };
+
+  document.addEventListener("astro:after-swap", handleAfterSwap);
+  handleAfterSwap();
+</script> <div class="flex pt-8"> <div class="hidden md:flex md:flex-col w-[240px] px-6 pb-6 pt-6 md:fixed md:top-16 md:bottom-0" data-left-nav-container data-astro-cid-73gi4scu><nav class="flex-1 overflow-y-auto overflow-x-visible" data-left-nav data-left-nav-id="/codex" data-astro-cid-73gi4scu><div data-astro-cid-73gi4scu><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="/codex" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Home</a></li><li data-astro-cid-73gi4scu><a href="/codex/quickstart" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Quickstart</a></li><li data-astro-cid-73gi4scu><a href="/codex/concepts" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Concepts</a></li><li data-astro-cid-73gi4scu><a href="/codex/models" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Models</a></li><li data-astro-cid-73gi4scu><a href="/codex/pricing" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Pricing</a></li><li data-astro-cid-73gi4scu><a href="/codex/changelog" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Changelog</a></li></ul></div><div data-astro-cid-73gi4scu><h3 class="mb-3 ml-3 mt-8 text-xs text-gray-500 dark:text-gray-400" data-astro-cid-73gi4scu>Codex CLI</h3><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="/codex/cli" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Overview</a></li><li data-astro-cid-73gi4scu><a href="/codex/cli/features" class="px-3 py-2 w-full rounded-lg transition-colors block text-gray-900 bg-gray-100 dark:text-white dark:bg-gray-800 " data-astro-cid-73gi4scu>Features</a></li><li data-astro-cid-73gi4scu><a href="/codex/cli/reference" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>CLI Reference</a></li><li data-astro-cid-73gi4scu><a href="/codex/local-config#cli" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Configuration</a></li></ul></div><div data-astro-cid-73gi4scu><h3 class="mb-3 ml-3 mt-8 text-xs text-gray-500 dark:text-gray-400" data-astro-cid-73gi4scu>Codex IDE Extension</h3><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="/codex/ide" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Set up your IDE</a></li><li data-astro-cid-73gi4scu><a href="/codex/local-config#ide" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Configuration</a></li><li data-astro-cid-73gi4scu><a href="/codex/ide/cloud-tasks" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>IDE → Cloud tasks</a></li></ul></div><div data-astro-cid-73gi4scu><h3 class="mb-3 ml-3 mt-8 text-xs text-gray-500 dark:text-gray-400" data-astro-cid-73gi4scu>Codex Cloud</h3><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="/codex/cloud" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Delegate to Codex</a></li><li data-astro-cid-73gi4scu><a href="/codex/cloud/environments" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Environments</a></li><li data-astro-cid-73gi4scu><a href="/codex/cloud/code-review" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Code Review</a></li><li data-astro-cid-73gi4scu><a href="/codex/cloud/internet-access" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Internet Access</a></li></ul></div><div data-astro-cid-73gi4scu><h3 class="mb-3 ml-3 mt-8 text-xs text-gray-500 dark:text-gray-400" data-astro-cid-73gi4scu>Codex SDK</h3><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="/codex/sdk" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Overview</a></li><li data-astro-cid-73gi4scu><a href="/codex/sdk#typescript-library" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>TypeScript</a></li><li data-astro-cid-73gi4scu><a href="/codex/sdk#github-action" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>GitHub Action</a></li></ul></div><div data-astro-cid-73gi4scu><h3 class="mb-3 ml-3 mt-8 text-xs text-gray-500 dark:text-gray-400" data-astro-cid-73gi4scu>Guides</h3><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="/codex/guides/agents-sdk" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Agents SDK</a></li><li data-astro-cid-73gi4scu><a href="/codex/prompting" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Prompting Codex</a></li><li data-astro-cid-73gi4scu><a href="/codex/guides/slash-commands" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Slash commands</a></li><li data-astro-cid-73gi4scu><a href="/codex/guides/agents-md" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Custom instructions with AGENTS.md</a></li><li data-astro-cid-73gi4scu><a href="/codex/mcp" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Model Context Protocol (MCP)</a></li><li data-astro-cid-73gi4scu><a href="/codex/autofix-ci" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Autofix CI</a></li><li data-astro-cid-73gi4scu><a href="/codex/guides/build-ai-native-engineering-team" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Build AI-Native Teams</a></li><li data-astro-cid-73gi4scu><a href="/codex/enterprise" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Enterprise Admin</a></li><li data-astro-cid-73gi4scu><a href="/codex/security" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Security Admin</a></li><li data-astro-cid-73gi4scu><a href="/codex/windows" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Windows</a></li></ul></div><div data-astro-cid-73gi4scu><h3 class="mb-3 ml-3 mt-8 text-xs text-gray-500 dark:text-gray-400" data-astro-cid-73gi4scu>Integrations</h3><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="/codex/integrations/slack" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 " data-astro-cid-73gi4scu>Slack</a></li></ul></div><div data-astro-cid-73gi4scu><h3 class="mb-3 ml-3 mt-8 text-xs text-gray-500 dark:text-gray-400" data-astro-cid-73gi4scu>Resources</h3><ul class="flex flex-col gap-0.5 text-sm text-gray-600 dark:text-gray-300 w-full" data-astro-cid-73gi4scu><li data-astro-cid-73gi4scu><a href="https://agents.md" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 flex items-center justify-between" target="_blank" rel="noopener noreferrer" data-astro-cid-73gi4scu>AGENTS.md<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 inline-block ml-1 text-gray-600 dark:text-gray-300 " data-astro-cid-73gi4scu="true" ><path d="M10.2426 0.757385C10.7949 0.757385 11.2426 1.2051 11.2426 1.75738V8.82845C11.2426 9.38074 10.7949 9.82845 10.2426 9.82845C9.69035 9.82845 9.24264 9.38074 9.24264 8.82845V4.1716L2.46446 10.9498C2.07394 11.3403 1.44077 11.3403 1.05025 10.9498C0.659724 10.5592 0.659723 9.92608 1.05025 9.53556L7.82842 2.75739H3.17157C2.61928 2.75739 2.17157 2.30967 2.17157 1.75738C2.17157 1.2051 2.61928 0.757385 3.17157 0.757385H10.2426Z" fill="currentColor"></path></svg></a></li><li data-astro-cid-73gi4scu><a href="https://github.com/openai/codex" class="px-3 py-2 w-full rounded-lg transition-colors block hover:text-gray-900 hover:bg-gray-50 dark:hover:text-gray-100 dark:hover:bg-gray-900 flex items-center justify-between" target="_blank" rel="noopener noreferrer" data-astro-cid-73gi4scu>Codex on GitHub<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 inline-block ml-1 text-gray-600 dark:text-gray-300 " data-astro-cid-73gi4scu="true" ><path d="M10.2426 0.757385C10.7949 0.757385 11.2426 1.2051 11.2426 1.75738V8.82845C11.2426 9.38074 10.7949 9.82845 10.2426 9.82845C9.69035 9.82845 9.24264 9.38074 9.24264 8.82845V4.1716L2.46446 10.9498C2.07394 11.3403 1.44077 11.3403 1.05025 10.9498C0.659724 10.5592 0.659723 9.92608 1.05025 9.53556L7.82842 2.75739H3.17157C2.61928 2.75739 2.17157 2.30967 2.17157 1.75738C2.17157 1.2051 2.61928 0.757385 3.17157 0.757385H10.2426Z" fill="currentColor"></path></svg></a></li></ul></div></nav></div><script>
+  const NAV_SELECTOR = "nav[data-left-nav]";
+  const STORAGE_PREFIX = "left-nav-scroll:";
+  const INITIALIZED_ATTRIBUTE = "data-left-nav-scroll-initialized";
+
+  const isStorageAvailable = (() => {
+    try {
+      const storageKey = `${STORAGE_PREFIX}__test__`;
+      sessionStorage.setItem(storageKey, "1");
+      sessionStorage.removeItem(storageKey);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  })();
+
+  const getNav = () => document.querySelector(NAV_SELECTOR);
+
+  const getStorageKey = (nav) =>
+    `${STORAGE_PREFIX}${nav.dataset.leftNavId ?? "default"}`;
+
+  const restoreScrollPosition = (nav) => {
+    if (!isStorageAvailable) return;
+    const storedValue = sessionStorage.getItem(getStorageKey(nav));
+    if (storedValue !== null) {
+      nav.scrollTop = Number(storedValue);
+    }
+  };
+
+  const saveScrollPosition = (nav) => {
+    if (!isStorageAvailable) return;
+    sessionStorage.setItem(getStorageKey(nav), String(nav.scrollTop));
+  };
+
+  const setupNav = () => {
+    const nav = getNav();
+    if (!nav || nav.getAttribute(INITIALIZED_ATTRIBUTE) === "true") return;
+
+    restoreScrollPosition(nav);
+
+    nav.addEventListener(
+      "scroll",
+      () => {
+        saveScrollPosition(nav);
+      },
+      { passive: true }
+    );
+
+    nav.setAttribute(INITIALIZED_ATTRIBUTE, "true");
+  };
+
+  const persistScrollPosition = () => {
+    const nav = getNav();
+    if (!nav) return;
+    saveScrollPosition(nav);
+  };
+
+  const initialize = () => {
+    setupNav();
+    const nav = getNav();
+    if (!nav) return;
+    restoreScrollPosition(nav);
+  };
+
+  window.addEventListener("pageshow", initialize);
+  document.addEventListener("astro:page-load", initialize);
+  document.addEventListener("astro:after-swap", initialize);
+
+  document.addEventListener("astro:before-swap", persistScrollPosition);
+  window.addEventListener("beforeunload", persistScrollPosition);
+
+  initialize();
+</script> <main class="flex-1 md:pl-[240px]"> <div class="px-4 py-12 mx-4 sm:mx-8 md:mx-auto md:max-w-6xl md:w-full"> <div class="mx-auto md:w-full grid grid-cols-1 gap-12 max-w-7xl xl:grid-cols-[minmax(0,1fr)_200px]"> <div class="hidden xl:flex fixed right-8 top-[7.5rem] z-30 w-[200px] max-h-[calc(100vh-7.5rem)] flex-col"> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><script>window._$HY||(e=>{let t=e=>e&&e.hasAttribute&&(e.hasAttribute("data-hk")?e:t(e.host&&e.host.nodeType?e.host:e.parentNode));["click", "input"].forEach((o=>document.addEventListener(o,(o=>{if(!e.events)return;let s=t(o.composedPath&&o.composedPath()[0]||o.target);s&&!e.completed.has(s)&&e.events.push([s,o])}))))})(_$HY={events:[],completed:new WeakSet,r:{},fe(){}});</script><!--xs--><astro-island uid="Z12bmnv" data-solid-render-id="s0" component-url="/_astro/TableOfContents.BCkPYL_I.js" component-export="default" renderer-url="/_astro/client.any8AbzQ.js" props="{&quot;variant&quot;:[0,&quot;static&quot;],&quot;class&quot;:[0,&quot;flex-1 overflow-y-auto pr-1&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;TableOfContents&quot;,&quot;value&quot;:true}" await-children><nav data-hk=s00000 class="hidden xl:block w-full overflow-y-auto flex-1 overflow-y-auto pr-1"><div class="relative"><div class="absolute left-0 top-0 bottom-0 w-[2.15px] bg-gray-100 dark:bg-gray-700"></div><div class="absolute left-0 w-[2.15px] bg-gray-700 dark:bg-gray-200 transition-transform duration-200 ease-out" style="transform:translateY(0);height:0px"></div><ul class="relative list-none p-0 m-0 ml-3 space-y-3 font-medium"></ul></div></nav><!--astro:end--></astro-island> <div class="mt-8 shrink-0"> <script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><astro-island uid="1ipq3I" component-url="/_astro/PageActions.CgXehJHc.js" component-export="default" renderer-url="/_astro/client.any8AbzQ.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;PageActions&quot;,&quot;value&quot;:&quot;solid-js&quot;}"></astro-island> </div> </div> <!-- MAIN --> <div class="space-y-12"> <div class="space-y-8"> <!-- Title + tagline --> <header class="space-y-4 pt-10 text-center"> <h1 class="text-5xl md:text-5xl font-medium tracking-tight text-gray-900 dark:text-white"> Codex CLI features </h1> <p class="mx-auto max-w-3xl md:text-xl text-gray-500 dark:text-gray-400 leading-relaxed"> Deep dives on the interactive terminal, model controls, approvals, scripting, and more. </p>  </header>  </div> <!-- Content --> <article class="article-container prose dark:prose-invert prose-lg max-w-none pt-4 pb-0" id="track-content"> <p>Codex ships with a rich set of workflows that go beyond a simple chat interface. Use this guide to understand what each experience unlocks and how to make the most of them.</p>
+<h2 id="running-in-interactive-mode" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Running in interactive mode</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="running-in-interactive-mode" aria-label="Copy link to running in interactive mode" title="Copy link to running in interactive mode"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Codex launches into a full-screen terminal UI that can read your repository, make edits, and run commands as you iterate together. Use it whenever you want a conversational workflow where you can review Codex’s actions in real time.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span></span></code></pre>
+<p>Once the session is open you can:</p>
+<ul>
+<li>Send prompts, code snippets, or screenshots (see <a href="#image-inputs">image inputs</a>) directly into the composer.</li>
+<li>Watch Codex explain its plan before making a change, and approve or reject steps inline.</li>
+<li>Press <kbd>Ctrl</kbd>+<kbd>C</kbd> or use <code>/exit</code> to close the interactive session when you’re done.</li>
+</ul>
+<h2 id="resuming-conversations" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Resuming conversations</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="resuming-conversations" aria-label="Copy link to resuming conversations" title="Copy link to resuming conversations"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Codex stores your transcripts locally so you can pick up where you left off instead of repeating context. Use the <code>resume</code> subcommand when you want to reopen an earlier thread with the same repository state and instructions.</p>
+<ul>
+<li><code>codex resume</code> launches a picker of recent interactive sessions. Highlight a run to see its summary and press <kbd>Enter</kbd> to reopen it.</li>
+<li><code>codex resume --last</code> skips the picker and jumps straight to your most recent session.</li>
+<li><code>codex resume &lt;SESSION_ID&gt;</code> targets a specific run. You can copy the ID from the picker, <code>/status</code>, or the files under <code>~/.codex/sessions/</code>.</li>
+</ul>
+<p>Non-interactive automations can resume too:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> exec</span><span style="color:#9ECBFF"> resume</span><span style="color:#79B8FF"> --last</span><span style="color:#9ECBFF"> &quot;Fix the race conditions you found&quot;</span></span>
+<span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> exec</span><span style="color:#9ECBFF"> resume</span><span style="color:#9ECBFF"> 7f9f9a2e-1b3c-4c7a-9b0e-....</span><span style="color:#9ECBFF"> &quot;Implement the plan&quot;</span></span></code></pre>
+<p>Each resumed run keeps the original transcript, plan history, and approvals, so Codex can use prior context while you supply new instructions. Override the working directory with <code>--cd</code> or add extra roots with <code>--add-dir</code> if you need to steer the environment before resuming.</p>
+<h2 id="models--reasoning" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Models &amp; reasoning</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="models--reasoning" aria-label="Copy link to models  reasoning" title="Copy link to models  reasoning"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Codex defaults to <code>gpt-5-codex</code> on macOS and Linux, and <code>gpt-5</code> on Windows. Switch models mid-session with the <code>/model</code> command, or specify one when launching the CLI.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#79B8FF"> --model</span><span style="color:#9ECBFF"> gpt-5-codex</span></span></code></pre>
+<p><a href="/codex/models">Learn more about the models available in Codex</a>.</p>
+<h2 id="image-inputs" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Image inputs</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="image-inputs" aria-label="Copy link to image inputs" title="Copy link to image inputs"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Attach screenshots or design specs so Codex can read the pixels alongside your prompt. You can paste images into the interactive composer or provide files on the command line.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#79B8FF"> -i</span><span style="color:#9ECBFF"> screenshot.png</span><span style="color:#9ECBFF"> &quot;Explain this error&quot;</span></span></code></pre>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#79B8FF"> --image</span><span style="color:#9ECBFF"> img1.png,img2.jpg</span><span style="color:#9ECBFF"> &quot;Summarize these diagrams&quot;</span></span></code></pre>
+<p>Codex accepts common formats such as PNG and JPEG. Use comma-separated filenames for multiple images, and combine them with text instructions to provide additional context.</p>
+<h2 id="running-local-code-review" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Running local code review</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="running-local-code-review" aria-label="Copy link to running local code review" title="Copy link to running local code review"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Type <code>/review</code> in the CLI to open Codex’s review presets. The CLI launches a dedicated reviewer that reads the diff you select and reports prioritized, actionable findings without touching your working tree.</p>
+<ul>
+<li><strong>Review against a base branch</strong> lets you pick a local branch; Codex finds the merge base against its upstream, diffs your work, and highlights the biggest risks before you open a pull request.</li>
+<li><strong>Review uncommitted changes</strong> inspects everything that’s staged, unstaged, or untracked so you can address issues before committing.</li>
+<li><strong>Review a commit</strong> lists recent commits and has Codex read the exact change set for the SHA you choose.</li>
+<li><strong>Custom review instructions</strong> accepts your own wording (for example, “Focus on accessibility regressions”) and runs the same reviewer with that prompt.</li>
+</ul>
+<p>Each run shows up as its own turn in the transcript, so you can rerun reviews as the code evolves and compare the feedback.</p>
+<h2 id="web-search" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Web search</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="web-search" aria-label="Copy link to web search" title="Copy link to web search"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Codex ships with a first-party web search tool that stays disabled until you opt in. Enable it in <code>~/.codex/config.toml</code> (or pass the <code>--search</code> flag) and optionally allow network access if you’re running in the default sandbox:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="toml"><code><span class="line"><span style="color:#E1E4E8">[</span><span style="color:#B392F0">features</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">web_search_request = </span><span style="color:#79B8FF">true</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">[</span><span style="color:#B392F0">sandbox_workspace_write</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#E1E4E8">network_access = </span><span style="color:#79B8FF">true</span></span></code></pre>
+<p>Once enabled, Codex can call the search tool when it needs fresh context. You’ll see <code>web_search</code> items in the transcript or <code>codex exec --json</code> output whenever Codex looks something up.</p>
+<h2 id="running-with-an-input-prompt" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Running with an input prompt</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="running-with-an-input-prompt" aria-label="Copy link to running with an input prompt" title="Copy link to running with an input prompt"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>When you just need a quick answer, run Codex with a single prompt and skip the interactive UI.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> &quot;explain this codebase&quot;</span></span></code></pre>
+<p>Codex will read the working directory, craft a plan, and stream the response back to your terminal before exiting. Pair this with flags like <code>--path</code> to target a specific directory or <code>--model</code> to dial in the behavior up front.</p>
+<h2 id="shell-completions" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Shell completions</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="shell-completions" aria-label="Copy link to shell completions" title="Copy link to shell completions"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Speed up everyday usage by installing the generated completion scripts for your shell:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> completion</span><span style="color:#9ECBFF"> bash</span></span>
+<span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> completion</span><span style="color:#9ECBFF"> zsh</span></span>
+<span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> completion</span><span style="color:#9ECBFF"> fish</span></span></code></pre>
+<p>Eval the completion script in your shell configuration file to set up the completions for new sessions. For example if you use zsh, you can add the following to the end of your <code>~/.zshrc</code> file:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D"># ~/.zshrc</span></span>
+<span class="line"><span style="color:#79B8FF">eval</span><span style="color:#9ECBFF"> &quot;$(</span><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> completion zsh)&quot;</span></span></code></pre>
+<p>Start a new session, type <code>codex</code> and press <kbd>Tab</kbd> to see the completions. If you see a <code>command not found: compdef</code> error, you need to enable <code>compdef</code> by adding <code>autoload -Uz compinit &amp;&amp; compinit</code> to your <code>~/.zshrc</code> file before the <code>eval &quot;$(codex completion zsh)&quot;</code> line and then restarting your shell.</p>
+<h2 id="approval-modes" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Approval modes</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="approval-modes" aria-label="Copy link to approval modes" title="Copy link to approval modes"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Approval modes define how much Codex can do without stopping for confirmation. Use <code>/approvals</code> inside an interactive session to switch modes as your comfort level changes.</p>
+<ul>
+<li><strong>Auto</strong> (default) lets Codex read files, edit, and run commands within the working directory. It still asks before touching anything outside that scope or using the network.</li>
+<li><strong>Read Only</strong> keeps Codex in a consultative mode. It can browse files but won’t make changes or execute commands until you approve a plan.</li>
+<li><strong>Full Access</strong> grants Codex the ability to work across your machine, including network access, without asking. Use it sparingly and only when you trust the repository and task.</li>
+</ul>
+<p>Codex always surfaces a transcript of its actions, so you can review or roll back changes with your usual git workflow.</p>
+<h2 id="scripting-codex" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Scripting Codex</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="scripting-codex" aria-label="Copy link to scripting codex" title="Copy link to scripting codex"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Automate workflows or wire Codex into your existing scripts with the <code>exec</code> subcommand. This runs Codex non-interactively, piping the final plan and results back to stdout.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> exec</span><span style="color:#9ECBFF"> &quot;fix the CI failure&quot;</span></span></code></pre>
+<p>Combine <code>exec</code> with shell scripting to build custom workflows, such as automatically updating changelogs, triaging issues, or enforcing editorial checks before a PR ships.</p>
+<h2 id="working-with-codex-cloud" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Working with Codex Cloud</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="working-with-codex-cloud" aria-label="Copy link to working with codex cloud" title="Copy link to working with codex cloud"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>The <code>codex cloud</code> command lets you triage and launch <a href="/codex/cloud">Codex Cloud tasks</a> without leaving the terminal. Run it with no arguments to open an interactive picker, browse active or finished tasks, and apply the changes to your local project.</p>
+<p>Alternatively you can start a task directly from the terminal:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">codex</span><span style="color:#9ECBFF"> cloud</span><span style="color:#9ECBFF"> exec</span><span style="color:#79B8FF"> --env</span><span style="color:#9ECBFF"> ENV_ID</span><span style="color:#9ECBFF"> &quot;Summarize open bugs&quot;</span></span></code></pre>
+<p>Add <code>--attempts</code> (1–4) to request best-of-N runs when you want Codex Cloud to generate multiple solutions. For example, <code>codex cloud exec --env ENV_ID --attempts 3 &quot;Summarize open bugs&quot;</code>.</p>
+<p>Environment IDs come from your Codex Cloud configuration—use <code>codex cloud</code> and press <kbd>Ctrl</kbd>+<kbd>O</kbd> to choose an environment or the web dashboard to confirm the exact value. Authentication follows your existing CLI login, and the command exits non-zero if submission fails so you can wire it into scripts or CI safely.</p>
+<h2 id="slash-commands" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Slash commands</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="slash-commands" aria-label="Copy link to slash commands" title="Copy link to slash commands"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Slash commands give you quick access to specialized workflows like <code>/review</code>, <code>/plan</code>, or your own reusable prompts. Codex ships with a curated set of built-ins, and you can create custom ones for team-specific tasks or personal shortcuts.</p>
+<p>See the <a href="/codex/guides/slash-commands">slash commands guide</a> to browse the catalog of built-ins, learn how to author custom commands, and understand where they live on disk.</p>
+<h2 id="model-context-protocol-mcp" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Model Context Protocol (MCP)</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="model-context-protocol-mcp" aria-label="Copy link to model context protocol mcp" title="Copy link to model context protocol mcp"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<p>Connect Codex to additional tools by configuring Model Context Protocol servers. Add STDIO or streamable HTTP servers in <code>~/.codex/config.toml</code>, or manage them with the <code>codex mcp</code> CLI commands—Codex launches them automatically when a session starts and exposes their tools next to the built-ins. You can even run Codex itself as an MCP server when you need it inside another agent.</p>
+<p>See <a href="/codex/mcp">Model Context Protocol</a> for example configs, supported auth flows, and a deeper walkthrough.</p>
+<h2 id="tips--shortcuts" class="group flex items-center gap-2 scroll-mt-[110px] " ><span class="min-w-0">Tips &amp; shortcuts</span><button type="button" class="shrink-0 self-center inline-flex items-center justify-center rounded-md p-1 opacity-0 transition-colors transition-opacity duration-200 ease-out text-gray-400 hover:text-gray-900 focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300 group-hover:opacity-100 dark:text-gray-500 dark:hover:text-gray-200 dark:focus-visible:outline-gray-600 motion-reduce:transition-none" data-anchor-id="tips--shortcuts" aria-label="Copy link to tips  shortcuts" title="Copy link to tips  shortcuts"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 "><path d="M18.2929 5.7071C16.4743 3.88849 13.5257 3.88849 11.7071 5.7071L10.7071 6.7071C10.3166 7.09763 9.68341 7.09763 9.29289 6.7071C8.90236 6.31658 8.90236 5.68341 9.29289 5.29289L10.2929 4.29289C12.8926 1.69322 17.1074 1.69322 19.7071 4.29289C22.3068 6.89255 22.3068 11.1074 19.7071 13.7071L18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071C16.9024 14.3166 16.9024 13.6834 17.2929 13.2929L18.2929 12.2929C20.1115 10.4743 20.1115 7.52572 18.2929 5.7071ZM15.7071 8.29289C16.0976 8.68341 16.0976 9.31658 15.7071 9.7071L9.7071 15.7071C9.31658 16.0976 8.68341 16.0976 8.29289 15.7071C7.90236 15.3166 7.90236 14.6834 8.29289 14.2929L14.2929 8.29289C14.6834 7.90236 15.3166 7.90236 15.7071 8.29289ZM6.7071 9.29289C7.09763 9.68341 7.09763 10.3166 6.7071 10.7071L5.7071 11.7071C3.88849 13.5257 3.88849 16.4743 5.7071 18.2929C7.52572 20.1115 10.4743 20.1115 12.2929 18.2929L13.2929 17.2929C13.6834 16.9024 14.3166 16.9024 14.7071 17.2929C15.0976 17.6834 15.0976 18.3166 14.7071 18.7071L13.7071 19.7071C11.1074 22.3068 6.89255 22.3068 4.29289 19.7071C1.69322 17.1074 1.69322 12.8926 4.29289 10.2929L5.29289 9.29289C5.68341 8.90236 6.31658 8.90236 6.7071 9.29289Z" fill="currentColor"></path></svg></button></h2>
+<ul>
+<li>Type <code>@</code> in the composer to open a fuzzy file search over the workspace root; press <kbd>Tab</kbd> or <kbd>Enter</kbd> to drop the highlighted path into your message.</li>
+<li>Tap <kbd>Esc</kbd> twice while the composer is empty to edit your previous user message. Continue pressing <kbd>Esc</kbd> to walk further back in the transcript, then hit <kbd>Enter</kbd> to fork from that point.</li>
+<li>Launch Codex from any directory using <code>codex --cd &lt;path&gt;</code> to set the working root without running <code>cd</code> first. The active path is echoed in the TUI header.</li>
+<li>Expose additional writable roots with <code>--add-dir</code> (e.g., <code>codex --cd apps/frontend --add-dir ../backend --add-dir ../shared</code>) when you need to coordinate changes across multiple projects.</li>
+</ul> </article> <div class="mt-8 flex justify-start xl:hidden"> <astro-island uid="1tWVsX" component-url="/_astro/PageActions.CgXehJHc.js" component-export="default" renderer-url="/_astro/client.any8AbzQ.js" props="{&quot;menuPlacement&quot;:[0,&quot;up-left&quot;]}" ssr client="only" opts="{&quot;name&quot;:&quot;PageActions&quot;,&quot;value&quot;:&quot;solid-js&quot;}"></astro-island> </div> </div> <!-- Spacer for fixed TOC --> <div></div> </div> </div>   <script>
+    const copyHeadingLink = async (slug) => {
+      const url = `${location.origin}${location.pathname}#${slug}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(url);
+          return;
+        } catch (error) {
+          console.warn("Copy to clipboard failed", error);
+        }
+      }
+
+      window.prompt("Copy link", url);
+    };
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const button = target.closest("[data-anchor-id]");
+      if (!button) return;
+
+      const slug = button.getAttribute("data-anchor-id");
+      if (!slug) return;
+
+      event.preventDefault();
+      copyHeadingLink(slug);
+      const heading = document.getElementById(slug);
+      if (heading) {
+        heading.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      history.replaceState(null, "", `#${slug}`);
+    });
+  </script>  <nav class="px-2 md:px-8 lg:px-16 w-full mb-8"><div class="flex justify-between items-center"><a href="/codex/cli" class="flex items-end gap-4"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-gray-800 dark:text-gray-200 mb-1 " ><path d="M3 12C3 11.7348 3.10536 11.4804 3.29289 11.2929L10.2929 4.29289C10.6834 3.90237 11.3166 3.90237 11.7071 4.29289C12.0976 4.68342 12.0976 5.31658 11.7071 5.70711L6.41421 11H20C20.5523 11 21 11.4477 21 12C21 12.5523 20.5523 13 20 13L6.41422 13L11.7071 18.2929C12.0976 18.6834 12.0976 19.3166 11.7071 19.7071C11.3166 20.0976 10.6834 20.0976 10.2929 19.7071L3.29289 12.7071C3.10536 12.5196 3 12.2652 3 12Z" fill="currentColor"></path></svg><div class="flex flex-col"><div class="text-xs font-bold text-gray-800 dark:text-gray-200">
+Previous
+</div><div class="text-sm text-gray-500 dark:text-gray-400">Overview</div></div></a><a href="/codex/cli/reference" class="flex items-end gap-2"><div class="flex flex-col"><div class="text-xs font-bold text-gray-800 dark:text-gray-200">
+Next
+</div><div class="text-sm text-gray-500 dark:text-gray-400">CLI Reference</div></div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-gray-800 dark:text-gray-200 mb-1 " ><path d="M21 12C21 12.2652 20.8946 12.5196 20.7071 12.7071L13.7071 19.7071C13.3166 20.0976 12.6834 20.0976 12.2929 19.7071C11.9024 19.3166 11.9024 18.6834 12.2929 18.2929L17.5858 13H4C3.44772 13 3 12.5523 3 12C3 11.4477 3.44772 11 4 11L17.5858 11L12.2929 5.70711C11.9024 5.31658 11.9024 4.68342 12.2929 4.29289C12.6834 3.90237 13.3166 3.90237 13.7071 4.29289L20.7071 11.2929C20.8946 11.4804 21 11.7348 21 12Z" fill="currentColor"></path></svg></a></div></nav> </main> </div> <astro-island uid="DQ4jb" component-url="/_astro/Analytics.B8u7a6Um.js" component-export="default" renderer-url="/_astro/client.any8AbzQ.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;VercelAnalyticsClient&quot;,&quot;value&quot;:&quot;solid-js&quot;}"></astro-island> </body></html>

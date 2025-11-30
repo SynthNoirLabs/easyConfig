@@ -12,6 +12,13 @@ const (
 
 // WorkflowTemplate holds the content and metadata for a workflow
 type WorkflowTemplate struct {
+	ID                TemplateID
+	Name              string
+	Description       string
+	Agent             string
+	Trigger           string
+	Tags              []string
+	DefaultFilename   string
 	Content           string
 	RequiredSecrets   []string
 	SetupInstructions string
@@ -19,6 +26,13 @@ type WorkflowTemplate struct {
 
 var templates = map[TemplateID]WorkflowTemplate{
 	ClaudeComment: {
+		ID:              ClaudeComment,
+		Name:            "Claude comment triage",
+		Description:     "Runs Claude when a comment includes /claude to triage issues/PRs.",
+		Agent:           "Claude",
+		Trigger:         "Comment",
+		Tags:            []string{"claude", "comment", "triage"},
+		DefaultFilename: "claude-comment.yml",
 		Content: `name: Claude Agent
 on:
   issue_comment:
@@ -50,6 +64,13 @@ jobs:
 		SetupInstructions: "Tip: Run `/install-github-app` in your Claude Code terminal for a guided setup.",
 	},
 	JulesLabel: {
+		ID:              JulesLabel,
+		Name:            "Jules label responder",
+		Description:     "Triggers Jules when an issue gets the 'jules' label.",
+		Agent:           "Jules",
+		Trigger:         "Label",
+		Tags:            []string{"jules", "label", "issues"},
+		DefaultFilename: "jules-label.yml",
 		Content: `name: Jules Agent
 on:
   issues:
@@ -77,6 +98,13 @@ jobs:
 		SetupInstructions: "Ensure you have the 'jules' label created in your repository.",
 	},
 	CodexPR: {
+		ID:              CodexPR,
+		Name:            "Codex PR reviewer",
+		Description:     "Uses Codex/OpenAI to review pull requests on open/synchronize.",
+		Agent:           "Codex",
+		Trigger:         "PR",
+		Tags:            []string{"codex", "openai", "pull_request"},
+		DefaultFilename: "codex-pr.yml",
 		Content: `name: Codex Review
 on:
   pull_request:
@@ -101,6 +129,13 @@ jobs:
 		SetupInstructions: "Get your API key from platform.openai.com.",
 	},
 	CopilotManual: {
+		ID:              CopilotManual,
+		Name:            "Copilot manual dispatch",
+		Description:     "Manually trigger Copilot CLI tasks via workflow_dispatch input.",
+		Agent:           "Copilot",
+		Trigger:         "Manual",
+		Tags:            []string{"copilot", "manual"},
+		DefaultFilename: "copilot-task.yml",
 		Content: `name: Copilot Task
 on:
   workflow_dispatch:

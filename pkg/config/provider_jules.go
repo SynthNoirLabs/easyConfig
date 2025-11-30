@@ -84,6 +84,12 @@ func (p *JulesProvider) Discover(projectPath string) ([]Item, error) {
 }
 
 func (p *JulesProvider) CheckStatus() ProviderStatus {
+	const (
+		msgHomeMissing   = "Home directory not found."
+		msgConfigMissing = "Global config not found. Create one to get started."
+		msgConfigOK      = "Configuration file found. (Authentication not yet verified)."
+	)
+
 	status := ProviderStatus{
 		ProviderName: p.Name(),
 		LastChecked:  time.Now().Format(time.RFC3339),
@@ -92,7 +98,7 @@ func (p *JulesProvider) CheckStatus() ProviderStatus {
 	home := paths.GetHomeDir()
 	if home == "" {
 		status.Health = StatusUnhealthy
-		status.StatusMessage = "Home directory not found."
+		status.StatusMessage = msgHomeMissing
 		return status
 	}
 
@@ -102,10 +108,10 @@ func (p *JulesProvider) CheckStatus() ProviderStatus {
 
 	if !FileExists(configPath) {
 		status.Health = StatusUnhealthy
-		status.StatusMessage = "Global config not found. Create one to get started."
+		status.StatusMessage = msgConfigMissing
 	} else {
 		status.Health = StatusHealthy
-		status.StatusMessage = "Configuration file found. (Authentication not yet verified)."
+		status.StatusMessage = msgConfigOK
 	}
 
 	return status

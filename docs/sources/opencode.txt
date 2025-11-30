@@ -1,0 +1,2 @@
+# OpenCode configuration
+https://opencode.ai/docs/config/
