@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -128,4 +129,15 @@ func (p *CrushProvider) Discover(projectPath string) ([]Item, error) {
 		}
 	}
 	return items, nil
+}
+
+func (p *CrushProvider) CheckStatus() ProviderStatus {
+	files, _ := p.Discover("")
+	return ProviderStatus{
+		ProviderName:    p.Name(),
+		Health:          StatusHealthy,
+		StatusMessage:   "Crush status checking not implemented yet.",
+		DiscoveredFiles: files,
+		LastChecked:     time.Now().Format(time.RFC3339),
+	}
 }

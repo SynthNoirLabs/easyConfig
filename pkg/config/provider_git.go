@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -105,4 +106,15 @@ func (p *GitProvider) Discover(projectPath string) ([]Item, error) {
 	}
 
 	return items, nil
+}
+
+func (p *GitProvider) CheckStatus() ProviderStatus {
+	files, _ := p.Discover("")
+	return ProviderStatus{
+		ProviderName:    p.Name(),
+		Health:          StatusHealthy,
+		StatusMessage:   "Git status checking not implemented yet.",
+		DiscoveredFiles: files,
+		LastChecked:     time.Now().Format(time.RFC3339),
+	}
 }

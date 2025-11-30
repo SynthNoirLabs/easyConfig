@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
+import ProviderStatusWidget from "./ProviderStatusWidget";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -121,6 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, onSelect, onAdd, currentView, 
           </div>
         ))}
       </div>
+      <ProviderStatusWidget />
     </div>
   );
 };

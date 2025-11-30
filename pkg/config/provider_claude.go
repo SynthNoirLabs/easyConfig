@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -189,4 +190,34 @@ func (p *ClaudeProvider) Discover(projectPath string) ([]Item, error) {
 	}
 
 	return items, nil
+}
+
+func (p *ClaudeProvider) CheckStatus() ProviderStatus {
+	status := ProviderStatus{
+		ProviderName: p.Name(),
+		LastChecked:  time.Now().Format(time.RFC3339),
+	}
+
+	// For Claude, we'll check for the global settings file.
+	// A more robust check could validate the contents, check for auth keys, etc.
+	home := paths.GetHomeDir()
+	if home == "" {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = "Home directory not found."
+		return status
+	}
+
+	cliSettingsPath := filepath.Join(home, ".claude", "settings.json")
+	files, _ := p.Discover("") // project path is empty for global checks
+	status.DiscoveredFiles = files
+
+	if !FileExists(cliSettingsPath) {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = "Global CLI settings not found. Use 'Create' to set one up."
+	} else {
+		status.Health = StatusHealthy
+		status.StatusMessage = "Configuration files found. (Authentication not yet verified)."
+	}
+
+	return status
 }

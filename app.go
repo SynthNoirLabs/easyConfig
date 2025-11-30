@@ -294,3 +294,8 @@ func (a *App) SaveWorkflow(filename, content string) error {
 func (a *App) GetSupportedWorkflows() []string {
 	return a.workflowGen.GetSupportedWorkflows()
 }
+
+// GetProviderStatuses returns the health status of all registered providers.
+func (a *App) GetProviderStatuses() []config.ProviderStatus {
+	return a.discoveryService.GetProviderStatuses()
+}

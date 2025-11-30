@@ -150,3 +150,15 @@ func (s *DiscoveryService) SaveConfig(path, content string) error {
 	}
 	return nil
 }
+
+// GetProviderStatuses iterates through all registered providers and returns their health status.
+func (s *DiscoveryService) GetProviderStatuses() []ProviderStatus {
+	var statuses []ProviderStatus
+
+	for _, p := range s.providers {
+		status := p.CheckStatus()
+		statuses = append(statuses, status)
+	}
+
+	return statuses
+}

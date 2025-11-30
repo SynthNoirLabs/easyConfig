@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -81,4 +82,15 @@ func (p *CopilotProvider) Discover(projectPath string) ([]Item, error) {
 		}
 	}
 	return items, nil
+}
+
+func (p *CopilotProvider) CheckStatus() ProviderStatus {
+	files, _ := p.Discover("")
+	return ProviderStatus{
+		ProviderName:    p.Name(),
+		Health:          StatusUnknown,
+		StatusMessage:   "Copilot status checking not implemented yet.",
+		DiscoveredFiles: files,
+		LastChecked:     time.Now().Format(time.RFC3339),
+	}
 }

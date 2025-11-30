@@ -1,7 +1,7 @@
 import { Toaster, toast } from "sonner";
 import { useState } from "react";
 import "./App.css";
-import type { config } from "../wailsjs/go/config/models";
+import type { config } from "../wailsjs/go/models"; // Corrected import path
 import AddConfigModal from "./components/AddConfigModal";
 import ConfigEditor from "./components/ConfigEditor";
 import Layout from "./components/Layout";
@@ -12,11 +12,11 @@ import { useConfig } from "./context/ConfigContext";
 
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
-  const [selectedItem, setSelectedItem] = useState<config.ConfigItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<config.Item | null>(null); // Corrected type
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<"configs" | "workflows" | "marketplace">("configs");
 
-  const handleSelectConfig = (item: config.ConfigItem) => {
+  const handleSelectConfig = (item: config.Item) => { // Corrected type
     setSelectedItem(item);
   };
 
@@ -54,7 +54,7 @@ function AppContent() {
       case "workflows":
         return <Workflows />;
       case "marketplace":
-        return <Marketplace />; // We need to import this
+        return <Marketplace />;
       case "configs":
       default:
         return selectedItem ? (
