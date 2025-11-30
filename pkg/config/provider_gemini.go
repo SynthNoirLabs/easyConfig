@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -262,4 +263,32 @@ func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
 	}
 
 	return items, nil
+}
+
+func (p *GeminiProvider) CheckStatus() ProviderStatus {
+	status := ProviderStatus{
+		ProviderName: p.Name(),
+		LastChecked:  time.Now().Format(time.RFC3339),
+	}
+
+	home := paths.GetHomeDir()
+	if home == "" {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = "Home directory not found."
+		return status
+	}
+
+	configPath := filepath.Join(home, ".gemini", "settings.json")
+	files, _ := p.Discover("")
+	status.DiscoveredFiles = files
+
+	if !FileExists(configPath) {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = "Global settings file not found. Create one to get started."
+	} else {
+		status.Health = StatusHealthy
+		status.StatusMessage = "Configuration file found. (Authentication not yet verified)."
+	}
+
+	return status
 }

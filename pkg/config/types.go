@@ -32,6 +32,24 @@ type Item struct {
 	Exists   bool   `json:"exists"`
 }
 
+// HealthStatus defines the overall health of a provider's configuration
+type HealthStatus string
+
+const (
+	StatusHealthy   HealthStatus = "healthy"
+	StatusUnhealthy HealthStatus = "unhealthy"
+	StatusUnknown   HealthStatus = "unknown"
+)
+
+// ProviderStatus represents the health and configuration status of a provider
+type ProviderStatus struct {
+	ProviderName    string       `json:"providerName"`
+	Health          HealthStatus `json:"health"`
+	StatusMessage   string       `json:"statusMessage,omitempty"`
+	DiscoveredFiles []Item       `json:"discoveredFiles,omitempty"`
+	LastChecked     string       `json:"lastChecked"` // ISO 8601 format
+}
+
 // Provider defines the interface for a tool configuration provider
 type Provider interface {
 	// Name returns the unique name of the provider (e.g. "Claude Code")
@@ -43,4 +61,6 @@ type Provider interface {
 	// projectPath: required if scope is "project"
 	// Returns the path of the created file or error
 	Create(scope Scope, projectPath string) (string, error)
+	// CheckStatus performs a health check on the provider's configuration
+	CheckStatus() ProviderStatus
 }

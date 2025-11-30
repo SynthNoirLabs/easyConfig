@@ -10,24 +10,12 @@ export function CreateConfig(arg1, arg2, arg3) {
   return window['go']['main']['App']['CreateConfig'](arg1, arg2, arg3);
 }
 
-export function DeleteConfig(arg1) {
-  return window['go']['main']['App']['DeleteConfig'](arg1);
-}
-
 export function DeleteProfile(arg1) {
   return window['go']['main']['App']['DeleteProfile'](arg1);
 }
 
 export function DiscoverConfigs(arg1) {
   return window['go']['main']['App']['DiscoverConfigs'](arg1);
-}
-
-export function FetchPopularServers() {
-  return window['go']['main']['App']['FetchPopularServers']();
-}
-
-export function FetchSchemas() {
-  return window['go']['main']['App']['FetchSchemas']();
 }
 
 export function GenerateWorkflow(arg1, arg2) {
@@ -46,6 +34,10 @@ export function InstallMCPPackage(arg1) {
   return window['go']['main']['App']['InstallMCPPackage'](arg1);
 }
 
+export function FetchPopularServers() {
+  return window['go']['main']['App']['FetchPopularServers']();
+}
+
 export function ListProfiles() {
   return window['go']['main']['App']['ListProfiles']();
 }
@@ -56,6 +48,10 @@ export function ListWorkflowTemplates() {
 
 export function ListDocs() {
   return window['go']['main']['App']['ListDocs']();
+}
+
+export function DeleteConfig(arg1) {
+  return window['go']['main']['App']['DeleteConfig'](arg1);
 }
 
 export function ReadConfig(arg1) {
@@ -80,4 +76,8 @@ export function SetSecret(arg1, arg2) {
 
 export function ReadDoc(arg1, arg2, arg3) {
   return window['go']['main']['App']['ReadDoc'](arg1, arg2, arg3);
+}
+
+export function GetProviderStatuses() {
+  return window['go']['main']['App']['GetProviderStatuses']();
 }

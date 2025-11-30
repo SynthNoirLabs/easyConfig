@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -62,4 +63,37 @@ func (p *OpenAIProvider) Discover(_ string) ([]Item, error) {
 		}
 	}
 	return items, nil
+}
+
+func (p *OpenAIProvider) CheckStatus() ProviderStatus {
+	const (
+		msgConfigMissing = "Global config not found. Create one to get started."
+		msgConfigOK      = "Configuration file found. (Authentication not yet verified)."
+	)
+
+	status := ProviderStatus{
+		ProviderName: p.Name(),
+		LastChecked:  time.Now().Format(time.RFC3339),
+	}
+
+	configDir := paths.GetConfigDir("openai")
+	if configDir == "" {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = "Config directory not found."
+		return status
+	}
+
+	configPath := filepath.Join(configDir, "config.yaml")
+	files, _ := p.Discover("")
+	status.DiscoveredFiles = files
+
+	if !FileExists(configPath) {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = msgConfigMissing
+	} else {
+		status.Health = StatusHealthy
+		status.StatusMessage = msgConfigOK
+	}
+
+	return status
 }

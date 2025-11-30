@@ -1,0 +1,39 @@
+.provider-status-widget {
+  padding: 1rem;
+  background-color: var(--dark-gray);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.provider-status-widget h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--light-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.status-pill:hover {
+  transform: translateY(-2px);
+}
+
+.provider-status-widget.error {
+  color: var(--red);
+}

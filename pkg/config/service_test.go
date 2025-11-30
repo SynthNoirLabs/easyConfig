@@ -132,6 +132,14 @@ func (m *MockFailingProvider) Discover(projectPath string) ([]Item, error) {
 func (m *MockFailingProvider) Create(scope Scope, projectPath string) (string, error) {
 	return "", os.ErrPermission
 }
+func (m *MockFailingProvider) CheckStatus() ProviderStatus {
+	return ProviderStatus{
+		ProviderName:  "Failing",
+		Health:        StatusUnhealthy,
+		StatusMessage: "This provider is designed to fail.",
+		LastChecked:   "now",
+	}
+}
 
 func TestGetUserHome(t *testing.T) {
 	home := GetUserHome()

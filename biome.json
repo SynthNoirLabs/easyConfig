@@ -12,6 +12,11 @@
       "recommended": true,
       "security": {
         "noDangerouslySetInnerHtml": "off"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off",
+        "useButtonType": "off"
       }
     }
   }

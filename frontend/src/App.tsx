@@ -56,10 +56,10 @@ function AppContent() {
     switch (currentView) {
       case "workflows":
         return <Workflows />;
-      case "marketplace":
-        return <Marketplace />; // We need to import this
       case "docs":
         return <Docs />;
+      case "marketplace":
+        return <Marketplace />;
       default:
         return selectedItem ? (
           <ConfigEditor configItem={selectedItem} />

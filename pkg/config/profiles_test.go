@@ -28,6 +28,13 @@ func (d *dummyProvider) Create(scope Scope, projectPath string) (string, error) 
 	return "", nil
 }
 
+func (d *dummyProvider) CheckStatus() ProviderStatus {
+	return ProviderStatus{
+		ProviderName: d.Name(),
+		Health:       StatusUnknown,
+	}
+}
+
 func TestSaveAndApplyProfile(t *testing.T) {
 	tmp := t.TempDir()
 	// isolate config dir

@@ -22,6 +22,7 @@ import {
 import type { config, config as configModels } from "../../wailsjs/go/models";
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { useConfig } from "../context/ConfigContext";
+import ProviderStatusWidget from "./ProviderStatusWidget";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -366,6 +367,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         ))}
       </div>
+      <ProviderStatusWidget />
     </div>
   );
 };

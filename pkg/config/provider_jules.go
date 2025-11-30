@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"easyConfig/pkg/util/paths"
 )
@@ -80,4 +81,38 @@ func (p *JulesProvider) Discover(projectPath string) ([]Item, error) {
 	}
 
 	return items, nil
+}
+
+func (p *JulesProvider) CheckStatus() ProviderStatus {
+	const (
+		msgHomeMissing   = "Home directory not found."
+		msgConfigMissing = "Global config not found. Create one to get started."
+		msgConfigOK      = "Configuration file found. (Authentication not yet verified)."
+	)
+
+	status := ProviderStatus{
+		ProviderName: p.Name(),
+		LastChecked:  time.Now().Format(time.RFC3339),
+	}
+
+	home := paths.GetHomeDir()
+	if home == "" {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = msgHomeMissing
+		return status
+	}
+
+	configPath := filepath.Join(home, ".jules-mcp", "data.json")
+	files, _ := p.Discover("")
+	status.DiscoveredFiles = files
+
+	if !FileExists(configPath) {
+		status.Health = StatusUnhealthy
+		status.StatusMessage = msgConfigMissing
+	} else {
+		status.Health = StatusHealthy
+		status.StatusMessage = msgConfigOK
+	}
+
+	return status
 }

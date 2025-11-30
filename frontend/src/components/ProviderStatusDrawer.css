@@ -1,0 +1,63 @@
+.status-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.status-drawer {
+  width: 400px;
+  background-color: var(--black);
+  color: var(--light-gray);
+  padding: 1.5rem;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.status-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.status-drawer-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.status-drawer-content .health-indicator {
+  text-transform: capitalize;
+  font-weight: bold;
+}
+
+.status-drawer-content .health-indicator.healthy {
+  color: var(--green);
+}
+
+.status-drawer-content .health-indicator.unhealthy {
+  color: var(--red);
+}
+
+.onboarding-checklist {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--dark-gray);
+  border-radius: 8px;
+}
+
+.onboarding-checklist h4 {
+  margin-top: 0;
+}
+
+.quick-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}

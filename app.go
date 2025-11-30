@@ -358,6 +358,11 @@ func (a *App) DeleteProfile(name string) error {
 	return a.discoveryService.DeleteProfile(name)
 }
 
+// GetProviderStatuses returns the health status of all registered providers.
+func (a *App) GetProviderStatuses() []config.ProviderStatus {
+	return a.discoveryService.GetProviderStatuses()
+}
+
 // ListDocs returns the locally synced documentation pages grouped by provider.
 // It scans docs/vendor/<provider>/latest and reports available .md/.html pages.
 func (a *App) ListDocs() ([]config.DocsProvider, error) {

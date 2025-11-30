@@ -26,6 +26,8 @@ export function Greet(arg1:string):Promise<string>;
 
 export function InstallMCPPackage(arg1:string):Promise<void>;
 
+export function FetchPopularServers():Promise<Array<marketplaces.MCPPackage>>;
+
 export function ListProfiles():Promise<Array<config.ProfileSummary>>;
 
 export function ListWorkflowTemplates():Promise<Array<workflows.Template>>;
@@ -36,6 +38,8 @@ export function ReadConfig(arg1:string):Promise<string>;
 
 export function SaveConfig(arg1:string,arg2:string):Promise<void>;
 
+export function DeleteConfig(arg1:string):Promise<void>;
+
 export function SaveProfile(arg1:string):Promise<void>;
 
 export function SaveWorkflow(arg1:string,arg2:string):Promise<void>;
@@ -43,3 +47,5 @@ export function SaveWorkflow(arg1:string,arg2:string):Promise<void>;
 export function SetSecret(arg1:string,arg2:string):Promise<void>;
 
 export function ReadDoc(arg1:string,arg2:string,arg3:string):Promise<string>;
+
+export function GetProviderStatuses():Promise<Array<config.ProviderStatus>>;
