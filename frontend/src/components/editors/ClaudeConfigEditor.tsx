@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import "./EditorStyles.css";
 
 interface ClaudeConfig {
@@ -13,7 +14,10 @@ interface ClaudeConfigEditorProps {
   onChange: (newContent: string) => void;
 }
 
-const ClaudeConfigEditor: React.FC<ClaudeConfigEditorProps> = ({ content, onChange }) => {
+const ClaudeConfigEditor: React.FC<ClaudeConfigEditorProps> = ({
+  content,
+  onChange,
+}) => {
   const [config, setConfig] = useState<ClaudeConfig>({});
   const [parseError, setParseError] = useState<string | null>(null);
 
@@ -22,7 +26,7 @@ const ClaudeConfigEditor: React.FC<ClaudeConfigEditorProps> = ({ content, onChan
       const parsed = JSON.parse(content || "{}");
       setConfig(parsed);
       setParseError(null);
-    } catch (e) {
+    } catch (_e) {
       setParseError("Invalid JSON content. Please switch to Code view to fix.");
     }
   }, [content]);
@@ -40,8 +44,9 @@ const ClaudeConfigEditor: React.FC<ClaudeConfigEditorProps> = ({ content, onChan
   return (
     <div className="form-editor">
       <div className="form-group">
-        <label>Global Shortcut</label>
+        <label htmlFor="claude-global-shortcut">Global Shortcut</label>
         <input
+          id="claude-global-shortcut"
           type="text"
           value={config.globalShortcut || ""}
           onChange={(e) => updateConfig({ globalShortcut: e.target.value })}
@@ -51,10 +56,13 @@ const ClaudeConfigEditor: React.FC<ClaudeConfigEditorProps> = ({ content, onChan
       </div>
 
       <div className="form-group">
-        <label>Theme</label>
+        <label htmlFor="claude-theme">Theme</label>
         <select
+          id="claude-theme"
           value={config.theme || "auto"}
-          onChange={(e) => updateConfig({ theme: e.target.value as any })}
+          onChange={(e) =>
+            updateConfig({ theme: e.target.value as ClaudeConfig["theme"] })
+          }
         >
           <option value="auto">Auto (System)</option>
           <option value="light">Light</option>

@@ -22,16 +22,21 @@ func (p *GooseProvider) Create(scope Scope, _ string) (string, error) {
 
 	switch scope {
 	case ScopeGlobal:
-		// Goose uses ~/.config/goose/config.yaml on Linux/macOS
-		// On Windows it uses AppData/Block/goose/config/config.yaml
-		// paths.GetConfigDir("goose") returns ~/.config/goose or AppData/goose
-		// We might need special handling for Windows if "Block" is strictly required.
-		// For now, we use standard XDG/AppData structure.
+		// Goose default locations:
+		// Linux/macOS: ~/.config/goose/config.yaml
+		// Windows: %APPDATA%/Block/goose/config/config.yaml
 		configDir := paths.GetConfigDir("goose")
 		if configDir == "" {
 			return "", fmt.Errorf("config directory not found")
 		}
 		path = filepath.Join(configDir, "config.yaml")
+		// If Windows Block path exists, prefer it
+		if block := os.Getenv("APPDATA"); block != "" {
+			blockPath := filepath.Join(block, "Block", "goose", "config", "config.yaml")
+			if _, err := os.Stat(filepath.Dir(blockPath)); err == nil {
+				path = blockPath
+			}
+		}
 	default:
 		return "", fmt.Errorf("unsupported scope (Goose only supports global config)")
 	}
@@ -51,7 +56,7 @@ func (p *GooseProvider) Create(scope Scope, _ string) (string, error) {
 func (p *GooseProvider) Discover(_ string) ([]Item, error) {
 	var items []Item
 
-	// 1. Global Config
+	// 1. Global Config (XDG/AppData)
 	configDir := paths.GetConfigDir("goose")
 	if configDir != "" {
 		path := filepath.Join(configDir, "config.yaml")
@@ -61,6 +66,21 @@ func (p *GooseProvider) Discover(_ string) ([]Item, error) {
 				Name:     "Global Config",
 				FileName: "config.yaml",
 				Path:     path,
+				Scope:    ScopeGlobal,
+				Format:   FormatYAML,
+				Exists:   true,
+			})
+		}
+	}
+	// 2. Windows Block path
+	if appData := os.Getenv("APPDATA"); appData != "" {
+		blockPath := filepath.Join(appData, "Block", "goose", "config", "config.yaml")
+		if FileExists(blockPath) {
+			items = append(items, Item{
+				Provider: p.Name(),
+				Name:     "Block Config",
+				FileName: "config.yaml",
+				Path:     blockPath,
 				Scope:    ScopeGlobal,
 				Format:   FormatYAML,
 				Exists:   true,

@@ -1,9 +1,18 @@
 import Editor from "@monaco-editor/react";
-import { RefreshCw, RotateCcw, Save, Code, LayoutTemplate } from "lucide-react";
+import {
+  Code,
+  Eye,
+  LayoutTemplate,
+  RefreshCw,
+  RotateCcw,
+  Save,
+} from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner"; // Import sonner toast
-import { config } from "../../wailsjs/go/models";
+import type { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
 import "./ConfigEditor.css";
 import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
@@ -37,21 +46,29 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<"code" | "form">("code");
+  const [viewMode, setViewMode] = useState<"code" | "form" | "preview">("code");
+
+  const isMarkdown =
+    configItem.format.toLowerCase() === "markdown" ||
+    configItem.fileName.toLowerCase().endsWith(".md");
 
   // Determine if a specific editor is available
-  const hasSpecificEditor = 
-    (configItem.provider === "Claude Code" && configItem.fileName === "claude_desktop_config.json") ||
-    (configItem.provider === "OpenCode" && configItem.fileName === "opencode.json");
+  const hasSpecificEditor =
+    (configItem.provider === "Claude Code" &&
+      configItem.fileName === "claude_desktop_config.json") ||
+    (configItem.provider === "OpenCode" &&
+      configItem.fileName === "opencode.json");
 
   useEffect(() => {
     // Default to form view if available
     if (hasSpecificEditor) {
       setViewMode("form");
+    } else if (isMarkdown) {
+      setViewMode("preview");
     } else {
       setViewMode("code");
     }
-  }, [configItem.provider, configItem.fileName, hasSpecificEditor]);
+  }, [hasSpecificEditor, isMarkdown]);
 
   const loadFile = useCallback(async () => {
     setIsLoading(true);
@@ -116,7 +133,12 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   };
 
   const handleReload = () => {
-    if (isDirty && !confirm("You have unsaved changes. Reloading will discard them. Continue?")) {
+    if (
+      isDirty &&
+      !confirm(
+        "You have unsaved changes. Reloading will discard them. Continue?",
+      )
+    ) {
       return;
     }
     loadFile();
@@ -135,23 +157,37 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <span className="file-path">{configItem.path}</span>
         </div>
         <div className="editor-actions">
-          {hasSpecificEditor && (
+          {(hasSpecificEditor || isMarkdown) && (
             <>
               <div className="view-toggle">
                 <button
+                  type="button"
                   className={`btn-toggle ${viewMode === "code" ? "active" : ""}`}
                   onClick={() => setViewMode("code")}
                   title="Code View"
                 >
                   <Code size={16} />
                 </button>
-                <button
-                  className={`btn-toggle ${viewMode === "form" ? "active" : ""}`}
-                  onClick={() => setViewMode("form")}
-                  title="Form View"
-                >
-                  <LayoutTemplate size={16} />
-                </button>
+                {hasSpecificEditor && (
+                  <button
+                    type="button"
+                    className={`btn-toggle ${viewMode === "form" ? "active" : ""}`}
+                    onClick={() => setViewMode("form")}
+                    title="Form View"
+                  >
+                    <LayoutTemplate size={16} />
+                  </button>
+                )}
+                {isMarkdown && (
+                  <button
+                    type="button"
+                    className={`btn-toggle ${viewMode === "preview" ? "active" : ""}`}
+                    onClick={() => setViewMode("preview")}
+                    title="Preview"
+                  >
+                    <Eye size={16} />
+                  </button>
+                )}
               </div>
               <div className="separator" />
             </>
@@ -194,10 +230,20 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <div className="editor-error">{error}</div>
         ) : viewMode === "form" && hasSpecificEditor ? (
           configItem.provider === "Claude Code" ? (
-            <ClaudeConfigEditor content={content} onChange={handleEditorChange} />
+            <ClaudeConfigEditor
+              content={content}
+              onChange={handleEditorChange}
+            />
           ) : (
-            <OpenCodeConfigEditor content={content} onChange={handleEditorChange} />
+            <OpenCodeConfigEditor
+              content={content}
+              onChange={handleEditorChange}
+            />
           )
+        ) : viewMode === "preview" && isMarkdown ? (
+          <div className="markdown-preview">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+          </div>
         ) : (
           <Editor
             height="100%"

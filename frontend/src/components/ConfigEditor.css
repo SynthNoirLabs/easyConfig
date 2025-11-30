@@ -122,6 +122,30 @@
   color: var(--danger);
 }
 
+.markdown-preview {
+  height: 100%;
+  overflow: auto;
+  padding: var(--spacing-lg);
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3 {
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+}
+
+.markdown-preview code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}
+
 /* Toggle Buttons */
 .view-toggle {
   display: flex;

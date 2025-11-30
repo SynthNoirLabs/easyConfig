@@ -1,0 +1,5 @@
+# Gemini CLI configuration & extensions
+https://geminicli.com/docs/cli/configuration/
+https://geminicli.com/docs/cli/settings/
+https://geminicli.com/docs/extensions/
+https://gemini-cli-docs.pages.dev/cli/configuration

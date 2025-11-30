@@ -56,9 +56,9 @@ func TestSmitheryClient_FetchPopularServers_Fallback(t *testing.T) {
 		t.Fatalf("Expected no error (fallback), got %v", err)
 	}
 
-	// Should return mock data (3 items)
-	if len(packages) != 3 {
-		t.Errorf("Expected 3 fallback packages, got %d", len(packages))
+	// Should return mock data (4 items)
+	if len(packages) != 4 {
+		t.Errorf("Expected 4 fallback packages, got %d", len(packages))
 	}
 }
 

@@ -10,13 +10,13 @@ import (
 func TestGetHomeDir(t *testing.T) {
 	// Test case 1: HOME is set
 	expectedHome := "/tmp/test_home"
-	os.Setenv("HOME", expectedHome)
+	mustSetEnv(t, "HOME", expectedHome)
 	if home := GetHomeDir(); home != expectedHome {
 		t.Errorf("GetHomeDir() with HOME set: got %s, want %s", home, expectedHome)
 	}
 
 	// Test case 2: HOME is not set (simulate by clearing it)
-	os.Unsetenv("HOME")
+	mustUnsetEnv(t, "HOME")
 	// On most systems, UserHomeDir will still find it, but if it returns empty string, our func should too
 	if home := GetHomeDir(); home == "" {
 		// This is acceptable, as os.UserHomeDir might return empty if it can't determine it.
@@ -36,14 +36,14 @@ func TestGetConfigDirForOS(t *testing.T) {
 	originalXDGConfigHome := os.Getenv("XDG_CONFIG_HOME")
 	originalAppData := os.Getenv("APPDATA")
 	defer func() {
-		os.Setenv("HOME", originalHome)
-		os.Setenv("XDG_CONFIG_HOME", originalXDGConfigHome)
-		os.Setenv("APPDATA", originalAppData)
+		mustSetEnv(t, "HOME", originalHome)
+		mustSetEnv(t, "XDG_CONFIG_HOME", originalXDGConfigHome)
+		mustSetEnv(t, "APPDATA", originalAppData)
 	}()
 
 	testAppName := "testapp"
 	mockHome := "/tmp/mock_home"
-	os.Setenv("HOME", mockHome)
+	mustSetEnv(t, "HOME", mockHome)
 
 	tests := []struct {
 		name          string
@@ -88,7 +88,7 @@ func TestGetConfigDirForOS(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set env vars
 			for k, v := range tt.env {
-				os.Setenv(k, v)
+				mustSetEnv(t, k, v)
 			}
 
 			// Call internal helper
@@ -107,10 +107,24 @@ func TestGetConfigDir(t *testing.T) {
 	dir := GetConfigDir("testapp")
 	if dir == "" {
 		// It might be empty if HOME is not set, but in test env usually HOME is set or we can set it
-		os.Setenv("HOME", "/tmp/test")
+		mustSetEnv(t, "HOME", "/tmp/test")
 		dir = GetConfigDir("testapp")
 		if dir == "" {
 			t.Error("GetConfigDir returned empty string even with HOME set")
 		}
+	}
+}
+
+func mustSetEnv(t *testing.T, key, value string) {
+	t.Helper()
+	if err := os.Setenv(key, value); err != nil {
+		t.Fatalf("failed to set env %s: %v", key, err)
+	}
+}
+
+func mustUnsetEnv(t *testing.T, key string) {
+	t.Helper()
+	if err := os.Unsetenv(key); err != nil {
+		t.Fatalf("failed to unset env %s: %v", key, err)
 	}
 }

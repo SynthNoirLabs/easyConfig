@@ -1,0 +1,958 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-bguv2lll"> <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Gemini CLI Configuration | Gemini CLI</title><link rel="canonical" href="https://geminicli.com/docs/cli/configuration/"/><link rel="sitemap" href="/sitemap-index.xml"/><link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="true"/><link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=block" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500&display=block" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Google+Sans+Mono:wght@400;500&display=block" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Google+Symbols&display=block" rel="stylesheet"/><link rel="icon" href="/favicon.ico" sizes="32x32"/><script async src="https://www.googletagmanager.com/gtag/js?id=G-66QE907DJT"></script><script>window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+  gtag("config", "G-66QE907DJT");</script><link rel="shortcut icon" href="/icon.png" type="image/png"/><meta name="generator" content="Astro v5.14.8"/><meta name="generator" content="Starlight v0.36.1"/><meta property="og:title" content="Gemini CLI Configuration"/><meta property="og:type" content="article"/><meta property="og:url" content="https://geminicli.com/docs/cli/configuration/"/><meta property="og:locale" content="en"/><meta property="og:description"/><meta property="og:site_name" content="Gemini CLI"/><meta name="twitter:card" content="summary_large_image"/><meta property="og:image" content="https://geminicli.com/assets/social-poster.png"/><meta name="twitter:image" content="https://geminicli.com/assets/social-poster.png"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.DNXP8c50.css" media="print"><link rel="stylesheet" href="/_astro/debugz.CZqLAfiE.css"><script type="module" src="/_astro/page.CqwDW6Ek.js"></script></head> <body class="astro-bguv2lll"> <a href="#_top" class="astro-7q3lir66">Skip to content</a>  <div class="announcement-banner astro-yriad4ts"> <b class="astro-yriad4ts">Gemini 3 Pro is now available</b>. Experience state-of-the-art reasoning
+  and agentic coding in your terminal. <a href="https://developers.googleblog.com/en/5-things-to-try-with-gemini-3-pro-in-gemini-cli/" class="astro-yriad4ts">Read the announcement</a> </div> <div class="page sl-flex astro-yriad4ts"> <header class="header astro-yriad4ts"><div id="page-header" class="header astro-3ef6ksr2"> <div class="title-wrapper sl-flex items-center astro-3ef6ksr2"> <div class="links-and-menu astro-3ef6ksr2" role="button" aria-label="Open navigation menu"> <a href="/" class="site-title sl-flex astro-m46x6ez3">  <img class="astro-m46x6ez3" alt="Gemini CLI Icon" src="/_astro/icon.Bo4M5sF3.png" width="1645" height="1645">  <span class="astro-m46x6ez3" translate="no"> Gemini CLI </span> </a>  <div class="nav-items astro-jvd4jwbq"> <a href="/" class="mobile-only astro-jvd4jwbq">Home</a> <div class="extensions-container astro-jvd4jwbq"> <a href="/extensions/" class="dark:text-white text-black no-underline extensions-link astro-jvd4jwbq">Extensions</a> <div class="extensions-menu astro-jvd4jwbq"> <a href="/extensions/" class="mobile-hide astro-jvd4jwbq" class="dark:text-white text-black no-underline extensions-link">Gallery</a> <a href="/extensions/about" class="dark:text-white text-black no-underline astro-jvd4jwbq">About Extensions</a> </div> </div> <a href="/docs/" class="dark:text-white text-black no-underline is-active astro-jvd4jwbq">Docs</a> <a href="/docs/changelogs/" class="dark:text-white text-black no-underline astro-jvd4jwbq">Changelog</a> </div>  </div> </div> <div class="sl-flex justify-end print:hidden search astro-3ef6ksr2"> <site-search class="astro-3ef6ksr2 astro-v37mnknz" data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}"> <button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-v37mnknz"> <svg aria-hidden="true" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg> <span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span> <kbd class="sl-hidden md:sl-flex astro-v37mnknz" style="display: none;"> <kbd class="astro-v37mnknz">Ctrl</kbd><kbd class="astro-v37mnknz">K</kbd> </kbd> </button> <dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"> <div class="dialog-frame sl-flex astro-v37mnknz">  <button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz"> Cancel </button> <div class="search-container astro-v37mnknz"> <div id="starlight__search" class="astro-v37mnknz"></div> </div> </div> </dialog> </site-search>  <script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script> <script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.cjYDvRdi.js"></script>   </div> <div class="sl-hidden md:sl-flex print:hidden right-group astro-3ef6ksr2"> <div class="sl-flex social-icons astro-3ef6ksr2"> <a href="https://github.com/google-gemini/gemini-cli" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script> <script type="module">const r="starlight-theme",o=e=>e==="auto"||e==="dark"||e==="light"?e:"auto",c=()=>o(typeof localStorage<"u"&&localStorage.getItem(r));function n(e){typeof localStorage<"u"&&localStorage.setItem(r,e==="light"||e==="dark"?e:"")}const l=()=>matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";function t(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e==="auto"?l():e,n(e)}matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{c()==="auto"&&t("auto")});class s extends HTMLElement{constructor(){super(),t(c()),this.querySelector("select")?.addEventListener("change",a=>{a.currentTarget instanceof HTMLSelectElement&&t(o(a.currentTarget.value))})}}customElements.define("starlight-theme-select",s);</script> <script type="module">class s extends HTMLElement{constructor(){super();const e=this.querySelector("select");e&&(e.addEventListener("change",t=>{t.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=t.currentTarget.value)}),window.addEventListener("pageshow",t=>{if(!t.persisted)return;const n=e.querySelector("option[selected]")?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}}customElements.define("starlight-lang-select",s);</script> </div> </div> <script type="module">const e=document.querySelector("[role=button].links-and-menu");e?.addEventListener("click",t=>{const{matches:s}=window.matchMedia("(max-width: 640px)");if(!s)return;if(e.querySelector(".nav-items")?.contains(t.target)){e.classList.remove("is-active");return}t.preventDefault(),e.classList.toggle("is-active")});</script>  </header> <nav class="sidebar print:hidden astro-yriad4ts" aria-label="Main"> <starlight-menu-button class="print:hidden astro-jif73yzw"> <button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"> <svg aria-hidden="true" class="open-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg> <svg aria-hidden="true" class="close-menu astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg> </button> </starlight-menu-button> <script type="module">class s extends HTMLElement{constructor(){super(),this.btn=this.querySelector("button"),this.btn.addEventListener("click",()=>this.toggleExpanded());const t=this.closest("nav");t&&t.addEventListener("keyup",e=>this.closeOnEscape(e))}setExpanded(t){this.setAttribute("aria-expanded",String(t)),document.body.toggleAttribute("data-mobile-menu-expanded",t)}toggleExpanded(){this.setExpanded(this.getAttribute("aria-expanded")!=="true")}closeOnEscape(t){t.code==="Escape"&&(this.setExpanded(!1),this.btn.focus())}}customElements.define("starlight-menu-button",s);</script>   <div id="starlight__sidebar" class="sidebar-pane astro-yriad4ts"> <div class="sidebar-content sl-flex astro-yriad4ts"> <sl-sidebar-state-persist data-hash="09vcj0p" class="astro-kku4brbg"> <script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script>  <ul class="top-level astro-3ii7xxms"> <li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Overview</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="0"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/architecture/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Architecture Overview</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/contributing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Contribution Guide</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Get Started</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="1"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/get-started/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Gemini CLI Quickstart</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/get-started/gemini-3/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Gemini 3 Pro on Gemini CLI</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/get-started/authentication/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Authentication</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/get-started/configuration/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Configuration</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/get-started/installation/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Installation</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/get-started/examples/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Examples</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">CLI</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="2"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/cli/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/commands/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Commands</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/checkpointing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Checkpointing</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/custom-commands/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Custom Commands</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/enterprise/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Enterprise</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/headless/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Headless Mode</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/keyboard-shortcuts/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Keyboard Shortcuts</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/model/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Model Selection</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/sandbox/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Sandbox</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/session-management/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Session Management</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/settings/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Settings</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/telemetry/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Telemetry</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/themes/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Themes</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/token-caching/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Token Caching</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/trusted-folders/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Trusted Folders</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/tutorials/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Tutorials</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/cli/uninstall/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Uninstall</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Core</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="3"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/core/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/core/tools-api/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Tools API</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/core/memport/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Memory Import Processor</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/core/policy-engine/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Policy Engine</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Tools</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="4"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/tools/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tools/file-system/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">File System</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tools/shell/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Shell</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tools/web-fetch/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Web Fetch</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tools/web-search/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Web Search</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tools/memory/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Memory</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tools/todos/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Todos</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tools/mcp-server/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">MCP Servers</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Extensions</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="5"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/extensions/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/extensions/getting-started-extensions/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Get Started with Extensions</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/extensions/extension-releasing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Extension Releasing</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">IDE Integration</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="6"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/ide-integration/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Introduction</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/ide-integration/ide-companion-spec/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">IDE Companion Spec</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Development</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="7"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/npm/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">NPM</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/releases/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Releases</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/changelogs/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Changelog</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/integration-tests/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Integration Tests</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/issue-and-pr-automation/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Issue and PR Automation</span>  </a> </li> </ul>  </details> </li><li class="astro-3ii7xxms"> <details open class="astro-3ii7xxms"> <summary class="astro-3ii7xxms"> <span class="group-label astro-3ii7xxms"> <span class="large astro-3ii7xxms">Support</span>  </span> <svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg> </summary> <sl-sidebar-restore data-index="8"></sl-sidebar-restore> <ul class="astro-3ii7xxms"> <li class="astro-3ii7xxms"> <a href="/docs/faq/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">FAQ</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/troubleshooting/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Troubleshooting</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/quota-and-pricing/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Quota and Pricing</span>  </a> </li><li class="astro-3ii7xxms"> <a href="/docs/tos-privacy/" aria-current="false" class="astro-3ii7xxms"> <span class="astro-3ii7xxms">Terms of Service</span>  </a> </li> </ul>  </details> </li> </ul>   <script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script> </sl-sidebar-state-persist>  <div class="md:sl-hidden"> <div class="mobile-preferences sl-flex astro-wu23bvmt"> <div class="social-icons astro-wu23bvmt"> <a href="https://github.com/google-gemini/gemini-cli" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a> </div> <starlight-theme-select>  <label style="--sl-select-width: 6.25em" class="astro-4yphtoen"> <span class="sr-only astro-4yphtoen">Select theme</span> <svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg> <select autocomplete="off" class="astro-4yphtoen"> <option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected class="astro-4yphtoen">Auto</option> </select> <svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg> </label>  </starlight-theme-select>  <script>
+	StarlightThemeProvider.updatePickers();
+</script>   </div>  </div> </div> </div> </nav> <!-- Main grows to push footer down --> <div class="main-frame astro-yriad4ts">   <script type="module">const a=document.getElementById("starlight__sidebar"),n=a?.querySelector("sl-sidebar-state-persist"),o="sl-sidebar-state",i=()=>{let t=[];const e=n?.dataset.hash||"";try{const s=sessionStorage.getItem(o),r=JSON.parse(s||"{}");Array.isArray(r.open)&&r.hash===e&&(t=r.open)}catch{}return{hash:e,open:t,scroll:a?.scrollTop||0}},c=t=>{try{sessionStorage.setItem(o,JSON.stringify(t))}catch{}},d=()=>c(i()),l=(t,e)=>{const s=i();s.open[e]=t,c(s)};n?.addEventListener("click",t=>{if(!(t.target instanceof Element))return;const e=t.target.closest("summary")?.closest("details");if(!e)return;const s=e.querySelector("sl-sidebar-restore"),r=parseInt(s?.dataset.index||"");isNaN(r)||l(!e.open,r)});addEventListener("visibilitychange",()=>{document.visibilityState==="hidden"&&d()});addEventListener("pageHide",d);</script> <div class="lg:sl-flex astro-67yu43on"> <aside class="right-sidebar-container print:hidden astro-67yu43on"> <div class="right-sidebar astro-67yu43on"> <div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><span class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Introduction</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#configuration-layers" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Configuration layers</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#settings-files" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Settings files</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#the-gemini-directory-in-your-project" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">The .gemini directory in your project</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#available-settings-in-settingsjson" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Available settings in settings.json:</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#example-settingsjson" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Example settings.json:</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#shell-history" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Shell History</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#environment-variables--env-files" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Environment Variables &amp; .env Files</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#command-line-arguments" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Command-Line Arguments</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#context-files-hierarchical-instructional-context" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Context Files (Hierarchical Instructional Context)</span> </a> <ul class="isMobile astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#example-context-file-content-eg-geminimd" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Example Context File Content (e.g., GEMINI.md)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#sandboxing" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Sandboxing</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#usage-statistics" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Usage Statistics</span> </a>  </li> </ul> </div></details></nav></mobile-starlight-toc><script type="module" src="/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C181hMzK.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"> <li class="astro-g2bywc46" style="--depth: 0;"> <a href="#_top" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Introduction</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#configuration-layers" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Configuration layers</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#settings-files" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Settings files</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#the-gemini-directory-in-your-project" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">The .gemini directory in your project</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#available-settings-in-settingsjson" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Available settings in settings.json:</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 1;"> <a href="#example-settingsjson" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Example settings.json:</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#shell-history" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Shell History</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#environment-variables--env-files" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Environment Variables &amp; .env Files</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#command-line-arguments" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Command-Line Arguments</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#context-files-hierarchical-instructional-context" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Context Files (Hierarchical Instructional Context)</span> </a> <ul class="astro-g2bywc46" style="--depth: 1;"> <li class="astro-g2bywc46" style="--depth: 1;"> <a href="#example-context-file-content-eg-geminimd" class="astro-g2bywc46" style="--depth: 1;"> <span class="astro-g2bywc46" style="--depth: 1;">Example Context File Content (e.g., GEMINI.md)</span> </a>  </li> </ul>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#sandboxing" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Sandboxing</span> </a>  </li><li class="astro-g2bywc46" style="--depth: 0;"> <a href="#usage-statistics" class="astro-g2bywc46" style="--depth: 0;"> <span class="astro-g2bywc46" style="--depth: 0;">Usage Statistics</span> </a>  </li> </ul> </nav></starlight-toc><script type="module" src="/_astro/TableOfContents.astro_astro_type_script_index_0_lang.CKWWgpjV.js"></script></div></div> </div> </aside> <div class="main-pane astro-67yu43on">  <main data-pagefind-body class="astro-bguv2lll" lang="en" dir="ltr">    <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <div class="flex items-center page-title astro-guvttfii"> <h1 id="_top" class="flex-1 astro-guvttfii"> Gemini CLI Configuration </h1> <div class="mt-4 astro-guvttfii"> <button id="copy-markdown-btn" class="copy-markdown-button astro-guvttfii astro-ym2cbydy" type="button" aria-label="Copy page content as markdown for selected language" title="Copy as Markdown"> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="astro-ym2cbydy"> <rect width="14" height="14" x="8" y="8" rx="2" ry="2" class="astro-ym2cbydy"></rect> <path d="m4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" class="astro-ym2cbydy"></path> </svg> <span class="button-text astro-ym2cbydy">Copy as Markdown</span> <span class="success-text astro-ym2cbydy" style="display: none;">Copied!</span> </button>  <script type="module">class i{constructor(){this.init()}init(){document.readyState==="loading"?document.addEventListener("DOMContentLoaded",()=>this.setupEventListeners()):this.setupEventListeners()}setupEventListeners(){const t=document.getElementById("copy-markdown-btn");t&&t.addEventListener("click",()=>this.copyMarkdown())}async copyMarkdown(){const t=document.getElementById("copy-markdown-btn");if(t)try{this.setButtonState(t,"copying");const e=`${window.location.pathname.replace(/\/$/,"")}.md`,o=await fetch(e);if(!o.ok)throw new Error(`Failed to fetch markdown: ${o.status}`);const a=await o.text();await this.copyToClipboard(a),this.setButtonState(t,"success"),setTimeout(()=>{this.setButtonState(t,"default")},2e3)}catch(n){console.error("Failed to copy markdown:",n),this.setButtonState(t,"error"),setTimeout(()=>{this.setButtonState(t,"default")},2e3)}}getCurrentLanguage(){return document.documentElement.getAttribute("data-genkit-lang")||"js"}async copyToClipboard(t){if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(t);else throw new Error("Clipboard API not available.")}setButtonState(t,n){const s=t.querySelector(".button-text"),e=t.querySelector(".success-text");switch(t.classList.remove("copying","success","error"),n){case"copying":t.classList.add("copying"),s&&(s.style.display="none"),e&&(e.textContent="Copying...",e.style.display="inline");break;case"success":t.classList.add("success"),s&&(s.style.display="none"),e&&(e.textContent="Copied!",e.style.display="inline");break;case"error":t.classList.add("error"),s&&(s.style.display="none"),e&&(e.textContent="Error",e.style.display="inline");break;default:s&&(s.style.display="inline"),e&&(e.style.display="none");break}}}new i;</script> </div> </div>  </div> </div>  <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <div class="sl-markdown-content"> <p>Gemini CLI offers several ways to configure its behavior, including environment
+variables, command-line arguments, and settings files. This document outlines
+the different configuration methods and available settings.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="configuration-layers">Configuration layers</h2><a class="sl-anchor-link" href="#configuration-layers"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Configuration layers”</span></a></div>
+<p>Configuration is applied in the following order of precedence (lower numbers are
+overridden by higher numbers):</p>
+<ol>
+<li><strong>Default values:</strong> Hardcoded defaults within the application.</li>
+<li><strong>User settings file:</strong> Global settings for the current user.</li>
+<li><strong>Project settings file:</strong> Project-specific settings.</li>
+<li><strong>System settings file:</strong> System-wide settings.</li>
+<li><strong>Environment variables:</strong> System-wide or session-specific variables,
+potentially loaded from <code dir="auto">.env</code> files.</li>
+<li><strong>Command-line arguments:</strong> Values passed when launching the CLI.</li>
+</ol>
+<div class="sl-heading-wrapper level-h2"><h2 id="settings-files">Settings files</h2><a class="sl-anchor-link" href="#settings-files"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Settings files”</span></a></div>
+<p>Gemini CLI uses <code dir="auto">settings.json</code> files for persistent configuration. There are
+three locations for these files:</p>
+<ul>
+<li><strong>User settings file:</strong>
+<ul>
+<li><strong>Location:</strong> <code dir="auto">~/.gemini/settings.json</code> (where <code dir="auto">~</code> is your home directory).</li>
+<li><strong>Scope:</strong> Applies to all Gemini CLI sessions for the current user.</li>
+</ul>
+</li>
+<li><strong>Project settings file:</strong>
+<ul>
+<li><strong>Location:</strong> <code dir="auto">.gemini/settings.json</code> within your project’s root directory.</li>
+<li><strong>Scope:</strong> Applies only when running Gemini CLI from that specific project.
+Project settings override user settings.</li>
+</ul>
+</li>
+<li><strong>System settings file:</strong>
+<ul>
+<li><strong>Location:</strong> <code dir="auto">/etc/gemini-cli/settings.json</code> (Linux),
+<code dir="auto">C:\ProgramData\gemini-cli\settings.json</code> (Windows) or
+<code dir="auto">/Library/Application Support/GeminiCli/settings.json</code> (macOS). The path can
+be overridden using the <code dir="auto">GEMINI_CLI_SYSTEM_SETTINGS_PATH</code> environment
+variable.</li>
+<li><strong>Scope:</strong> Applies to all Gemini CLI sessions on the system, for all users.
+System settings override user and project settings. May be useful for system
+administrators at enterprises to have controls over users’ Gemini CLI
+setups.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Note on environment variables in settings:</strong> String values within your
+<code dir="auto">settings.json</code> files can reference environment variables using either
+<code dir="auto">$VAR_NAME</code> or <code dir="auto">${VAR_NAME}</code> syntax. These variables will be automatically
+resolved when the settings are loaded. For example, if you have an environment
+variable <code dir="auto">MY_API_TOKEN</code>, you could use it in <code dir="auto">settings.json</code> like this:
+<code dir="auto">"apiKey": "$MY_API_TOKEN"</code>.</p>
+<div class="sl-heading-wrapper level-h3"><h3 id="the-gemini-directory-in-your-project">The <code dir="auto">.gemini</code> directory in your project</h3><a class="sl-anchor-link" href="#the-gemini-directory-in-your-project"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “The .gemini directory in your project”</span></a></div>
+<p>In addition to a project settings file, a project’s <code dir="auto">.gemini</code> directory can
+contain other project-specific files related to Gemini CLI’s operation, such as:</p>
+<ul>
+<li><a href="#sandboxing">Custom sandbox profiles</a> (e.g.,
+<code dir="auto">.gemini/sandbox-macos-custom.sb</code>, <code dir="auto">.gemini/sandbox.Dockerfile</code>).</li>
+</ul>
+<div class="sl-heading-wrapper level-h3"><h3 id="available-settings-in-settingsjson">Available settings in <code dir="auto">settings.json</code>:</h3><a class="sl-anchor-link" href="#available-settings-in-settingsjson"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Available settings in settings.json:”</span></a></div>
+<ul>
+<li>
+<p><strong><code dir="auto">contextFileName</code></strong> (string or array of strings):</p>
+<ul>
+<li><strong>Description:</strong> Specifies the filename for context files (e.g.,
+<code dir="auto">GEMINI.md</code>, <code dir="auto">AGENTS.md</code>). Can be a single filename or a list of accepted
+filenames.</li>
+<li><strong>Default:</strong> <code dir="auto">GEMINI.md</code></li>
+<li><strong>Example:</strong> <code dir="auto">"contextFileName": "AGENTS.md"</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">bugCommand</code></strong> (object):</p>
+<ul>
+<li><strong>Description:</strong> Overrides the default URL for the <code dir="auto">/bug</code> command.</li>
+<li><strong>Default:</strong>
+<code dir="auto">"urlTemplate": "https://github.com/google-gemini/gemini-cli/issues/new?template=bug_report.yml&#x26;title={title}&#x26;info={info}"</code></li>
+<li><strong>Properties:</strong>
+<ul>
+<li><strong><code dir="auto">urlTemplate</code></strong> (string): A URL that can contain <code dir="auto">{title}</code> and <code dir="auto">{info}</code>
+placeholders.</li>
+</ul>
+</li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.me98n.css"><script type="module" src="/_astro/ec.p1z7b.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"bugCommand"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"urlTemplate"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"https://bug.example.com/new?title={title}&#x26;info={info}"</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;bugCommand&#x22;: {  &#x22;urlTemplate&#x22;: &#x22;https://bug.example.com/new?title={title}&#x26;info={info}&#x22;}"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">fileFiltering</code></strong> (object):</p>
+<ul>
+<li><strong>Description:</strong> Controls git-aware file filtering behavior for @ commands
+and file discovery tools.</li>
+<li><strong>Default:</strong> <code dir="auto">"respectGitIgnore": true, "enableRecursiveFileSearch": true</code></li>
+<li><strong>Properties:</strong>
+<ul>
+<li><strong><code dir="auto">respectGitIgnore</code></strong> (boolean): Whether to respect .gitignore patterns
+when discovering files. When set to <code dir="auto">true</code>, git-ignored files (like
+<code dir="auto">node_modules/</code>, <code dir="auto">dist/</code>, <code dir="auto">.env</code>) are automatically excluded from @
+commands and file listing operations.</li>
+<li><strong><code dir="auto">enableRecursiveFileSearch</code></strong> (boolean): Whether to enable searching
+recursively for filenames under the current tree when completing @
+prefixes in the prompt.</li>
+</ul>
+</li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"fileFiltering"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"respectGitIgnore"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"enableRecursiveFileSearch"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">false</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;fileFiltering&#x22;: {  &#x22;respectGitIgnore&#x22;: true,  &#x22;enableRecursiveFileSearch&#x22;: false}"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">coreTools</code></strong> (array of strings):</p>
+<ul>
+<li><strong>Description:</strong> Allows you to specify a list of core tool names that should
+be made available to the model. This can be used to restrict the set of
+built-in tools. See <a href="/docs/core/tools-api#built-in-tools">Built-in Tools</a>
+for a list of core tools. You can also specify command-specific restrictions
+for tools that support it, like the <code dir="auto">ShellTool</code>. For example,
+<code dir="auto">"coreTools": ["ShellTool(ls -l)"]</code> will only allow the <code dir="auto">ls -l</code> command to
+be executed.</li>
+<li><strong>Default:</strong> All tools available for use by the Gemini model.</li>
+<li><strong>Example:</strong> <code dir="auto">"coreTools": ["ReadFileTool", "GlobTool", "ShellTool(ls)"]</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">excludeTools</code></strong> (array of strings):</p>
+<ul>
+<li><strong>Description:</strong> Allows you to specify a list of core tool names that should
+be excluded from the model. A tool listed in both <code dir="auto">excludeTools</code> and
+<code dir="auto">coreTools</code> is excluded. You can also specify command-specific restrictions
+for tools that support it, like the <code dir="auto">ShellTool</code>. For example,
+<code dir="auto">"excludeTools": ["ShellTool(rm -rf)"]</code> will block the <code dir="auto">rm -rf</code> command.</li>
+<li><strong>Default</strong>: No tools excluded.</li>
+<li><strong>Example:</strong> <code dir="auto">"excludeTools": ["run_shell_command", "findFiles"]</code>.</li>
+<li><strong>Security Note:</strong> Command-specific restrictions in <code dir="auto">excludeTools</code> for
+<code dir="auto">run_shell_command</code> are based on simple string matching and can be easily
+bypassed. This feature is <strong>not a security mechanism</strong> and should not be
+relied upon to safely execute untrusted code. It is recommended to use
+<code dir="auto">coreTools</code> to explicitly select commands that can be executed.</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">allowMCPServers</code></strong> (array of strings):</p>
+<ul>
+<li><strong>Description:</strong> Allows you to specify a list of MCP server names that
+should be made available to the model. This can be used to restrict the set
+of MCP servers to connect to. Note that this will be ignored if
+<code dir="auto">--allowed-mcp-server-names</code> is set.</li>
+<li><strong>Default:</strong> All MCP servers are available for use by the Gemini model.</li>
+<li><strong>Example:</strong> <code dir="auto">"allowMCPServers": ["myPythonServer"]</code>.</li>
+<li><strong>Security Note:</strong> This uses simple string matching on MCP server names,
+which can be modified. If you’re a system administrator looking to prevent
+users from bypassing this, consider configuring the <code dir="auto">mcpServers</code> at the
+system settings level such that the user will not be able to configure any
+MCP servers of their own. This should not be used as an airtight security
+mechanism.</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">excludeMCPServers</code></strong> (array of strings):</p>
+<ul>
+<li><strong>Description:</strong> Allows you to specify a list of MCP server names that
+should be excluded from the model. A server listed in both
+<code dir="auto">excludeMCPServers</code> and <code dir="auto">allowMCPServers</code> is excluded. Note that this will
+be ignored if <code dir="auto">--allowed-mcp-server-names</code> is set.</li>
+<li><strong>Default</strong>: No MCP servers excluded.</li>
+<li><strong>Example:</strong> <code dir="auto">"excludeMCPServers": ["myNodeServer"]</code>.</li>
+<li><strong>Security Note:</strong> This uses simple string matching on MCP server names,
+which can be modified. If you’re a system administrator looking to prevent
+users from bypassing this, consider configuring the <code dir="auto">mcpServers</code> at the
+system settings level such that the user will not be able to configure any
+MCP servers of their own. This should not be used as an airtight security
+mechanism.</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">autoAccept</code></strong> (boolean):</p>
+<ul>
+<li><strong>Description:</strong> Controls whether the CLI automatically accepts and executes
+tool calls that are considered safe (e.g., read-only operations) without
+explicit user confirmation. If set to <code dir="auto">true</code>, the CLI will bypass the
+confirmation prompt for tools deemed safe.</li>
+<li><strong>Default:</strong> <code dir="auto">false</code></li>
+<li><strong>Example:</strong> <code dir="auto">"autoAccept": true</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">theme</code></strong> (string):</p>
+<ul>
+<li><strong>Description:</strong> Sets the visual <a href="/docs/cli/themes">theme</a> for Gemini CLI.</li>
+<li><strong>Default:</strong> <code dir="auto">"Default"</code></li>
+<li><strong>Example:</strong> <code dir="auto">"theme": "GitHub"</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">vimMode</code></strong> (boolean):</p>
+<ul>
+<li><strong>Description:</strong> Enables or disables vim mode for input editing. When
+enabled, the input area supports vim-style navigation and editing commands
+with NORMAL and INSERT modes. The vim mode status is displayed in the footer
+and persists between sessions.</li>
+<li><strong>Default:</strong> <code dir="auto">false</code></li>
+<li><strong>Example:</strong> <code dir="auto">"vimMode": true</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">sandbox</code></strong> (boolean or string):</p>
+<ul>
+<li><strong>Description:</strong> Controls whether and how to use sandboxing for tool
+execution. If set to <code dir="auto">true</code>, Gemini CLI uses a pre-built
+<code dir="auto">gemini-cli-sandbox</code> Docker image. For more information, see
+<a href="#sandboxing">Sandboxing</a>.</li>
+<li><strong>Default:</strong> <code dir="auto">false</code></li>
+<li><strong>Example:</strong> <code dir="auto">"sandbox": "docker"</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">toolDiscoveryCommand</code></strong> (string):</p>
+<ul>
+<li><strong>Description:</strong> Defines a custom shell command for discovering tools from
+your project. The shell command must return on <code dir="auto">stdout</code> a JSON array of
+<a href="https://ai.google.dev/gemini-api/docs/function-calling#function-declarations">function declarations</a>.
+Tool wrappers are optional.</li>
+<li><strong>Default:</strong> Empty</li>
+<li><strong>Example:</strong> <code dir="auto">"toolDiscoveryCommand": "bin/get_tools"</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">toolCallCommand</code></strong> (string):</p>
+<ul>
+<li><strong>Description:</strong> Defines a custom shell command for calling a specific tool
+that was discovered using <code dir="auto">toolDiscoveryCommand</code>. The shell command must
+meet the following criteria:
+<ul>
+<li>It must take function <code dir="auto">name</code> (exactly as in
+<a href="https://ai.google.dev/gemini-api/docs/function-calling#function-declarations">function declaration</a>)
+as first command line argument.</li>
+<li>It must read function arguments as JSON on <code dir="auto">stdin</code>, analogous to
+<a href="https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference#functioncall"><code dir="auto">functionCall.args</code></a>.</li>
+<li>It must return function output as JSON on <code dir="auto">stdout</code>, analogous to
+<a href="https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/inference#functionresponse"><code dir="auto">functionResponse.response.content</code></a>.</li>
+</ul>
+</li>
+<li><strong>Default:</strong> Empty</li>
+<li><strong>Example:</strong> <code dir="auto">"toolCallCommand": "bin/call_tool"</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">mcpServers</code></strong> (object):</p>
+<ul>
+<li><strong>Description:</strong> Configures connections to one or more Model-Context
+Protocol (MCP) servers for discovering and using custom tools. Gemini CLI
+attempts to connect to each configured MCP server to discover available
+tools. If multiple MCP servers expose a tool with the same name, the tool
+names will be prefixed with the server alias you defined in the
+configuration (e.g., <code dir="auto">serverAlias__actualToolName</code>) to avoid conflicts. Note
+that the system might strip certain schema properties from MCP tool
+definitions for compatibility.</li>
+<li><strong>Default:</strong> Empty</li>
+<li><strong>Properties:</strong>
+<ul>
+<li><strong><code dir="auto">&#x3C;SERVER_NAME></code></strong> (object): The server parameters for the named server.
+<ul>
+<li><code dir="auto">command</code> (string, required): The command to execute to start the MCP
+server.</li>
+<li><code dir="auto">args</code> (array of strings, optional): Arguments to pass to the command.</li>
+<li><code dir="auto">env</code> (object, optional): Environment variables to set for the server
+process.</li>
+<li><code dir="auto">cwd</code> (string, optional): The working directory in which to start the
+server.</li>
+<li><code dir="auto">timeout</code> (number, optional): Timeout in milliseconds for requests to
+this MCP server.</li>
+<li><code dir="auto">trust</code> (boolean, optional): Trust this server and bypass all tool call
+confirmations.</li>
+<li><code dir="auto">includeTools</code> (array of strings, optional): List of tool names to
+include from this MCP server. When specified, only the tools listed here
+will be available from this server (whitelist behavior). If not
+specified, all tools from the server are enabled by default.</li>
+<li><code dir="auto">excludeTools</code> (array of strings, optional): List of tool names to
+exclude from this MCP server. Tools listed here will not be available to
+the model, even if they are exposed by the server. <strong>Note:</strong>
+<code dir="auto">excludeTools</code> takes precedence over <code dir="auto">includeTools</code> - if a tool is in
+both lists, it will be excluded.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"mcpServers"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"myPythonServer"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"command"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"python"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"args"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"mcp_server.py"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"--port"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"8080"</span><span style="--0:#E1DFDF;--1:#292929">],</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"cwd"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"./mcp_tools/python"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"timeout"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">5000</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"includeTools"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"safe_tool"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"file_reader"</span><span style="--0:#E1DFDF;--1:#292929">],</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">},</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"myNodeServer"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"command"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"node"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"args"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"mcp_server.js"</span><span style="--0:#E1DFDF;--1:#292929">],</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"cwd"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"./mcp_tools/node"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"excludeTools"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"dangerous_tool"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"file_deleter"</span><span style="--0:#E1DFDF;--1:#292929">]</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">},</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"myDockerServer"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"command"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"docker"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"args"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"run"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"-i"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"--rm"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"-e"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"API_KEY"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"ghcr.io/foo/bar"</span><span style="--0:#E1DFDF;--1:#292929">],</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"env"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">      </span><span style="--0:#85CDF1;--1:#00709A">"API_KEY"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"$MY_API_TOKEN"</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">    </span></span><span style="--0:#E1DFDF;--1:#292929">}</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">}</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;mcpServers&#x22;: {  &#x22;myPythonServer&#x22;: {    &#x22;command&#x22;: &#x22;python&#x22;,    &#x22;args&#x22;: [&#x22;mcp_server.py&#x22;, &#x22;--port&#x22;, &#x22;8080&#x22;],    &#x22;cwd&#x22;: &#x22;./mcp_tools/python&#x22;,    &#x22;timeout&#x22;: 5000,    &#x22;includeTools&#x22;: [&#x22;safe_tool&#x22;, &#x22;file_reader&#x22;],  },  &#x22;myNodeServer&#x22;: {    &#x22;command&#x22;: &#x22;node&#x22;,    &#x22;args&#x22;: [&#x22;mcp_server.js&#x22;],    &#x22;cwd&#x22;: &#x22;./mcp_tools/node&#x22;,    &#x22;excludeTools&#x22;: [&#x22;dangerous_tool&#x22;, &#x22;file_deleter&#x22;]  },  &#x22;myDockerServer&#x22;: {    &#x22;command&#x22;: &#x22;docker&#x22;,    &#x22;args&#x22;: [&#x22;run&#x22;, &#x22;-i&#x22;, &#x22;--rm&#x22;, &#x22;-e&#x22;, &#x22;API_KEY&#x22;, &#x22;ghcr.io/foo/bar&#x22;],    &#x22;env&#x22;: {      &#x22;API_KEY&#x22;: &#x22;$MY_API_TOKEN&#x22;    }  }}"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">checkpointing</code></strong> (object):</p>
+<ul>
+<li><strong>Description:</strong> Configures the checkpointing feature, which allows you to
+save and restore conversation and file states. See the
+<a href="/docs/cli/checkpointing">Checkpointing documentation</a> for more details.</li>
+<li><strong>Default:</strong> <code dir="auto">{"enabled": false}</code></li>
+<li><strong>Properties:</strong>
+<ul>
+<li><strong><code dir="auto">enabled</code></strong> (boolean): When <code dir="auto">true</code>, the <code dir="auto">/restore</code> command is available.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">preferredEditor</code></strong> (string):</p>
+<ul>
+<li><strong>Description:</strong> Specifies the preferred editor to use for viewing diffs.</li>
+<li><strong>Default:</strong> <code dir="auto">vscode</code></li>
+<li><strong>Example:</strong> <code dir="auto">"preferredEditor": "vscode"</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">telemetry</code></strong> (object)</p>
+<ul>
+<li><strong>Description:</strong> Configures logging and metrics collection for Gemini CLI.
+For more information, see <a href="/docs/cli/telemetry">Telemetry</a>.</li>
+<li><strong>Default:</strong>
+<code dir="auto">{"enabled": false, "target": "local", "otlpEndpoint": "http://localhost:4317", "logPrompts": true}</code></li>
+<li><strong>Properties:</strong>
+<ul>
+<li><strong><code dir="auto">enabled</code></strong> (boolean): Whether or not telemetry is enabled.</li>
+<li><strong><code dir="auto">target</code></strong> (string): The destination for collected telemetry. Supported
+values are <code dir="auto">local</code> and <code dir="auto">gcp</code>.</li>
+<li><strong><code dir="auto">otlpEndpoint</code></strong> (string): The endpoint for the OTLP Exporter.</li>
+<li><strong><code dir="auto">logPrompts</code></strong> (boolean): Whether or not to include the content of user
+prompts in the logs.</li>
+</ul>
+</li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"telemetry"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"enabled"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"target"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"local"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"otlpEndpoint"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"http://localhost:16686"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"logPrompts"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">false</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;telemetry&#x22;: {  &#x22;enabled&#x22;: true,  &#x22;target&#x22;: &#x22;local&#x22;,  &#x22;otlpEndpoint&#x22;: &#x22;http://localhost:16686&#x22;,  &#x22;logPrompts&#x22;: false}"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">usageStatisticsEnabled</code></strong> (boolean):</p>
+<ul>
+<li><strong>Description:</strong> Enables or disables the collection of usage statistics. See
+<a href="#usage-statistics">Usage Statistics</a> for more information.</li>
+<li><strong>Default:</strong> <code dir="auto">true</code></li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"usageStatisticsEnabled"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">false</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;usageStatisticsEnabled&#x22;: false"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">hideTips</code></strong> (boolean):</p>
+<ul>
+<li>
+<p><strong>Description:</strong> Enables or disables helpful tips in the CLI interface.</p>
+</li>
+<li>
+<p><strong>Default:</strong> <code dir="auto">false</code></p>
+</li>
+<li>
+<p><strong>Example:</strong></p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"hideTips"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;hideTips&#x22;: true"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">hideBanner</code></strong> (boolean):</p>
+<ul>
+<li>
+<p><strong>Description:</strong> Enables or disables the startup banner (ASCII art logo) in
+the CLI interface.</p>
+</li>
+<li>
+<p><strong>Default:</strong> <code dir="auto">false</code></p>
+</li>
+<li>
+<p><strong>Example:</strong></p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"hideBanner"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;hideBanner&#x22;: true"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">maxSessionTurns</code></strong> (number):</p>
+<ul>
+<li><strong>Description:</strong> Sets the maximum number of turns for a session. If the
+session exceeds this limit, the CLI will stop processing and start a new
+chat.</li>
+<li><strong>Default:</strong> <code dir="auto">-1</code> (unlimited)</li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"maxSessionTurns"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">10</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;maxSessionTurns&#x22;: 10"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">summarizeToolOutput</code></strong> (object):</p>
+<ul>
+<li><strong>Description:</strong> Enables or disables the summarization of tool output. You
+can specify the token budget for the summarization using the <code dir="auto">tokenBudget</code>
+setting.</li>
+<li>Note: Currently only the <code dir="auto">run_shell_command</code> tool is supported.</li>
+<li><strong>Default:</strong> <code dir="auto">{}</code> (Disabled by default)</li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"summarizeToolOutput"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"run_shell_command"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"tokenBudget"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">2000</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">}</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;summarizeToolOutput&#x22;: {  &#x22;run_shell_command&#x22;: {    &#x22;tokenBudget&#x22;: 2000  }}"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">excludedProjectEnvVars</code></strong> (array of strings):</p>
+<ul>
+<li><strong>Description:</strong> Specifies environment variables that should be excluded
+from being loaded from project <code dir="auto">.env</code> files. This prevents project-specific
+environment variables (like <code dir="auto">DEBUG=true</code>) from interfering with gemini-cli
+behavior. Variables from <code dir="auto">.gemini/.env</code> files are never excluded.</li>
+<li><strong>Default:</strong> <code dir="auto">["DEBUG", "DEBUG_MODE"]</code></li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"excludedProjectEnvVars"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"DEBUG"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"DEBUG_MODE"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"NODE_ENV"</span><span style="--0:#E1DFDF;--1:#292929">]</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;excludedProjectEnvVars&#x22;: [&#x22;DEBUG&#x22;, &#x22;DEBUG_MODE&#x22;, &#x22;NODE_ENV&#x22;]"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">includeDirectories</code></strong> (array of strings):</p>
+<ul>
+<li><strong>Description:</strong> Specifies an array of additional absolute or relative paths
+to include in the workspace context. This allows you to work with files
+across multiple directories as if they were one. Paths can use <code dir="auto">~</code> to refer
+to the user’s home directory. This setting can be combined with the
+<code dir="auto">--include-directories</code> command-line flag.</li>
+<li><strong>Default:</strong> <code dir="auto">[]</code></li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"includeDirectories"</span><span style="--0:#E1DFDF;--1:#292929">: [</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#77D5A3;--1:#007847">"/path/to/another/project"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#77D5A3;--1:#007847">"../shared-library"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#77D5A3;--1:#007847">"~/common-utils"</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">]</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;includeDirectories&#x22;: [  &#x22;/path/to/another/project&#x22;,  &#x22;../shared-library&#x22;,  &#x22;~/common-utils&#x22;]"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong><code dir="auto">loadMemoryFromIncludeDirectories</code></strong> (boolean):</p>
+<ul>
+<li><strong>Description:</strong> Controls the behavior of the <code dir="auto">/memory refresh</code> command. If
+set to <code dir="auto">true</code>, <code dir="auto">GEMINI.md</code> files should be loaded from all directories that
+are added. If set to <code dir="auto">false</code>, <code dir="auto">GEMINI.md</code> should only be loaded from the
+current directory.</li>
+<li><strong>Default:</strong> <code dir="auto">false</code></li>
+<li><strong>Example:</strong>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#77D5A3;--1:#007847">"loadMemoryFromIncludeDirectories"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="&#x22;loadMemoryFromIncludeDirectories&#x22;: true"><div></div></button></div></figure></div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="sl-heading-wrapper level-h3"><h3 id="example-settingsjson">Example <code dir="auto">settings.json</code>:</h3><a class="sl-anchor-link" href="#example-settingsjson"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Example settings.json:”</span></a></div>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">{</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"theme"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"GitHub"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"sandbox"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"docker"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"toolDiscoveryCommand"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"bin/get_tools"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"toolCallCommand"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"bin/call_tool"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"mcpServers"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"mainServer"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">      </span><span style="--0:#85CDF1;--1:#00709A">"command"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"bin/mcp_server.py"</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">    </span></span><span style="--0:#E1DFDF;--1:#292929">},</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"anotherServer"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">      </span><span style="--0:#85CDF1;--1:#00709A">"command"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"node"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">      </span><span style="--0:#85CDF1;--1:#00709A">"args"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"mcp_server.js"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"--verbose"</span><span style="--0:#E1DFDF;--1:#292929">]</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">    </span></span><span style="--0:#E1DFDF;--1:#292929">}</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">},</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"telemetry"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"enabled"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"target"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"local"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"otlpEndpoint"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#77D5A3;--1:#007847">"http://localhost:4317"</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"logPrompts"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">},</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"usageStatisticsEnabled"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"hideTips"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">false</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"hideBanner"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">false</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"maxSessionTurns"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">10</span><span style="--0:#E1DFDF;--1:#292929">,</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"summarizeToolOutput"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#85CDF1;--1:#00709A">"run_shell_command"</span><span style="--0:#E1DFDF;--1:#292929">: {</span></div></div><div class="ec-line"><div class="code"><span class="indent">      </span><span style="--0:#85CDF1;--1:#00709A">"tokenBudget"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">100</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">    </span></span><span style="--0:#E1DFDF;--1:#292929">}</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">},</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"excludedProjectEnvVars"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"DEBUG"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"DEBUG_MODE"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"NODE_ENV"</span><span style="--0:#E1DFDF;--1:#292929">],</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"includeDirectories"</span><span style="--0:#E1DFDF;--1:#292929">: [</span><span style="--0:#77D5A3;--1:#007847">"path/to/dir1"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"~/path/to/dir2"</span><span style="--0:#E1DFDF;--1:#292929">, </span><span style="--0:#77D5A3;--1:#007847">"../path/to/dir3"</span><span style="--0:#E1DFDF;--1:#292929">],</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"loadMemoryFromIncludeDirectories"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">true</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="{  &#x22;theme&#x22;: &#x22;GitHub&#x22;,  &#x22;sandbox&#x22;: &#x22;docker&#x22;,  &#x22;toolDiscoveryCommand&#x22;: &#x22;bin/get_tools&#x22;,  &#x22;toolCallCommand&#x22;: &#x22;bin/call_tool&#x22;,  &#x22;mcpServers&#x22;: {    &#x22;mainServer&#x22;: {      &#x22;command&#x22;: &#x22;bin/mcp_server.py&#x22;    },    &#x22;anotherServer&#x22;: {      &#x22;command&#x22;: &#x22;node&#x22;,      &#x22;args&#x22;: [&#x22;mcp_server.js&#x22;, &#x22;--verbose&#x22;]    }  },  &#x22;telemetry&#x22;: {    &#x22;enabled&#x22;: true,    &#x22;target&#x22;: &#x22;local&#x22;,    &#x22;otlpEndpoint&#x22;: &#x22;http://localhost:4317&#x22;,    &#x22;logPrompts&#x22;: true  },  &#x22;usageStatisticsEnabled&#x22;: true,  &#x22;hideTips&#x22;: false,  &#x22;hideBanner&#x22;: false,  &#x22;maxSessionTurns&#x22;: 10,  &#x22;summarizeToolOutput&#x22;: {    &#x22;run_shell_command&#x22;: {      &#x22;tokenBudget&#x22;: 100    }  },  &#x22;excludedProjectEnvVars&#x22;: [&#x22;DEBUG&#x22;, &#x22;DEBUG_MODE&#x22;, &#x22;NODE_ENV&#x22;],  &#x22;includeDirectories&#x22;: [&#x22;path/to/dir1&#x22;, &#x22;~/path/to/dir2&#x22;, &#x22;../path/to/dir3&#x22;],  &#x22;loadMemoryFromIncludeDirectories&#x22;: true}"><div></div></button></div></figure></div>
+<div class="sl-heading-wrapper level-h2"><h2 id="shell-history">Shell History</h2><a class="sl-anchor-link" href="#shell-history"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Shell History”</span></a></div>
+<p>The CLI keeps a history of shell commands you run. To avoid conflicts between
+different projects, this history is stored in a project-specific directory
+within your user’s home folder.</p>
+<ul>
+<li><strong>Location:</strong> <code dir="auto">~/.gemini/tmp/&#x3C;project_hash>/shell_history</code>
+<ul>
+<li><code dir="auto">&#x3C;project_hash></code> is a unique identifier generated from your project’s root
+path.</li>
+<li>The history is stored in a file named <code dir="auto">shell_history</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="sl-heading-wrapper level-h2"><h2 id="environment-variables--env-files">Environment Variables &#x26; <code dir="auto">.env</code> Files</h2><a class="sl-anchor-link" href="#environment-variables--env-files"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Environment Variables &#x26; .env Files”</span></a></div>
+<p>Environment variables are a common way to configure applications, especially for
+sensitive information like API keys or for settings that might change between
+environments.</p>
+<p>The CLI automatically loads environment variables from an <code dir="auto">.env</code> file. The
+loading order is:</p>
+<ol>
+<li><code dir="auto">.env</code> file in the current working directory.</li>
+<li>If not found, it searches upwards in parent directories until it finds an
+<code dir="auto">.env</code> file or reaches the project root (identified by a <code dir="auto">.git</code> folder) or
+the home directory.</li>
+<li>If still not found, it looks for <code dir="auto">~/.env</code> (in the user’s home directory).</li>
+</ol>
+<p><strong>Environment Variable Exclusion:</strong> Some environment variables (like <code dir="auto">DEBUG</code> and
+<code dir="auto">DEBUG_MODE</code>) are automatically excluded from being loaded from project <code dir="auto">.env</code>
+files to prevent interference with gemini-cli behavior. Variables from
+<code dir="auto">.gemini/.env</code> files are never excluded. You can customize this behavior using
+the <code dir="auto">excludedProjectEnvVars</code> setting in your <code dir="auto">settings.json</code> file.</p>
+<ul>
+<li><strong><code dir="auto">GEMINI_API_KEY</code></strong> (Required):
+<ul>
+<li>Your API key for the Gemini API.</li>
+<li><strong>Crucial for operation.</strong> The CLI will not function without it.</li>
+<li>Set this in your shell profile (e.g., <code dir="auto">~/.bashrc</code>, <code dir="auto">~/.zshrc</code>) or an <code dir="auto">.env</code>
+file.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GEMINI_MODEL</code></strong>:
+<ul>
+<li>Specifies the default Gemini model to use.</li>
+<li>Overrides the hardcoded default</li>
+<li>Example: <code dir="auto">export GEMINI_MODEL="gemini-2.5-flash"</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">GEMINI_CLI_CUSTOM_HEADERS</code></strong>:
+<ul>
+<li>Adds extra HTTP headers to Gemini API and Code Assist requests.</li>
+<li>Accepts a comma-separated list of <code dir="auto">Name: value</code> pairs.</li>
+<li>Example:
+<code dir="auto">export GEMINI_CLI_CUSTOM_HEADERS="X-My-Header: foo, X-Trace-ID: abc123"</code>.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GEMINI_API_KEY_AUTH_MECHANISM</code></strong>:
+<ul>
+<li>Specifies how the API key should be sent for authentication when using
+<code dir="auto">AuthType.USE_GEMINI</code> or <code dir="auto">AuthType.USE_VERTEX_AI</code>.</li>
+<li>Valid values are <code dir="auto">x-goog-api-key</code> (default) or <code dir="auto">bearer</code>.</li>
+<li>If set to <code dir="auto">bearer</code>, the API key will be sent in the
+<code dir="auto">Authorization: Bearer &#x3C;key></code> header.</li>
+<li>Example: <code dir="auto">export GEMINI_API_KEY_AUTH_MECHANISM="bearer"</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">GOOGLE_API_KEY</code></strong>:
+<ul>
+<li>Your Google Cloud API key.</li>
+<li>Required for using Vertex AI in express mode.</li>
+<li>Ensure you have the necessary permissions.</li>
+<li>Example: <code dir="auto">export GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"</code>.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GOOGLE_CLOUD_PROJECT</code></strong>:
+<ul>
+<li>Your Google Cloud Project ID.</li>
+<li>Required for using Code Assist or Vertex AI.</li>
+<li>If using Vertex AI, ensure you have the necessary permissions in this
+project.</li>
+<li><strong>Cloud Shell Note:</strong> When running in a Cloud Shell environment, this
+variable defaults to a special project allocated for Cloud Shell users. If
+you have <code dir="auto">GOOGLE_CLOUD_PROJECT</code> set in your global environment in Cloud
+Shell, it will be overridden by this default. To use a different project in
+Cloud Shell, you must define <code dir="auto">GOOGLE_CLOUD_PROJECT</code> in a <code dir="auto">.env</code> file.</li>
+<li>Example: <code dir="auto">export GOOGLE_CLOUD_PROJECT="YOUR_PROJECT_ID"</code>.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GOOGLE_APPLICATION_CREDENTIALS</code></strong> (string):
+<ul>
+<li><strong>Description:</strong> The path to your Google Application Credentials JSON file.</li>
+<li><strong>Example:</strong>
+<code dir="auto">export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/credentials.json"</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">OTLP_GOOGLE_CLOUD_PROJECT</code></strong>:
+<ul>
+<li>Your Google Cloud Project ID for Telemetry in Google Cloud</li>
+<li>Example: <code dir="auto">export OTLP_GOOGLE_CLOUD_PROJECT="YOUR_PROJECT_ID"</code>.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GOOGLE_CLOUD_LOCATION</code></strong>:
+<ul>
+<li>Your Google Cloud Project Location (e.g., us-central1).</li>
+<li>Required for using Vertex AI in non express mode.</li>
+<li>Example: <code dir="auto">export GOOGLE_CLOUD_LOCATION="YOUR_PROJECT_LOCATION"</code>.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GEMINI_SANDBOX</code></strong>:
+<ul>
+<li>Alternative to the <code dir="auto">sandbox</code> setting in <code dir="auto">settings.json</code>.</li>
+<li>Accepts <code dir="auto">true</code>, <code dir="auto">false</code>, <code dir="auto">docker</code>, <code dir="auto">podman</code>, or a custom command string.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">HTTP_PROXY</code> / <code dir="auto">HTTPS_PROXY</code></strong>:
+<ul>
+<li>Specifies the proxy server to use for outgoing HTTP/HTTPS requests.</li>
+<li>Example: <code dir="auto">export HTTPS_PROXY="http://proxy.example.com:8080"</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">SEATBELT_PROFILE</code></strong> (macOS specific):
+<ul>
+<li>Switches the Seatbelt (<code dir="auto">sandbox-exec</code>) profile on macOS.</li>
+<li><code dir="auto">permissive-open</code>: (Default) Restricts writes to the project folder (and a
+few other folders, see
+<code dir="auto">packages/cli/src/utils/sandbox-macos-permissive-open.sb</code>) but allows other
+operations.</li>
+<li><code dir="auto">strict</code>: Uses a strict profile that declines operations by default.</li>
+<li><code dir="auto">&#x3C;profile_name></code>: Uses a custom profile. To define a custom profile, create
+a file named <code dir="auto">sandbox-macos-&#x3C;profile_name>.sb</code> in your project’s <code dir="auto">.gemini/</code>
+directory (e.g., <code dir="auto">my-project/.gemini/sandbox-macos-custom.sb</code>).</li>
+</ul>
+</li>
+<li><strong><code dir="auto">DEBUG</code> or <code dir="auto">DEBUG_MODE</code></strong> (often used by underlying libraries or the CLI
+itself):
+<ul>
+<li>Set to <code dir="auto">true</code> or <code dir="auto">1</code> to enable verbose debug logging, which can be helpful
+for troubleshooting.</li>
+<li><strong>Note:</strong> These variables are automatically excluded from project <code dir="auto">.env</code>
+files by default to prevent interference with gemini-cli behavior. Use
+<code dir="auto">.gemini/.env</code> files if you need to set these for gemini-cli specifically.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">NO_COLOR</code></strong>:
+<ul>
+<li>Set to any value to disable all color output in the CLI.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">CLI_TITLE</code></strong>:
+<ul>
+<li>Set to a string to customize the title of the CLI.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">CODE_ASSIST_ENDPOINT</code></strong>:
+<ul>
+<li>Specifies the endpoint for the code assist server.</li>
+<li>This is useful for development and testing.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GEMINI_SYSTEM_MD</code></strong>:
+<ul>
+<li>Overrides the base system prompt with the contents of a Markdown file.</li>
+<li>If set to <code dir="auto">1</code> or <code dir="auto">true</code>, it uses the file at <code dir="auto">.gemini/system.md</code>.</li>
+<li>If set to a file path, it uses that file. The path can be absolute or
+relative. <code dir="auto">~</code> is supported for the home directory.</li>
+<li>The specified file must exist.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">GEMINI_WRITE_SYSTEM_MD</code></strong>:
+<ul>
+<li>Writes the default system prompt to a file. This is useful for getting a
+template to customize.</li>
+<li>If set to <code dir="auto">1</code> or <code dir="auto">true</code>, it writes to <code dir="auto">.gemini/system.md</code>.</li>
+<li>If set to a file path, it writes to that path. The path can be absolute or
+relative. <code dir="auto">~</code> is supported for the home directory. <strong>Note: This will
+overwrite the file if it already exists.</strong></li>
+</ul>
+</li>
+</ul>
+<div class="sl-heading-wrapper level-h2"><h2 id="command-line-arguments">Command-Line Arguments</h2><a class="sl-anchor-link" href="#command-line-arguments"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Command-Line Arguments”</span></a></div>
+<p>Arguments passed directly when running the CLI can override other configurations
+for that specific session.</p>
+<ul>
+<li><strong><code dir="auto">--model &#x3C;model_name></code></strong> (<strong><code dir="auto">-m &#x3C;model_name></code></strong>):
+<ul>
+<li>Specifies the Gemini model to use for this session.</li>
+<li>Example: <code dir="auto">npm start -- --model gemini-1.5-pro-latest</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">--prompt &#x3C;your_prompt></code></strong> (<strong><code dir="auto">-p &#x3C;your_prompt></code></strong>):
+<ul>
+<li>Used to pass a prompt directly to the command. This invokes Gemini CLI in a
+non-interactive mode.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--prompt-interactive &#x3C;your_prompt></code></strong> (<strong><code dir="auto">-i &#x3C;your_prompt></code></strong>):
+<ul>
+<li>Starts an interactive session with the provided prompt as the initial input.</li>
+<li>The prompt is processed within the interactive session, not before it.</li>
+<li>Cannot be used when piping input from stdin.</li>
+<li>Example: <code dir="auto">gemini -i "explain this code"</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">--sandbox</code></strong> (<strong><code dir="auto">-s</code></strong>):
+<ul>
+<li>Enables sandbox mode for this session.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--sandbox-image</code></strong>:
+<ul>
+<li>Sets the sandbox image URI.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--debug</code></strong> (<strong><code dir="auto">-d</code></strong>):
+<ul>
+<li>Enables debug mode for this session, providing more verbose output.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--all-files</code></strong> (<strong><code dir="auto">-a</code></strong>):
+<ul>
+<li>If set, recursively includes all files within the current directory as
+context for the prompt.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--help</code></strong> (or <strong><code dir="auto">-h</code></strong>):
+<ul>
+<li>Displays help information about command-line arguments.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--show-memory-usage</code></strong>:
+<ul>
+<li>Displays the current memory usage.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--yolo</code></strong>:
+<ul>
+<li>Enables YOLO mode, which automatically approves all tool calls.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--telemetry</code></strong>:
+<ul>
+<li>Enables <a href="/docs/cli/telemetry">telemetry</a>.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--telemetry-target</code></strong>:
+<ul>
+<li>Sets the telemetry target. See <a href="/docs/cli/telemetry">telemetry</a> for more
+information.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--telemetry-otlp-endpoint</code></strong>:
+<ul>
+<li>Sets the OTLP endpoint for telemetry. See <a href="/docs/cli/telemetry">telemetry</a> for
+more information.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--telemetry-log-prompts</code></strong>:
+<ul>
+<li>Enables logging of prompts for telemetry. See <a href="/docs/cli/telemetry">telemetry</a>
+for more information.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--extensions &#x3C;extension_name ...></code></strong> (<strong><code dir="auto">-e &#x3C;extension_name ...></code></strong>):
+<ul>
+<li>Specifies a list of extensions to use for the session. If not provided, all
+available extensions are used.</li>
+<li>Use the special term <code dir="auto">gemini -e none</code> to disable all extensions.</li>
+<li>Example: <code dir="auto">gemini -e my-extension -e my-other-extension</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">--list-extensions</code></strong> (<strong><code dir="auto">-l</code></strong>):
+<ul>
+<li>Lists all available extensions and exits.</li>
+</ul>
+</li>
+<li><strong><code dir="auto">--include-directories &#x3C;dir1,dir2,...></code></strong>:
+<ul>
+<li>Includes additional directories in the workspace for multi-directory
+support.</li>
+<li>Can be specified multiple times or as comma-separated values.</li>
+<li>5 directories can be added at maximum.</li>
+<li>Example: <code dir="auto">--include-directories /path/to/project1,/path/to/project2</code> or
+<code dir="auto">--include-directories /path/to/project1 --include-directories /path/to/project2</code></li>
+</ul>
+</li>
+<li><strong><code dir="auto">--version</code></strong>:
+<ul>
+<li>Displays the version of the CLI.</li>
+</ul>
+</li>
+</ul>
+<div class="sl-heading-wrapper level-h2"><h2 id="context-files-hierarchical-instructional-context">Context Files (Hierarchical Instructional Context)</h2><a class="sl-anchor-link" href="#context-files-hierarchical-instructional-context"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Context Files (Hierarchical Instructional Context)”</span></a></div>
+<p>While not strictly configuration for the CLI’s <em>behavior</em>, context files
+(defaulting to <code dir="auto">GEMINI.md</code> but configurable via the <code dir="auto">contextFileName</code> setting)
+are crucial for configuring the <em>instructional context</em> (also referred to as
+“memory”) provided to the Gemini model. This powerful feature allows you to give
+project-specific instructions, coding style guides, or any relevant background
+information to the AI, making its responses more tailored and accurate to your
+needs. The CLI includes UI elements, such as an indicator in the footer showing
+the number of loaded context files, to keep you informed about the active
+context.</p>
+<ul>
+<li><strong>Purpose:</strong> These Markdown files contain instructions, guidelines, or context
+that you want the Gemini model to be aware of during your interactions. The
+system is designed to manage this instructional context hierarchically.</li>
+</ul>
+<div class="sl-heading-wrapper level-h3"><h3 id="example-context-file-content-eg-geminimd">Example Context File Content (e.g., <code dir="auto">GEMINI.md</code>)</h3><a class="sl-anchor-link" href="#example-context-file-content-eg-geminimd"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Example Context File Content (e.g., GEMINI.md)”</span></a></div>
+<p>Here’s a conceptual example of what a context file at the root of a TypeScript
+project might contain:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="markdown"><code><div class="ec-line"><div class="code"><span style="--0:#8DA8FF;--0fw:bold;--1:#3252B8;--1fw:bold"># Project: My Awesome TypeScript Library</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#8DA8FF;--0fw:bold;--1:#3252B8;--1fw:bold">## General Instructions:</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> When generating new TypeScript code, please follow the existing coding style.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Ensure all new functions and classes have JSDoc comments.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Prefer functional programming paradigms where appropriate.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> All code should be compatible with TypeScript 5.0 and Node.js 20+.</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#8DA8FF;--0fw:bold;--1:#3252B8;--1fw:bold">## Coding Style:</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Use 2 spaces for indentation.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Interface names should be prefixed with </span><span style="--0:#E1DFDF;--1:#292929">`I`</span><span style="--0:#E1DFDF;--1:#292929"> (e.g., </span><span style="--0:#E1DFDF;--1:#292929">`IUserService`</span><span style="--0:#E1DFDF;--1:#292929">).</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Private class members should be prefixed with an underscore (</span><span style="--0:#E1DFDF;--1:#292929">`_`</span><span style="--0:#E1DFDF;--1:#292929">).</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Always use strict equality (</span><span style="--0:#E1DFDF;--1:#292929">`===`</span><span style="--0:#E1DFDF;--1:#292929"> and </span><span style="--0:#E1DFDF;--1:#292929">`!==`</span><span style="--0:#E1DFDF;--1:#292929">).</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#8DA8FF;--0fw:bold;--1:#3252B8;--1fw:bold">## Specific Component: </span><span style="--0:#8DA8FF;--0fw:bold;--1:#3252B8;--1fw:bold">`src/api/client.ts`</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> This file handles all outbound API requests.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> When adding new API call functions, ensure they include robust error handling</span></div></div><div class="ec-line"><div class="code"><span class="indent"><span style="--0:#E1DFDF;--1:#292929">  </span></span><span style="--0:#E1DFDF;--1:#292929">and logging.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Use the existing </span><span style="--0:#E1DFDF;--1:#292929">`fetchWithRetry`</span><span style="--0:#E1DFDF;--1:#292929"> utility for all GET requests.</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#8DA8FF;--0fw:bold;--1:#3252B8;--1fw:bold">## Regarding Dependencies:</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> Avoid introducing new external dependencies unless absolutely necessary.</span></div></div><div class="ec-line"><div class="code"><span style="--0:#FFD395;--1:#99581C">-</span><span style="--0:#E1DFDF;--1:#292929"> If a new dependency is required, please state the reason.</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="# Project: My Awesome TypeScript Library## General Instructions:- When generating new TypeScript code, please follow the existing coding style.- Ensure all new functions and classes have JSDoc comments.- Prefer functional programming paradigms where appropriate.- All code should be compatible with TypeScript 5.0 and Node.js 20+.## Coding Style:- Use 2 spaces for indentation.- Interface names should be prefixed with &#x60;I&#x60; (e.g., &#x60;IUserService&#x60;).- Private class members should be prefixed with an underscore (&#x60;_&#x60;).- Always use strict equality (&#x60;===&#x60; and &#x60;!==&#x60;).## Specific Component: &#x60;src/api/client.ts&#x60;- This file handles all outbound API requests.- When adding new API call functions, ensure they include robust error handling  and logging.- Use the existing &#x60;fetchWithRetry&#x60; utility for all GET requests.## Regarding Dependencies:- Avoid introducing new external dependencies unless absolutely necessary.- If a new dependency is required, please state the reason."><div></div></button></div></figure></div>
+<p>This example demonstrates how you can provide general project context, specific
+coding conventions, and even notes about particular files or components. The
+more relevant and precise your context files are, the better the AI can assist
+you. Project-specific context files are highly encouraged to establish
+conventions and context.</p>
+<ul>
+<li><strong>Hierarchical Loading and Precedence:</strong> The CLI implements a sophisticated
+hierarchical memory system by loading context files (e.g., <code dir="auto">GEMINI.md</code>) from
+several locations. Content from files lower in this list (more specific)
+typically overrides or supplements content from files higher up (more
+general). The exact concatenation order and final context can be inspected
+using the <code dir="auto">/memory show</code> command. The typical loading order is:
+<ol>
+<li><strong>Global Context File:</strong>
+<ul>
+<li>Location: <code dir="auto">~/.gemini/&#x3C;contextFileName></code> (e.g., <code dir="auto">~/.gemini/GEMINI.md</code> in
+your user home directory).</li>
+<li>Scope: Provides default instructions for all your projects.</li>
+</ul>
+</li>
+<li><strong>Project Root &#x26; Ancestors Context Files:</strong>
+<ul>
+<li>Location: The CLI searches for the configured context file in the
+current working directory and then in each parent directory up to either
+the project root (identified by a <code dir="auto">.git</code> folder) or your home directory.</li>
+<li>Scope: Provides context relevant to the entire project or a significant
+portion of it.</li>
+</ul>
+</li>
+<li><strong>Sub-directory Context Files (Contextual/Local):</strong>
+<ul>
+<li>Location: The CLI also scans for the configured context file in
+subdirectories <em>below</em> the current working directory (respecting common
+ignore patterns like <code dir="auto">node_modules</code>, <code dir="auto">.git</code>, etc.). The breadth of this
+search is limited to 200 directories by default, but can be configured
+with a <code dir="auto">memoryDiscoveryMaxDirs</code> field in your <code dir="auto">settings.json</code> file.</li>
+<li>Scope: Allows for highly specific instructions relevant to a particular
+component, module, or subsection of your project.</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><strong>Concatenation &#x26; UI Indication:</strong> The contents of all found context files are
+concatenated (with separators indicating their origin and path) and provided
+as part of the system prompt to the Gemini model. The CLI footer displays the
+count of loaded context files, giving you a quick visual cue about the active
+instructional context.</li>
+<li><strong>Importing Content:</strong> You can modularize your context files by importing
+other Markdown files using the <code dir="auto">@path/to/file.md</code> syntax. For more details,
+see the <a href="/docs/core/memport">Memory Import Processor documentation</a>.</li>
+<li><strong>Commands for Memory Management:</strong>
+<ul>
+<li>Use <code dir="auto">/memory refresh</code> to force a re-scan and reload of all context files
+from all configured locations. This updates the AI’s instructional context.</li>
+<li>Use <code dir="auto">/memory show</code> to display the combined instructional context currently
+loaded, allowing you to verify the hierarchy and content being used by the
+AI.</li>
+<li>See the <a href="/docs/cli/commands#memory">Commands documentation</a> for full details on
+the <code dir="auto">/memory</code> command and its sub-commands (<code dir="auto">show</code> and <code dir="auto">refresh</code>).</li>
+</ul>
+</li>
+</ul>
+<p>By understanding and utilizing these configuration layers and the hierarchical
+nature of context files, you can effectively manage the AI’s memory and tailor
+the Gemini CLI’s responses to your specific needs and projects.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="sandboxing">Sandboxing</h2><a class="sl-anchor-link" href="#sandboxing"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Sandboxing”</span></a></div>
+<p>The Gemini CLI can execute potentially unsafe operations (like shell commands
+and file modifications) within a sandboxed environment to protect your system.</p>
+<p>Sandboxing is disabled by default, but you can enable it in a few ways:</p>
+<ul>
+<li>Using <code dir="auto">--sandbox</code> or <code dir="auto">-s</code> flag.</li>
+<li>Setting <code dir="auto">GEMINI_SANDBOX</code> environment variable.</li>
+<li>Sandbox is enabled in <code dir="auto">--yolo</code> mode by default.</li>
+</ul>
+<p>By default, it uses a pre-built <code dir="auto">gemini-cli-sandbox</code> Docker image.</p>
+<p>For project-specific sandboxing needs, you can create a custom Dockerfile at
+<code dir="auto">.gemini/sandbox.Dockerfile</code> in your project’s root directory. This Dockerfile
+can be based on the base sandbox image:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="dockerfile"><code><div class="ec-line"><div class="code"><span style="--0:#FD8DA3;--1:#C12F57">FROM</span><span style="--0:#E1DFDF;--1:#292929"> gemini-cli-sandbox</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span style="--0:#8E8E8E;--1:#686868"># Add your custom dependencies or configurations here</span></div></div><div class="ec-line"><div class="code"><span style="--0:#8E8E8E;--1:#686868"># For example:</span></div></div><div class="ec-line"><div class="code"><span style="--0:#8E8E8E;--1:#686868"># RUN apt-get update &#x26;&#x26; apt-get install -y some-package</span></div></div><div class="ec-line"><div class="code"><span style="--0:#8E8E8E;--1:#686868"># COPY ./my-config /app/my-config</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="FROM gemini-cli-sandbox# Add your custom dependencies or configurations here# For example:# RUN apt-get update &#x26;&#x26; apt-get install -y some-package# COPY ./my-config /app/my-config"><div></div></button></div></figure></div>
+<p>When <code dir="auto">.gemini/sandbox.Dockerfile</code> exists, you can use <code dir="auto">BUILD_SANDBOX</code>
+environment variable when running Gemini CLI to automatically build the custom
+sandbox image:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">BUILD_SANDBOX</span><span style="--0:#FD8DA3;--1:#C12F57">=</span><span style="--0:#77D5A3;--1:#007847">1</span><span style="--0:#E1DFDF;--1:#292929"> </span><span style="--0:#BD9CFE;--1:#6F4CDE">gemini</span><span style="--0:#E1DFDF;--1:#292929"> </span><span style="--0:#8DA8FF;--1:#3252B8">-s</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="BUILD_SANDBOX=1 gemini -s"><div></div></button></div></figure></div>
+<div class="sl-heading-wrapper level-h2"><h2 id="usage-statistics">Usage Statistics</h2><a class="sl-anchor-link" href="#usage-statistics"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentcolor" d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 0 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 1 0-1.42-1.42Zm8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 0 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 1 0 1.42 1.42l3.88-3.89a4.49 4.49 0 0 0 0-6.33ZM8.83 15.17a1 1 0 0 0 1.1.22 1 1 0 0 0 .32-.22l4.92-4.92a1 1 0 0 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42Z"></path></svg></span><span class="sr-only">Section titled “Usage Statistics”</span></a></div>
+<p>To help us improve the Gemini CLI, we collect anonymized usage statistics. This
+data helps us understand how the CLI is used, identify common issues, and
+prioritize new features.</p>
+<p><strong>What we collect:</strong></p>
+<ul>
+<li><strong>Tool Calls:</strong> We log the names of the tools that are called, whether they
+succeed or fail, and how long they take to execute. We do not collect the
+arguments passed to the tools or any data returned by them.</li>
+<li><strong>API Requests:</strong> We log the Gemini model used for each request, the duration
+of the request, and whether it was successful. We do not collect the content
+of the prompts or responses.</li>
+<li><strong>Session Information:</strong> We collect information about the configuration of the
+CLI, such as the enabled tools and the approval mode.</li>
+</ul>
+<p><strong>What we DON’T collect:</strong></p>
+<ul>
+<li><strong>Personally Identifiable Information (PII):</strong> We do not collect any personal
+information, such as your name, email address, or API keys.</li>
+<li><strong>Prompt and Response Content:</strong> We do not log the content of your prompts or
+the responses from the Gemini model.</li>
+<li><strong>File Content:</strong> We do not log the content of any files that are read or
+written by the CLI.</li>
+</ul>
+<p><strong>How to opt out:</strong></p>
+<p>You can opt out of usage statistics collection at any time by setting the
+<code dir="auto">usageStatisticsEnabled</code> property to <code dir="auto">false</code> in your <code dir="auto">settings.json</code> file:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="json"><code><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">{</span></div></div><div class="ec-line"><div class="code"><span class="indent">  </span><span style="--0:#85CDF1;--1:#00709A">"usageStatisticsEnabled"</span><span style="--0:#E1DFDF;--1:#292929">: </span><span style="--0:#8DA8FF;--1:#3252B8">false</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1DFDF;--1:#292929">}</span></div></div></code></pre><div class="copy"><button title="Copy to clipboard" data-copied="Copied!" data-code="{  &#x22;usageStatisticsEnabled&#x22;: false}"><div></div></button></div></figure></div> </div>  </div> </div>   </main> </div> </div>   </div> <div id="cookie-notice-wrapper" class="hidden astro-uz2wdcl7"> <div class="cookie-notice-container fixed bottom-0 left-0 right-0 flex justify-center z-50 astro-uz2wdcl7"> <div class="cookie-notice text-sm dark:bg-black/50 bg-white/50 backdrop-blur-sm m-2 p-3 rounded-lg flex max-sm:flex-col items-center border border-black/20 astro-uz2wdcl7"> <div class="mr-2 astro-uz2wdcl7">
+This website uses <a href="https://policies.google.com/technologies/cookies" class="underline text-black/70 dark:text-white/70 astro-uz2wdcl7" target="_blank">cookies</a> from Google to deliver and enhance the quality of its services and to analyze
+        traffic.
+</div> <button id="cookie-ack-button" class="font-bold text-nowrap px-2 py-1 border rounded dark:bg-black/80 dark:text-white/70 dark:border-white/30 border-black/20 astro-uz2wdcl7">
+I understand.
+</button> </div> </div> </div> <script type="module">const e=document.getElementById("cookie-notice-wrapper"),t="__cookieAck";e&&localStorage.getItem(t)!=="true"&&e.classList.remove("hidden");const o=document.getElementById("cookie-ack-button");o?.addEventListener("click",()=>{localStorage.setItem(t,"true"),e&&(e.style.display="none")});</script>  <!-- Footer at bottom of .page flex container --> <footer class="site-footer astro-yriad4ts theme-aware astro-sz7xmlte"> <div class="footer-content astro-sz7xmlte"> <div class="logos astro-sz7xmlte"> <img class="logo-light astro-sz7xmlte" src="/assets/Google.svg" alt="Google logo" width="64.216" height="21"> <img class="logo-dark astro-sz7xmlte" src="/assets/Google-dark.svg" alt="Google logo" width="64.216" height="21"> <img class="logo-light fordev-logo astro-sz7xmlte" src="/assets/fordevelopers.svg" alt="For Developers logo" width="122.678" height="17.583"> <img class="logo-dark fordev-logo astro-sz7xmlte" src="/assets/fordevelopers-dark.svg" alt="For Developers logo" width="122.678" height="17.583"> </div> <div class="footer-links astro-sz7xmlte"> <a href="/terms" class="tos-link astro-sz7xmlte" target="_blank" rel="noopener noreferrer">Terms</a> <span class="divider astro-sz7xmlte">|</span> <a href="https://policies.google.com/privacy" class="tos-link astro-sz7xmlte" target="_blank" rel="noopener noreferrer">Privacy</a> </div> </div> </footer>  </div>  </body></html>

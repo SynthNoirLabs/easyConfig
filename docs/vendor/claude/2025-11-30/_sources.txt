@@ -1,0 +1,4 @@
+provider=claude
+fetched_at=2025-11-30
+urls:
+  - https://docs.claude.com/en/docs/claude-code/settings

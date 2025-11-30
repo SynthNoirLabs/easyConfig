@@ -7,6 +7,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	toml "github.com/pelletier/go-toml/v2"
+	"gopkg.in/yaml.v3"
 )
 
 // DiscoveryService manages the discovery of configurations across multiple providers
@@ -135,12 +138,22 @@ func (s *DiscoveryService) ReadConfig(path string) (string, error) {
 // to avoid creating world-readable configuration files that may contain
 // secrets.
 func (s *DiscoveryService) SaveConfig(path, content string) error {
-	// Validate JSON if the file is a .json file
 	ext := strings.ToLower(filepath.Ext(path))
-	if ext == ".json" {
+	switch ext {
+	case ".json":
 		var js json.RawMessage
 		if err := json.Unmarshal([]byte(content), &js); err != nil {
 			return fmt.Errorf("invalid JSON content: %w", err)
+		}
+	case ".yaml", ".yml":
+		var y any
+		if err := yaml.Unmarshal([]byte(content), &y); err != nil {
+			return fmt.Errorf("invalid YAML content: %w", err)
+		}
+	case ".toml":
+		var t any
+		if err := toml.Unmarshal([]byte(content), &t); err != nil {
+			return fmt.Errorf("invalid TOML content: %w", err)
 		}
 	}
 

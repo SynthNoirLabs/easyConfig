@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import "./EditorStyles.css";
 
 interface OpenCodeConfig {
@@ -13,7 +14,10 @@ interface OpenCodeConfigEditorProps {
   onChange: (newContent: string) => void;
 }
 
-const OpenCodeConfigEditor: React.FC<OpenCodeConfigEditorProps> = ({ content, onChange }) => {
+const OpenCodeConfigEditor: React.FC<OpenCodeConfigEditorProps> = ({
+  content,
+  onChange,
+}) => {
   const [config, setConfig] = useState<OpenCodeConfig>({});
   const [parseError, setParseError] = useState<string | null>(null);
 
@@ -22,7 +26,7 @@ const OpenCodeConfigEditor: React.FC<OpenCodeConfigEditorProps> = ({ content, on
       const parsed = JSON.parse(content || "{}");
       setConfig(parsed);
       setParseError(null);
-    } catch (e) {
+    } catch (_e) {
       setParseError("Invalid JSON content. Please switch to Code view to fix.");
     }
   }, [content]);
@@ -40,8 +44,9 @@ const OpenCodeConfigEditor: React.FC<OpenCodeConfigEditorProps> = ({ content, on
   return (
     <div className="form-editor">
       <div className="form-group">
-        <label>Default Model</label>
+        <label htmlFor="opencode-default-model">Default Model</label>
         <select
+          id="opencode-default-model"
           value={config.defaultModel || "gpt-4"}
           onChange={(e) => updateConfig({ defaultModel: e.target.value })}
         >
@@ -54,31 +59,38 @@ const OpenCodeConfigEditor: React.FC<OpenCodeConfigEditorProps> = ({ content, on
       </div>
 
       <div className="form-group">
-        <label>Max Tokens</label>
+        <label htmlFor="opencode-max-tokens">Max Tokens</label>
         <input
+          id="opencode-max-tokens"
           type="number"
           value={config.maxTokens || 4096}
-          onChange={(e) => updateConfig({ maxTokens: parseInt(e.target.value) || 0 })}
+          onChange={(e) =>
+            updateConfig({ maxTokens: parseInt(e.target.value, 10) || 0 })
+          }
         />
         <small>Maximum number of tokens to generate</small>
       </div>
 
       <div className="form-group">
-        <label>Temperature (0.0 - 1.0)</label>
+        <label htmlFor="opencode-temperature">Temperature (0.0 - 1.0)</label>
         <input
+          id="opencode-temperature"
           type="number"
           step="0.1"
           min="0"
           max="1"
           value={config.temperature ?? 0.7}
-          onChange={(e) => updateConfig({ temperature: parseFloat(e.target.value) })}
+          onChange={(e) =>
+            updateConfig({ temperature: parseFloat(e.target.value) })
+          }
         />
         <small>Controls randomness: 0 is deterministic, 1 is creative</small>
       </div>
 
       <div className="form-group">
-        <label>API Key (Optional override)</label>
+        <label htmlFor="opencode-api-key">API Key (Optional override)</label>
         <input
+          id="opencode-api-key"
           type="password"
           value={config.apiKey || ""}
           onChange={(e) => updateConfig({ apiKey: e.target.value })}
