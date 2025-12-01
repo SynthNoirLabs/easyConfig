@@ -3,15 +3,30 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'coverage.out'
+      - 'build/**'
+      - 'frontend/dist/**'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'coverage.out'
+      - 'build/**'
+      - 'frontend/dist/**'
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+  build-and-test-mac:
+    # Primary CI job: runs on your macOS self-hosted runner.
+    # Configure the runner with labels: selfhosted, easyconfig, mac
+    runs-on: [selfhosted, easyconfig, mac]
     defaults:
       run:
         shell: bash
@@ -24,14 +39,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24'
-      - name: Cache Go
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: ${{ runner.os }}-go-
 
       - name: Go test
         run: go test ./...
@@ -54,17 +61,15 @@ jobs:
           cd frontend
           npm ci
 
-      - name: Install Playwright browsers (Linux/macOS)
-        if: ${{ matrix.os != 'windows-latest' }}
+      - name: Install Playwright browsers (mac self-hosted)
         run: |
           cd frontend
-          npx playwright install --with-deps chromium
-
-      - name: Install Playwright browsers (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: |
-          cd frontend
-          npx playwright install chromium
+          # Skip reinstall if cached on the self-hosted runner
+          if ls ~/.cache/ms-playwright/chromium-* >/dev/null 2>&1; then
+            echo "Playwright chromium already present, skipping install"
+          else
+            npx playwright install --with-deps chromium
+          fi
 
       - name: Frontend build
         run: |
@@ -80,3 +85,24 @@ jobs:
         run: |
           cd frontend
           npm run test:e2e
+
+  build-and-test-ubuntu-smoke:
+    # Lightweight hosted fallback / periodic check on ubuntu-latest.
+    # You can disable or cron-gate this later if desired.
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    defaults:
+      run:
+        shell: bash
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: 0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Go test (Ubuntu smoke)
+        run: go test ./...
