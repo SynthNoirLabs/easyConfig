@@ -73,10 +73,11 @@ jobs:
             npx playwright install --with-deps chromium
           fi
 
-      - name: Frontend build
+      - name: Frontend build (create dist for Go embed)
         run: |
           cd frontend
           npm run build
+          touch dist/.keep
 
       - name: Frontend lint
         run: |
