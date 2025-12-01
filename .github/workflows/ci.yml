@@ -24,9 +24,8 @@ concurrency:
 
 jobs:
   build-and-test-mac:
-    # Primary CI job: runs on your macOS self-hosted runner.
-    # Configure the runner with labels: selfhosted, easyconfig, mac
-    runs-on: [selfhosted, easyconfig, mac]
+    # Primary CI job: macOS self-hosted runner (default labels: self-hosted, macOS, ARM64).
+    runs-on: [self-hosted, macOS, ARM64]
     defaults:
       run:
         shell: bash
