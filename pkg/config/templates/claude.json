@@ -1,0 +1,21 @@
+{
+  "name": "Claude Code",
+  "provider": "claude",
+  "description": "Default Claude Code configuration.",
+  "files": {
+    "settings.json": {
+      "format": "json",
+      "content": {
+        "anthropic_api_key": "YOUR_ANTHROPIC_API_KEY",
+        "model": "claude-3-opus-20240229",
+        "temperature": 0.2,
+        "custom_prompts": {
+          "default": {
+            "description": "Default prompt",
+            "template": "Human: You are a helpful AI assistant named Claude. The user is going to ask you a question. Your job is to answer that question. Here is the question: {PROMPT}\n\nAssistant: Here is my answer to the question:"
+          }
+        }
+      }
+    }
+  }
+}

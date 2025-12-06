@@ -175,3 +175,76 @@ func (s *DiscoveryService) GetProviderStatuses() []ProviderStatus {
 
 	return statuses
 }
+
+// CreateConfigFromTemplate creates a new configuration file from a template
+func (s *DiscoveryService) CreateConfigFromTemplate(providerName string, scope Scope, projectPath, templateID string) (string, error) {
+	templates, err := GetTemplates()
+	if err != nil {
+		return "", fmt.Errorf("failed to get templates: %w", err)
+	}
+
+	var tpl *Template
+	for _, t := range templates {
+		if t.ID == templateID {
+			tpl = &t
+			break
+		}
+	}
+
+	if tpl == nil {
+		return "", fmt.Errorf("template not found: %s", templateID)
+	}
+
+	var basePath string
+	if scope == ScopeGlobal {
+		// Use the provider name to create a subdirectory in the user's config directory
+		basePath = filepath.Join(GetUserHome(), ".config", tpl.Provider)
+	} else {
+		basePath = projectPath
+	}
+
+	if basePath == "" {
+		return "", fmt.Errorf("base path is empty for scope %v", scope)
+	}
+
+	// Create the directory if it doesn't exist
+	if err := os.MkdirAll(basePath, 0755); err != nil {
+		return "", fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	var lastPath string
+	for filename, fileTpl := range tpl.Files {
+		configPath := filepath.Join(basePath, filename)
+
+		var content []byte
+		var err error
+
+		switch fileTpl.Format {
+		case "json":
+			content, err = json.MarshalIndent(fileTpl.Content, "", "  ")
+		case "yaml":
+			content, err = yaml.Marshal(fileTpl.Content)
+		case "toml":
+			content, err = toml.Marshal(fileTpl.Content)
+		default:
+			return "", fmt.Errorf("unsupported format: %s", fileTpl.Format)
+		}
+
+		if err != nil {
+			return "", fmt.Errorf("failed to marshal content: %w", err)
+		}
+
+		err = os.WriteFile(configPath, content, 0644)
+		if err != nil {
+			return "", fmt.Errorf("failed to write file: %w", err)
+		}
+
+		lastPath = configPath
+	}
+
+	if lastPath == "" {
+		return "", fmt.Errorf("template has no files")
+	}
+
+	return lastPath, nil
+}

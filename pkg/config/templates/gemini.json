@@ -1,0 +1,15 @@
+{
+  "name": "Gemini",
+  "provider": "gemini",
+  "description": "Default Gemini configuration.",
+  "files": {
+    "settings.json": {
+      "format": "json",
+      "content": {
+        "google_api_key": "YOUR_GOOGLE_API_KEY",
+        "model": "gemini-pro",
+        "temperature": 0.2
+      }
+    }
+  }
+}
