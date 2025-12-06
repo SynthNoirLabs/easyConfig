@@ -1,23 +1,15 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { GetProviderStatuses } from "../../wailsjs/go/main/App";
+import type { config } from "../../wailsjs/go/models";
 import ProviderStatusDrawer from "./ProviderStatusDrawer";
 import "./ProviderStatusWidget.css";
 
-// Define the type based on the Go struct
-interface ProviderStatus {
-  providerName: string;
-  health: "healthy" | "unhealthy" | "unknown";
-  statusMessage: string;
-  lastChecked: string;
-}
-
 const ProviderStatusWidget: React.FC = () => {
-  const [statuses, setStatuses] = useState<ProviderStatus[]>([]);
+  const [statuses, setStatuses] = useState<config.ProviderStatus[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<ProviderStatus | null>(
-    null,
-  );
+  const [selectedStatus, setSelectedStatus] =
+    useState<config.ProviderStatus | null>(null);
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -37,7 +29,7 @@ const ProviderStatusWidget: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handlePillClick = (status: ProviderStatus) => {
+  const handlePillClick = (status: config.ProviderStatus) => {
     setSelectedStatus(status);
   };
 
@@ -45,7 +37,7 @@ const ProviderStatusWidget: React.FC = () => {
     setSelectedStatus(null);
   };
 
-  const getHealthColor = (health: "healthy" | "unhealthy" | "unknown") => {
+  const getHealthColor = (health: string) => {
     switch (health) {
       case "healthy":
         return "var(--green)";

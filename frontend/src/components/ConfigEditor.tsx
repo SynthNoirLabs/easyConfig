@@ -2,6 +2,7 @@ import Editor from "@monaco-editor/react";
 import {
   Code,
   Eye,
+  History,
   LayoutTemplate,
   RefreshCw,
   RotateCcw,
@@ -11,12 +12,17 @@ import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { toast } from "sonner"; // Import sonner toast
-import type { config } from "../../wailsjs/go/models";
+import { toast } from "sonner";
+import type { config, versions } from "../../wailsjs/go/models";
+import {
+  GetFileContentAtCommit,
+  GetFileHistory,
+} from "../../wailsjs/go/main/App";
 import { useConfig } from "../context/ConfigContext";
 import "./ConfigEditor.css";
 import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
 import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
+import GitHistoryViewer from "./GitHistoryViewer";
 
 interface ConfigEditorProps {
   configItem: config.Item;
@@ -30,7 +36,7 @@ const getLanguage = (format: string) => {
     case "yml":
       return "yaml";
     case "toml":
-      return "ini"; // TOML syntax highlighting is not built-in, INI is closest
+      return "ini";
     case "ini":
       return "ini";
     default:
@@ -47,12 +53,13 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"code" | "form" | "preview">("code");
+  const [history, setHistory] = useState<versions.CommitInfo[]>([]);
+  const [isHistoryVisible, setIsHistoryVisible] = useState<boolean>(false);
 
   const isMarkdown =
     configItem.format.toLowerCase() === "markdown" ||
     configItem.fileName.toLowerCase().endsWith(".md");
 
-  // Determine if a specific editor is available
   const hasSpecificEditor =
     (configItem.provider === "Claude Code" &&
       configItem.fileName === "claude_desktop_config.json") ||
@@ -60,7 +67,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
       configItem.fileName === "opencode.json");
 
   useEffect(() => {
-    // Default to form view if available
     if (hasSpecificEditor) {
       setViewMode("form");
     } else if (isMarkdown) {
@@ -84,17 +90,10 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
       setError(
         err instanceof Error ? err.message : "Failed to load configurations",
       );
-      if (String(err).includes("window.go")) {
-        const mock = `// Mock content for ${configItem.name}\n// Backend not connected.`;
-        setContent(mock);
-        setOriginalContent(mock);
-        setIsDirty(false);
-        setError(null);
-      }
     } finally {
       setIsLoading(false);
     }
-  }, [configItem.path, configItem.name, readConfig]);
+  }, [configItem.path, readConfig]);
 
   useEffect(() => {
     loadFile();
@@ -103,16 +102,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      if (configItem.format === "json") {
-        try {
-          JSON.parse(content);
-        } catch (_e) {
-          toast.error("Invalid JSON format. Please fix errors before saving.");
-          setIsSaving(false);
-          return;
-        }
-      }
-
       await saveConfig(configItem.path, content);
       setOriginalContent(content);
       setIsDirty(false);
@@ -149,6 +138,39 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     setIsDirty(value !== originalContent);
   };
 
+  const handleShowHistory = async () => {
+    try {
+      const historyData = await GetFileHistory(configItem.path);
+      setHistory(historyData);
+      setIsHistoryVisible(true);
+    } catch (err) {
+      console.error("Error fetching file history:", err);
+      toast.error(
+        err instanceof Error ? err.message : "Failed to fetch file history.",
+      );
+    }
+  };
+
+  const handleSelectCommit = async (commitHash: string) => {
+    try {
+      const commitContent = await GetFileContentAtCommit(
+        configItem.path,
+        commitHash,
+      );
+      setContent(commitContent);
+      setIsDirty(commitContent !== originalContent);
+      setIsHistoryVisible(false);
+      toast.info(
+        "Content reverted to the selected version. Save to apply changes.",
+      );
+    } catch (err) {
+      console.error("Error reverting to commit:", err);
+      toast.error(
+        err instanceof Error ? err.message : "Failed to revert to commit.",
+      );
+    }
+  };
+
   return (
     <div className="config-editor">
       <div className="editor-toolbar">
@@ -181,7 +203,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
                 {isMarkdown && (
                   <button
                     type="button"
-                    className={`btn-toggle ${viewMode === "preview" ? "active" : ""}`}
+                    className={`btn-toggle ${
+                      viewMode === "preview" ? "active" : ""
+                    }`}
                     onClick={() => setViewMode("preview")}
                     title="Preview"
                   >
@@ -192,6 +216,15 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
               <div className="separator" />
             </>
           )}
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleShowHistory}
+            disabled={isLoading}
+            title="View file history"
+          >
+            <History size={16} />
+          </button>
           <button
             type="button"
             className="btn-secondary"
@@ -261,6 +294,14 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           />
         )}
       </div>
+
+      {isHistoryVisible && (
+        <GitHistoryViewer
+          history={history}
+          onSelectCommit={handleSelectCommit}
+          onClose={() => setIsHistoryVisible(false)}
+        />
+      )}
     </div>
   );
 };

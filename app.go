@@ -15,21 +15,23 @@ import (
 	"easyConfig/pkg/mcp"
 	"easyConfig/pkg/schema"
 	"easyConfig/pkg/util/paths"
+	"easyConfig/pkg/versions"
 	"easyConfig/pkg/watcher"
 	"easyConfig/pkg/workflows"
 )
 
 // App struct
 type App struct {
-	ctx              context.Context
-	discoveryService *config.DiscoveryService
-	watcherService   *watcher.Service
-	installer        *install.Installer
-	smitheryClient   *marketplaces.SmitheryClient
-	awesomeClient    *marketplaces.AwesomeClient
-	workflowGen      *workflows.Generator
-	secretsManager   *workflows.SecretsManager
-	mcpInjector      *mcp.Injector
+	ctx                   context.Context
+	discoveryService      *config.DiscoveryService
+	watcherService        *watcher.Service
+	installer             *install.Installer
+	smitheryClient        *marketplaces.SmitheryClient
+	awesomeClient         *marketplaces.AwesomeClient
+	workflowGen           *workflows.Generator
+	secretsManager        *workflows.SecretsManager
+	mcpInjector           *mcp.Injector
+	versionControlService *versions.VersionControlService
 }
 
 // NewApp creates a new App application struct
@@ -50,6 +52,7 @@ func (a *App) startup(ctx context.Context) {
 	a.workflowGen = workflows.NewGenerator()
 	a.secretsManager = workflows.NewSecretsManager()
 	a.mcpInjector = mcp.NewInjector()
+	a.versionControlService = versions.NewVersionControlService(logger)
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -382,4 +385,14 @@ func (a *App) ReadDoc(provider, slug, format string) (string, error) {
 		return "", fmt.Errorf("get working dir: %w", err)
 	}
 	return config.ReadDocFromRoot(root, provider, slug, format)
+}
+
+// GetFileHistory returns the git history for a file.
+func (a *App) GetFileHistory(path string) ([]versions.CommitInfo, error) {
+	return a.versionControlService.GetFileHistory(path)
+}
+
+// GetFileContentAtCommit returns the content of a file at a specific commit.
+func (a *App) GetFileContentAtCommit(path, commitHash string) (string, error) {
+	return a.versionControlService.GetFileContentAtCommit(path, commitHash)
 }
