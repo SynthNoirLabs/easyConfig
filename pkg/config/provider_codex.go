@@ -214,3 +214,7 @@ func (p *CodexProvider) CheckStatus() ProviderStatus {
 
 	return status
 }
+
+func (p *CodexProvider) GetWizard() Wizard {
+	return nil
+}

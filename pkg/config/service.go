@@ -47,6 +47,16 @@ func (s *DiscoveryService) RegisterProvider(p Provider) {
 	s.providers = append(s.providers, p)
 }
 
+// GetProvider returns a provider by name.
+func (s *DiscoveryService) GetProvider(name string) Provider {
+	for _, p := range s.providers {
+		if p.Name() == name {
+			return p
+		}
+	}
+	return nil
+}
+
 // DiscoverAll iterates through all registered providers and collects configs
 // projectPath: The root directory of the current project (optional)
 func (s *DiscoveryService) DiscoverAll(projectPath string) ([]Item, error) {
@@ -170,6 +180,7 @@ func (s *DiscoveryService) GetProviderStatuses() []ProviderStatus {
 
 	for _, p := range s.providers {
 		status := p.CheckStatus()
+		status.HasWizard = p.GetWizard() != nil
 		statuses = append(statuses, status)
 	}
 

@@ -116,3 +116,56 @@ func (p *JulesProvider) CheckStatus() ProviderStatus {
 
 	return status
 }
+
+func (p *JulesProvider) GetWizard() Wizard {
+	return &JulesWizard{}
+}
+
+// --- Jules Wizard ---
+
+type JulesWizard struct {
+	currentStep string
+	configData  map[string]interface{}
+}
+
+func (w *JulesWizard) Start() (*WizardStep, error) {
+	w.currentStep = "welcome"
+	w.configData = make(map[string]interface{})
+	return &WizardStep{
+		ID:          "welcome",
+		Title:       "Welcome to the Jules Configuration Wizard!",
+		Description: "This wizard will help you set up your Jules `data.json` file. Click Next to continue.",
+	}, nil
+}
+
+func (w *JulesWizard) Next(currentStepID, response string) (*WizardStep, error) {
+	switch currentStepID {
+	case "welcome":
+		w.currentStep = "get_name"
+		return &WizardStep{
+			ID:          "get_name",
+			Title:       "What is your name?",
+			Description: "Jules would like to know your name.",
+		}, nil
+	case "get_name":
+		w.configData["name"] = response
+		w.currentStep = "done"
+		// In a real wizard, we'd save the file here.
+		return &WizardStep{
+			ID: "done",
+			Title: "Configuration Complete!",
+			Description: fmt.Sprintf("Thanks, %s! Your configuration has been created.", response),
+		}, nil
+	case "done":
+		return nil, nil // Wizard is finished
+	default:
+		return nil, fmt.Errorf("unknown step: %s", currentStepID)
+	}
+}
+
+func (w *JulesWizard) Cancel() error {
+	// Reset the wizard state
+	w.currentStep = ""
+	w.configData = nil
+	return nil
+}

@@ -2,15 +2,11 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { GetProviderStatuses } from "../../wailsjs/go/main/App";
 import ProviderStatusDrawer from "./ProviderStatusDrawer";
+import ConfigWizard from "./ConfigWizard";
+import type { config } from "../../wailsjs/go/models";
 import "./ProviderStatusWidget.css";
 
-// Define the type based on the Go struct
-interface ProviderStatus {
-  providerName: string;
-  health: "healthy" | "unhealthy" | "unknown";
-  statusMessage: string;
-  lastChecked: string;
-}
+type ProviderStatus = config.ProviderStatus;
 
 const ProviderStatusWidget: React.FC = () => {
   const [statuses, setStatuses] = useState<ProviderStatus[]>([]);
@@ -18,6 +14,7 @@ const ProviderStatusWidget: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<ProviderStatus | null>(
     null,
   );
+  const [wizardProvider, setWizardProvider] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -45,7 +42,7 @@ const ProviderStatusWidget: React.FC = () => {
     setSelectedStatus(null);
   };
 
-  const getHealthColor = (health: "healthy" | "unhealthy" | "unknown") => {
+  const getHealthColor = (health: string) => {
     switch (health) {
       case "healthy":
         return "var(--green)";
@@ -66,21 +63,31 @@ const ProviderStatusWidget: React.FC = () => {
         <h4>Provider Status</h4>
         <div className="status-pills">
           {statuses.map((status) => (
-            <button
-              type="button"
-              key={status.providerName}
-              className="status-pill"
-              style={{ backgroundColor: getHealthColor(status.health) }}
-              title={`${status.providerName}: ${status.statusMessage}`}
-              onClick={() => handlePillClick(status)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handlePillClick(status);
-                }
-              }}
-            >
-              {status.providerName}
-            </button>
+            <div key={status.providerName} className="status-pill-container">
+              <button
+                type="button"
+                className="status-pill"
+                style={{ backgroundColor: getHealthColor(status.health) }}
+                title={`${status.providerName}: ${status.statusMessage}`}
+                onClick={() => handlePillClick(status)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handlePillClick(status);
+                  }
+                }}
+              >
+                {status.providerName}
+              </button>
+              {status.hasWizard && (
+                <button
+                  type="button"
+                  className="wizard-button"
+                  onClick={() => setWizardProvider(status.providerName)}
+                >
+                  Wizard
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -88,6 +95,13 @@ const ProviderStatusWidget: React.FC = () => {
         status={selectedStatus}
         onClose={handleDrawerClose}
       />
+      {wizardProvider && (
+        <ConfigWizard
+          providerName={wizardProvider}
+          isOpen={!!wizardProvider}
+          onClose={() => setWizardProvider(null)}
+        />
+      )}
     </>
   );
 };

@@ -120,3 +120,7 @@ func (p *CopilotProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *CopilotProvider) GetWizard() Wizard {
+	return nil
+}

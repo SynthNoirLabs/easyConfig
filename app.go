@@ -30,11 +30,17 @@ type App struct {
 	workflowGen      *workflows.Generator
 	secretsManager   *workflows.SecretsManager
 	mcpInjector      *mcp.Injector
+
+	// Active wizards, mapped by provider name
+	activeWizards map[string]config.Wizard
+	wizardMu      sync.Mutex
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	return &App{
+		activeWizards: make(map[string]config.Wizard),
+	}
 }
 
 // startup is called when the app starts. The context is saved
@@ -382,4 +388,60 @@ func (a *App) ReadDoc(provider, slug, format string) (string, error) {
 		return "", fmt.Errorf("get working dir: %w", err)
 	}
 	return config.ReadDocFromRoot(root, provider, slug, format)
+}
+
+// --- Wizard Methods ---
+
+// StartWizard initiates a configuration wizard for a given provider.
+func (a *App) StartWizard(providerName string) (*config.WizardStep, error) {
+	a.wizardMu.Lock()
+	defer a.wizardMu.Unlock()
+
+	provider := a.discoveryService.GetProvider(providerName)
+	if provider == nil {
+		return nil, fmt.Errorf("provider not found: %s", providerName)
+	}
+
+	wizard := provider.GetWizard()
+	if wizard == nil {
+		return nil, fmt.Errorf("provider '%s' does not have a wizard", providerName)
+	}
+
+	a.activeWizards[providerName] = wizard
+	return wizard.Start()
+}
+
+// NextWizardStep advances the wizard to the next step.
+func (a *App) NextWizardStep(providerName, currentStepID, response string) (*config.WizardStep, error) {
+	a.wizardMu.Lock()
+	defer a.wizardMu.Unlock()
+
+	wizard, ok := a.activeWizards[providerName]
+	if !ok {
+		return nil, fmt.Errorf("no active wizard for provider: %s", providerName)
+	}
+
+	step, err := wizard.Next(currentStepID, response)
+	if err != nil {
+		return nil, err
+	}
+	// If the wizard is finished, remove it from the active list
+	if step == nil {
+		delete(a.activeWizards, providerName)
+	}
+	return step, nil
+}
+
+// CancelWizard cancels an active wizard.
+func (a *App) CancelWizard(providerName string) error {
+	a.wizardMu.Lock()
+	defer a.wizardMu.Unlock()
+
+	wizard, ok := a.activeWizards[providerName]
+	if !ok {
+		return fmt.Errorf("no active wizard for provider: %s", providerName)
+	}
+
+	delete(a.activeWizards, providerName)
+	return wizard.Cancel()
 }

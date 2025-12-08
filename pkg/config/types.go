@@ -48,6 +48,26 @@ type ProviderStatus struct {
 	StatusMessage   string       `json:"statusMessage,omitempty"`
 	DiscoveredFiles []Item       `json:"discoveredFiles,omitempty"`
 	LastChecked     string       `json:"lastChecked"` // ISO 8601 format
+	HasWizard       bool         `json:"hasWizard"`
+}
+
+// WizardStep represents a single step in a configuration wizard.
+type WizardStep struct {
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	// More fields like question type, options, etc. can be added here.
+}
+
+// Wizard defines the interface for a multi-step, interactive configuration wizard.
+type Wizard interface {
+	// Start begins the wizard and returns the first step.
+	Start() (*WizardStep, error)
+	// Next takes the current step ID and the user's response, and returns the next step.
+	// If the wizard is finished, it returns a nil step.
+	Next(currentStepID, response string) (*WizardStep, error)
+	// Cancel aborts the wizard.
+	Cancel() error
 }
 
 // Provider defines the interface for a tool configuration provider
@@ -63,4 +83,6 @@ type Provider interface {
 	Create(scope Scope, projectPath string) (string, error)
 	// CheckStatus performs a health check on the provider's configuration
 	CheckStatus() ProviderStatus
+	// GetWizard returns the configuration wizard for this provider, if available.
+	GetWizard() Wizard
 }

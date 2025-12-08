@@ -6,8 +6,16 @@ export function ApplyProfile(arg1) {
   return window['go']['main']['App']['ApplyProfile'](arg1);
 }
 
+export function CancelWizard(arg1) {
+  return window['go']['main']['App']['CancelWizard'](arg1);
+}
+
 export function CreateConfig(arg1, arg2, arg3) {
   return window['go']['main']['App']['CreateConfig'](arg1, arg2, arg3);
+}
+
+export function DeleteConfig(arg1) {
+  return window['go']['main']['App']['DeleteConfig'](arg1);
 }
 
 export function DeleteProfile(arg1) {
@@ -18,8 +26,20 @@ export function DiscoverConfigs(arg1) {
   return window['go']['main']['App']['DiscoverConfigs'](arg1);
 }
 
+export function FetchPopularServers() {
+  return window['go']['main']['App']['FetchPopularServers']();
+}
+
+export function FetchSchemas() {
+  return window['go']['main']['App']['FetchSchemas']();
+}
+
 export function GenerateWorkflow(arg1, arg2) {
   return window['go']['main']['App']['GenerateWorkflow'](arg1, arg2);
+}
+
+export function GetProviderStatuses() {
+  return window['go']['main']['App']['GetProviderStatuses']();
 }
 
 export function GetSupportedWorkflows() {
@@ -34,8 +54,8 @@ export function InstallMCPPackage(arg1) {
   return window['go']['main']['App']['InstallMCPPackage'](arg1);
 }
 
-export function FetchPopularServers() {
-  return window['go']['main']['App']['FetchPopularServers']();
+export function ListDocs() {
+  return window['go']['main']['App']['ListDocs']();
 }
 
 export function ListProfiles() {
@@ -46,16 +66,16 @@ export function ListWorkflowTemplates() {
   return window['go']['main']['App']['ListWorkflowTemplates']();
 }
 
-export function ListDocs() {
-  return window['go']['main']['App']['ListDocs']();
-}
-
-export function DeleteConfig(arg1) {
-  return window['go']['main']['App']['DeleteConfig'](arg1);
+export function NextWizardStep(arg1, arg2, arg3) {
+  return window['go']['main']['App']['NextWizardStep'](arg1, arg2, arg3);
 }
 
 export function ReadConfig(arg1) {
   return window['go']['main']['App']['ReadConfig'](arg1);
+}
+
+export function ReadDoc(arg1, arg2, arg3) {
+  return window['go']['main']['App']['ReadDoc'](arg1, arg2, arg3);
 }
 
 export function SaveConfig(arg1, arg2) {
@@ -74,10 +94,6 @@ export function SetSecret(arg1, arg2) {
   return window['go']['main']['App']['SetSecret'](arg1, arg2);
 }
 
-export function ReadDoc(arg1, arg2, arg3) {
-  return window['go']['main']['App']['ReadDoc'](arg1, arg2, arg3);
-}
-
-export function GetProviderStatuses() {
-  return window['go']['main']['App']['GetProviderStatuses']();
+export function StartWizard(arg1) {
+  return window['go']['main']['App']['StartWizard'](arg1);
 }

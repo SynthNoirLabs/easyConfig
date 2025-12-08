@@ -395,3 +395,7 @@ func (p *ClaudeProvider) CheckStatus() ProviderStatus {
 
 	return status
 }
+
+func (p *ClaudeProvider) GetWizard() Wizard {
+	return nil
+}

@@ -35,6 +35,10 @@ func (d *dummyProvider) CheckStatus() ProviderStatus {
 	}
 }
 
+func (d *dummyProvider) GetWizard() Wizard {
+	return nil
+}
+
 func TestSaveAndApplyProfile(t *testing.T) {
 	tmp := t.TempDir()
 	// isolate config dir

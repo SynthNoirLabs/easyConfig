@@ -133,3 +133,7 @@ func (p *CrushProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *CrushProvider) GetWizard() Wizard {
+	return nil
+}

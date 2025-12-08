@@ -141,6 +141,10 @@ func (m *MockFailingProvider) CheckStatus() ProviderStatus {
 	}
 }
 
+func (m *MockFailingProvider) GetWizard() Wizard {
+	return nil
+}
+
 func TestGetUserHome(t *testing.T) {
 	home := GetUserHome()
 	if home == "" {

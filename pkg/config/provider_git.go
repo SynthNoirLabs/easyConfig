@@ -118,3 +118,7 @@ func (p *GitProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *GitProvider) GetWizard() Wizard {
+	return nil
+}

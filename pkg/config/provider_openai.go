@@ -97,3 +97,7 @@ func (p *OpenAIProvider) CheckStatus() ProviderStatus {
 
 	return status
 }
+
+func (p *OpenAIProvider) GetWizard() Wizard {
+	return nil
+}

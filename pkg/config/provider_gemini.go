@@ -292,3 +292,7 @@ func (p *GeminiProvider) CheckStatus() ProviderStatus {
 
 	return status
 }
+
+func (p *GeminiProvider) GetWizard() Wizard {
+	return nil
+}

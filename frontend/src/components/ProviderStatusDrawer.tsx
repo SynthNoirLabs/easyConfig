@@ -1,14 +1,9 @@
 import { X } from "lucide-react";
 import type React from "react";
+import type { config } from "../../wailsjs/go/models";
 import "./ProviderStatusDrawer.css";
 
-// Define the type based on the Go struct
-interface ProviderStatus {
-  providerName: string;
-  health: "healthy" | "unhealthy" | "unknown";
-  statusMessage: string;
-  lastChecked: string;
-}
+type ProviderStatus = config.ProviderStatus;
 
 interface ProviderStatusDrawerProps {
   status: ProviderStatus | null;

@@ -101,3 +101,7 @@ func (p *GooseProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *GooseProvider) GetWizard() Wizard {
+	return nil
+}

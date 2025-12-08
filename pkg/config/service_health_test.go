@@ -40,6 +40,10 @@ func (m *MockProvider) CheckStatus() ProviderStatus {
 	return status
 }
 
+func (m *MockProvider) GetWizard() Wizard {
+	return nil
+}
+
 func TestGetProviderStatuses(t *testing.T) {
 	// Setup
 	ds := NewDiscoveryService(nil) // logger is nil for test simplicity
