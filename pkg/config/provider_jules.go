@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -150,11 +151,31 @@ func (w *JulesWizard) Next(currentStepID, response string) (*WizardStep, error) 
 	case "get_name":
 		w.configData["name"] = response
 		w.currentStep = "done"
-		// In a real wizard, we'd save the file here.
+
+		// Save the config file
+		home := paths.GetHomeDir()
+		if home == "" {
+			return nil, fmt.Errorf("home directory not found")
+		}
+		path := filepath.Join(home, ".jules-mcp", "data.json")
+
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			return nil, fmt.Errorf("failed to create dir: %w", err)
+		}
+
+		data, err := json.MarshalIndent(w.configData, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal config data: %w", err)
+		}
+
+		if err := os.WriteFile(path, data, 0o600); err != nil {
+			return nil, fmt.Errorf("failed to write config file: %w", err)
+		}
+
 		return &WizardStep{
-			ID: "done",
-			Title: "Configuration Complete!",
-			Description: fmt.Sprintf("Thanks, %s! Your configuration has been created.", response),
+			ID:          "done",
+			Title:       "Configuration Complete!",
+			Description: fmt.Sprintf("Thanks, %s! Your configuration has been created at %s.", response, path),
 		}, nil
 	case "done":
 		return nil, nil // Wizard is finished
