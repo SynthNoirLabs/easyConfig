@@ -51,7 +51,14 @@
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.form-group-description {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+  margin-bottom: 12px;
 }
 
 .form-group label {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import "./App.css";
 import type { config } from "../wailsjs/go/models";
-import AddConfigModal from "./components/AddConfigModal";
+import QuickConfigWizard from "./components/QuickConfigWizard";
 import ConfigEditor from "./components/ConfigEditor";
 import Docs from "./components/Docs";
 import Layout from "./components/Layout";
@@ -91,7 +91,7 @@ function AppContent() {
         <div className="app-content">{renderContent()}</div>
       </Layout>
 
-      <AddConfigModal
+      <QuickConfigWizard
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         onSuccess={handleConfigAdded}
