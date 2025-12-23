@@ -105,9 +105,10 @@ func TestDiscoveryService(t *testing.T) {
 	}
 
 	// Test RegisterProvider
+	initialCount := len(service.providers)
 	service.RegisterProvider(&ClaudeProvider{})
-	if len(service.providers) != 12 { // 11 default + 1 added
-		t.Errorf("Expected 12 providers, got %d", len(service.providers))
+	if len(service.providers) != initialCount+1 {
+		t.Errorf("Expected %d providers, got %d", initialCount+1, len(service.providers))
 	}
 
 	// Test DiscoverAll with failing provider

@@ -61,7 +61,6 @@ func (p *GeminiProvider) Create(scope Scope, projectPath string) (string, error)
 
 func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
-	home := paths.GetHomeDir()
 	seen := map[string]bool{}
 	add := func(it Item) {
 		if !seen[it.Path] {
@@ -70,199 +69,153 @@ func (p *GeminiProvider) Discover(projectPath string) ([]Item, error) {
 		}
 	}
 
-	// 1. Global settings
-	if home != "" {
-		path := filepath.Join(home, ".gemini", "settings.json")
+	// Helper to check and add a simple file
+	checkFile := func(path, name string, scope Scope, format Format) {
 		if FileExists(path) {
 			add(Item{
 				Provider: p.Name(),
-				Name:     "User Settings",
-				FileName: "settings.json",
+				Name:     name,
+				FileName: filepath.Base(path),
 				Path:     path,
-				Scope:    ScopeGlobal,
-				Format:   FormatJSON,
+				Scope:    scope,
+				Format:   format,
 				Exists:   true,
 			})
 		}
+	}
 
-		// Optional legacy/global config.json (XDG)
+	home := paths.GetHomeDir()
+
+	// 1. Global Settings & Extensions
+	if home != "" {
+		// Legacy Global
+		checkFile(filepath.Join(home, ".gemini", "settings.json"), "User Settings (Legacy)", ScopeGlobal, FormatJSON)
+
+		// XDG Global
 		if cfgDir := paths.GetConfigDir("gemini-cli"); cfgDir != "" {
-			cfgJSON := filepath.Join(cfgDir, "config.json")
-			if FileExists(cfgJSON) {
-				add(Item{
-					Provider: p.Name(),
-					Name:     "Global Config",
-					FileName: "config.json",
-					Path:     cfgJSON,
-					Scope:    ScopeGlobal,
-					Format:   FormatJSON,
-					Exists:   true,
-				})
+			checkFile(filepath.Join(cfgDir, "config.json"), "Global Config", ScopeGlobal, FormatJSON)
+		}
+
+		// Global Extensions (Legacy .gemini/extensions)
+		exts, _ := fastWalk(filepath.Join(home, ".gemini"), 4, func(path string, d os.DirEntry) bool {
+			if d.IsDir() {
+				return false
 			}
+			// Look for extension manifests or context files
+			return strings.Contains(path, filepath.Join(".gemini", "extensions")) &&
+				(strings.EqualFold(d.Name(), "gemini-extension.json") ||
+					strings.EqualFold(d.Name(), "gemini.md"))
+		})
+		for _, match := range exts {
+			add(Item{
+				Provider: p.Name(),
+				Name:     "Global Extension: " + filepath.Base(filepath.Dir(match)),
+				FileName: filepath.Base(match),
+				Path:     match,
+				Scope:    ScopeGlobal,
+				Format:   detectFormat(match),
+				Exists:   true,
+			})
 		}
 	}
 
 	// 2. System Settings
-	sysCandidates := []string{}
+	systemPaths := []string{}
 	if dir := paths.GetConfigDir("gemini-cli"); dir != "" {
-		sysCandidates = append(sysCandidates,
-			filepath.Join(dir, "system-defaults.json"),
-			filepath.Join(dir, "settings.json"))
+		systemPaths = append(systemPaths, filepath.Join(dir, "system-defaults.json"))
 	}
 	if runtime.GOOS == "linux" {
-		sysCandidates = append(sysCandidates,
-			"/etc/gemini-cli/system-defaults.json",
-			"/etc/gemini-cli/settings.json")
+		systemPaths = append(systemPaths, "/etc/gemini-cli/system-defaults.json")
 	}
 	if runtime.GOOS == "windows" {
 		if appData := os.Getenv("PROGRAMDATA"); appData != "" {
-			sysCandidates = append(sysCandidates,
-				filepath.Join(appData, "gemini-cli", "system-defaults.json"),
-				filepath.Join(appData, "gemini-cli", "settings.json"))
+			systemPaths = append(systemPaths, filepath.Join(appData, "gemini-cli", "system-defaults.json"))
 		}
 	}
-	for _, candidate := range sysCandidates {
-		if FileExists(candidate) {
-			name := "System Config"
-			if strings.Contains(candidate, "system-defaults") {
-				name = "System Defaults"
-			} else if strings.Contains(candidate, "settings.json") {
-				name = "System Overrides"
-			}
-			add(Item{
-				Provider: p.Name(),
-				Name:     name,
-				FileName: filepath.Base(candidate),
-				Path:     candidate,
-				Scope:    ScopeSystem,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
-		}
+	for _, sp := range systemPaths {
+		checkFile(sp, "System Defaults", ScopeSystem, FormatJSON)
 	}
 
-	// 3. Project settings
+	// 3. Project Settings
 	if projectPath != "" {
-		// settings.json
-		path := filepath.Join(projectPath, ".gemini", "settings.json")
-		if FileExists(path) {
+		// New Standard: .mcp.json
+		checkFile(filepath.Join(projectPath, ".mcp.json"), "MCP Config", ScopeProject, FormatJSON)
+
+		// New Standard: .agent/
+		// Rules
+		rules, _ := fastWalk(filepath.Join(projectPath, ".agent", "rules"), 1, func(path string, d os.DirEntry) bool {
+			return !d.IsDir() && strings.HasSuffix(d.Name(), ".md")
+		})
+		for _, r := range rules {
 			add(Item{
 				Provider: p.Name(),
-				Name:     "Workspace Settings",
-				FileName: "settings.json",
-				Path:     path,
-				Scope:    ScopeProject,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
-		}
-		// Optional project config.json
-		pathCfg := filepath.Join(projectPath, ".gemini", "config.json")
-		if FileExists(pathCfg) {
-			add(Item{
-				Provider: p.Name(),
-				Name:     "Workspace Config",
-				FileName: "config.json",
-				Path:     pathCfg,
-				Scope:    ScopeProject,
-				Format:   FormatJSON,
-				Exists:   true,
-			})
-		}
-		// GEMINI.md
-		pathContext := filepath.Join(projectPath, "GEMINI.md")
-		if FileExists(pathContext) {
-			items = append(items, Item{
-				Provider: p.Name(),
-				Name:     "Context File",
-				FileName: "GEMINI.md",
-				Path:     pathContext,
+				Name:     "Rule: " + strings.TrimSuffix(filepath.Base(r), ".md"),
+				FileName: filepath.Base(r),
+				Path:     r,
 				Scope:    ScopeProject,
 				Format:   FormatMD,
 				Exists:   true,
 			})
 		}
 
-		// Project Extensions via fast scan
+		// Workflows
+		workflows, _ := fastWalk(filepath.Join(projectPath, ".agent", "workflows"), 1, func(path string, d os.DirEntry) bool {
+			return !d.IsDir() && strings.HasSuffix(d.Name(), ".md")
+		})
+		for _, w := range workflows {
+			add(Item{
+				Provider: p.Name(),
+				Name:     "Workflow: " + strings.TrimSuffix(filepath.Base(w), ".md"),
+				FileName: filepath.Base(w),
+				Path:     w,
+				Scope:    ScopeProject,
+				Format:   FormatMD,
+				Exists:   true,
+			})
+		}
+
+		// Legacy Project Configs
+		checkFile(filepath.Join(projectPath, ".gemini", "settings.json"), "Workspace Settings (Legacy)", ScopeProject, FormatJSON)
+		checkFile(filepath.Join(projectPath, ".gemini", "config.json"), "Workspace Config (Legacy)", ScopeProject, FormatJSON)
+		checkFile(filepath.Join(projectPath, "GEMINI.md"), "Context File", ScopeProject, FormatMD)
+
+		// Legacy Project Extensions
 		exts, _ := fastWalk(projectPath, 6, func(path string, d os.DirEntry) bool {
 			if d.IsDir() {
 				return false
 			}
-			inExtDir := strings.Contains(path, string(filepath.Separator)+".gemini"+string(filepath.Separator)+"extensions"+string(filepath.Separator))
+			inExtDir := strings.Contains(path, filepath.Join(".gemini", "extensions"))
 			if !inExtDir {
 				return false
 			}
 			name := strings.ToLower(d.Name())
-			return name == "gemini-extension.json" ||
-				name == "gemini.md" ||
-				strings.HasSuffix(name, ".json") ||
-				strings.HasSuffix(name, ".js") ||
-				strings.HasSuffix(name, ".ts") ||
-				strings.HasSuffix(name, ".toml")
+			return name == "gemini-extension.json" || name == "gemini.md"
 		})
 		for _, match := range exts {
-			name := "Extension: " + filepath.Base(filepath.Dir(match))
-			format := FormatTXT
-			if strings.HasSuffix(match, ".json") {
-				format = FormatJSON
-			} else if strings.HasSuffix(match, ".md") {
-				format = FormatMD
-			} else if strings.HasSuffix(match, ".toml") {
-				format = FormatTOML
-			}
 			add(Item{
 				Provider: p.Name(),
-				Name:     name,
+				Name:     "Extension: " + filepath.Base(filepath.Dir(match)),
 				FileName: filepath.Base(match),
 				Path:     match,
 				Scope:    ScopeProject,
-				Format:   format,
-				Exists:   true,
-			})
-		}
-	}
-
-	// Global Extensions (~/.gemini/extensions/*)
-	if home != "" {
-		exts, _ := fastWalk(filepath.Join(home, ".gemini"), 4, func(path string, d os.DirEntry) bool {
-			if d.IsDir() {
-				return false
-			}
-			inExtDir := strings.Contains(path, string(filepath.Separator)+"extensions"+string(filepath.Separator))
-			if !inExtDir {
-				return false
-			}
-			name := strings.ToLower(d.Name())
-			return name == "gemini-extension.json" ||
-				name == "gemini.md" ||
-				strings.HasSuffix(name, ".json") ||
-				strings.HasSuffix(name, ".js") ||
-				strings.HasSuffix(name, ".ts") ||
-				strings.HasSuffix(name, ".toml")
-		})
-		for _, match := range exts {
-			name := "Extension: " + filepath.Base(filepath.Dir(match))
-			format := FormatTXT
-			if strings.HasSuffix(match, ".json") {
-				format = FormatJSON
-			} else if strings.HasSuffix(match, ".md") {
-				format = FormatMD
-			} else if strings.HasSuffix(match, ".toml") {
-				format = FormatTOML
-			}
-			add(Item{
-				Provider: p.Name(),
-				Name:     name,
-				FileName: filepath.Base(match),
-				Path:     match,
-				Scope:    ScopeGlobal,
-				Format:   format,
+				Format:   detectFormat(match),
 				Exists:   true,
 			})
 		}
 	}
 
 	return items, nil
+}
+
+func detectFormat(path string) Format {
+	if strings.HasSuffix(path, ".json") {
+		return FormatJSON
+	} else if strings.HasSuffix(path, ".md") {
+		return FormatMD
+	} else if strings.HasSuffix(path, ".toml") {
+		return FormatTOML
+	}
+	return FormatTXT
 }
 
 func (p *GeminiProvider) CheckStatus() ProviderStatus {

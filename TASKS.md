@@ -23,8 +23,18 @@ This file serves as the Master Backlog. Agents (Jules, Claude, etc.) should look
 - [x] **Req**: Add TOML support (`github.com/pelletier/go-toml/v2`). Parse `config.toml`.
 
 ### 2.3 Git Provider
-- [ ] **Task**: Implement `GitProvider` to read `.gitconfig`.
-- [ ] **Req**: Use `go-ini` or standard git config parsing.
+- [x] **Task**: Implement `GitProvider` to read `.gitconfig`.
+- [x] **Req**: Use `go-ini` or standard git config parsing.
+
+### 2.4 New Providers (Expansion)
+- [x] **Amazon Q**: Implement `pkg/config/provider_amazonq.go` (`~/.aws/amazonq/mcp.json`).
+- [x] **Cursor**: Implement `pkg/config/provider_cursor.go` (`~/.cursor/cli-config.json`).
+- [x] **Windsurf**: Implement `pkg/config/provider_windsurf.go` (`~/.config/Windsurf/User/settings.json`).
+- [x] **Continue**: Implement `pkg/config/provider_continue.go` (`~/.continue/config.yaml`).
+- [x] **Mentat**: Implement `pkg/config/provider_mentat.go` (`.mentat/` and `~/.mentat/.env`).
+- [x] **Sweep**: Implement `pkg/config/provider_sweep.go` (`.sweep.yaml`).
+- [x] **Plandex**: Implement `pkg/config/provider_plandex.go` (`.plandex/`).
+- [x] **OpenHands**: Implement `pkg/config/provider_openhands.go` (`config.toml`).
 
 ## 💾 Phase 3: Core Logic (Go)
 - [x] **Config I/O Service**: Implement `ReadConfig(path)` and `SaveConfig(path, content)` in `pkg/config/service.go`.
@@ -39,13 +49,13 @@ This file serves as the Master Backlog. Agents (Jules, Claude, etc.) should look
 - [x] **Config Editor**: Create a text editor component to view/edit config content.
 
 ## 🚀 Phase 5: Advanced Features
-- [ ] **MCP Injector**: Logic to parse `mcpServers` block and inject a new server entry. (In Progress - Issue #34)
-- [ ] **File Watcher**: Auto-reload configs when changed on disk (fsnotify). (In Progress - Issue #35)
-- [ ] **Auto-Schema Fetcher**: Scrape official docs/repos to update local references.
-- [ ] **Add Config Wizard**: Create new config files from templates via UI.
-- [ ] **Toast Notifications**: Replace alerts with non-blocking notifications.
-- [x] **Cross-Platform Paths**: Refactor path logic into `pkg/util/paths`. (Completed)
+- [x] **MCP Injector**: Logic to parse `mcpServers` block and inject a new server entry.
+- [x] **File Watcher**: Auto-reload configs when changed on disk (fsnotify).
+- [ ] **Auto-Schema Fetcher**: Scrape official docs/repos to update local references. (Partially implemented)
+- [x] **Add Config Wizard**: Create new config files from templates via UI.
+- [x] **Toast Notifications**: Replace alerts with non-blocking notifications.
+- [x] **Cross-Platform Paths**: Refactor path logic into `pkg/util/paths`.
 
 ## 🧩 Phase 6: Specialized Configs
-- [ ] **Claude Extras**: Discover Subagents (`agents/*.md`), Hooks, and Custom Commands.
-- [ ] **Gemini Extensions**: Discover standalone extension configurations (if applicable).
+- [x] **Claude Extras**: Discover Subagents (`agents/*.md`), Hooks, and Custom Commands.
+- [x] **Gemini Extensions**: Discover standalone extension configurations.

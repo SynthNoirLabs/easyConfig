@@ -4,6 +4,7 @@ import "./App.css";
 import type { config } from "../wailsjs/go/models";
 import AddConfigModal from "./components/AddConfigModal";
 import ConfigEditor from "./components/ConfigEditor";
+import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
 import Layout from "./components/Layout";
 import Marketplace from "./components/Marketplace";
@@ -70,6 +71,7 @@ function AppContent() {
               Select a configuration file to edit, or explore workflows and
               marketplace.
             </p>
+            <ConfigWizard />
           </div>
         );
     }

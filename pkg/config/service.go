@@ -37,6 +37,14 @@ func NewDiscoveryService(logger *slog.Logger) *DiscoveryService {
 			&GitProvider{},
 			&AiderProvider{},
 			&GooseProvider{},
+			&AmazonQProvider{},
+			&CursorProvider{},
+			&WindsurfProvider{},
+			&ContinueProvider{},
+			&MentatProvider{},
+			&SweepProvider{},
+			&PlandexProvider{},
+			&OpenHandsProvider{},
 		},
 	}
 	return ds
