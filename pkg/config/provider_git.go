@@ -39,7 +39,7 @@ func (p *GitProvider) Create(scope Scope, projectPath string) (string, error) {
 	}
 
 	// Ensure directory exists (especially for .git/config)
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return "", fmt.Errorf("failed to create dir: %w", err)
 	}
 	if FileExists(path) {

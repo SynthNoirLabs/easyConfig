@@ -126,6 +126,7 @@ func FileExists(path string) bool {
 func (s *DiscoveryService) ReadConfig(path string) (string, error) {
 	// Read the file content directly. Avoid a separate existence check to
 	// prevent TOCTOU race conditions; rely on os.ReadFile and check the error.
+	//nolint:gosec // G304: Path is user-provided as intended feature
 	content, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {

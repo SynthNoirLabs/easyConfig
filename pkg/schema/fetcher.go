@@ -26,7 +26,7 @@ func NewFetcher() *Fetcher {
 // FetchAllSchemas iterates through the registry and downloads available JSON schemas
 // It saves them to the specified output directory
 func (f *Fetcher) FetchAllSchemas(outputDir string) error {
-	if err := os.MkdirAll(outputDir, 0o755); err != nil {
+	if err := os.MkdirAll(outputDir, 0o750); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
@@ -61,7 +61,7 @@ func (f *Fetcher) fetchAndSave(url, outputDir, filename string) error {
 	outputPath := filepath.Join(outputDir, filename)
 
 	// Ensure directory exists
-	if err := os.MkdirAll(filepath.Dir(outputPath), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(outputPath), 0o750); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 

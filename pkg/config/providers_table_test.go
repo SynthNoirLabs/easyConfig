@@ -25,7 +25,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &ClaudeProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".claude")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create claude dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte("{}"), 0o600); err != nil {
@@ -34,7 +34,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			},
 			setupProject: func(t *testing.T, projectDir string) {
 				dir := filepath.Join(projectDir, ".claude")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create project claude dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte("{}"), 0o600); err != nil {
@@ -46,7 +46,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 
 				// Subagents
 				agentsDir := filepath.Join(projectDir, "agents")
-				if err := os.MkdirAll(agentsDir, 0o755); err != nil {
+				if err := os.MkdirAll(agentsDir, 0o750); err != nil {
 					t.Fatalf("Failed to create agents dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(agentsDir, "coder.md"), []byte("# Coder"), 0o600); err != nil {
@@ -55,7 +55,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 
 				// Custom Commands
 				cmdDir := filepath.Join(projectDir, ".claude", "commands")
-				if err := os.MkdirAll(cmdDir, 0o755); err != nil {
+				if err := os.MkdirAll(cmdDir, 0o750); err != nil {
 					t.Fatalf("Failed to create commands dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(cmdDir, "test.md"), []byte("# Command"), 0o600); err != nil {
@@ -87,7 +87,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &GeminiProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".gemini")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create gemini dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte("{}"), 0o600); err != nil {
@@ -96,7 +96,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			},
 			setupProject: func(t *testing.T, projectDir string) {
 				dir := filepath.Join(projectDir, ".gemini")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create project gemini dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte("{}"), 0o600); err != nil {
@@ -105,7 +105,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 
 				// Extensions
 				extDir := filepath.Join(dir, "extensions", "my-ext")
-				if err := os.MkdirAll(extDir, 0o755); err != nil {
+				if err := os.MkdirAll(extDir, 0o750); err != nil {
 					t.Fatalf("Failed to create extensions dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(extDir, "gemini-extension.json"), []byte(`{"displayName": "My Ext"}`), 0o600); err != nil {
@@ -130,7 +130,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &OpenCodeProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".config", "opencode")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create opencode dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "opencode.json"), []byte("{}"), 0o600); err != nil {
@@ -149,7 +149,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &CrushProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".config", "crush")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create crush dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "crush.json"), []byte("{}"), 0o600); err != nil {
@@ -173,7 +173,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			},
 			setupProject: func(t *testing.T, projectDir string) {
 				dir := filepath.Join(projectDir, ".git")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create .git dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "config"), []byte("[core]"), 0o600); err != nil {
@@ -202,7 +202,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &GooseProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".config", "goose")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create goose config dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "config.yaml"), []byte(""), 0o600); err != nil {
@@ -217,7 +217,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &CopilotProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".copilot")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create .copilot dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "mcp-config.json"), []byte("{}"), 0o600); err != nil {
@@ -226,7 +226,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			},
 			setupProject: func(t *testing.T, projectDir string) {
 				dir := filepath.Join(projectDir, ".github")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create .github dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "copilot-instructions.md"), []byte(""), 0o600); err != nil {
@@ -240,7 +240,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &OpenAIProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".config", "openai")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create openai config dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "config.yaml"), []byte(""), 0o600); err != nil {
@@ -255,7 +255,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &JulesProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".jules-mcp")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create .jules-mcp dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "data.json"), []byte("{}"), 0o600); err != nil {
@@ -274,7 +274,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			provider: &CodexProvider{},
 			setupGlobal: func(t *testing.T, homeDir string) {
 				dir := filepath.Join(homeDir, ".codex")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create .codex dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "config.toml"), []byte(""), 0o600); err != nil {
@@ -283,7 +283,7 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 			},
 			setupProject: func(t *testing.T, projectDir string) {
 				dir := filepath.Join(projectDir, ".codex")
-				if err := os.MkdirAll(dir, 0o755); err != nil {
+				if err := os.MkdirAll(dir, 0o750); err != nil {
 					t.Fatalf("Failed to create project .codex dir: %v", err)
 				}
 				if err := os.WriteFile(filepath.Join(dir, "config.toml"), []byte(""), 0o600); err != nil {

@@ -25,7 +25,7 @@ func TestListDocsFromRoot_Basic(t *testing.T) {
 	base := filepath.Join(root, "docs", "vendor", "claude")
 	latestDir := filepath.Join(base, snapDate)
 
-	if err := os.MkdirAll(latestDir, 0o755); err != nil {
+	if err := os.MkdirAll(latestDir, 0o750); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 
@@ -35,15 +35,15 @@ func TestListDocsFromRoot_Basic(t *testing.T) {
 	}
 
 	// Add one md and one html page with same slug
-	if err := os.WriteFile(filepath.Join(latestDir, "settings.md"), []byte("# Settings"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(latestDir, "settings.md"), []byte("# Settings"), 0o600); err != nil {
 		t.Fatalf("write md: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(latestDir, "settings.html"), []byte("<h1>Settings</h1>"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(latestDir, "settings.html"), []byte("<h1>Settings</h1>"), 0o600); err != nil {
 		t.Fatalf("write html: %v", err)
 	}
 
 	// and a sources file that should be ignored
-	if err := os.WriteFile(filepath.Join(latestDir, "_sources.txt"), []byte("meta"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(latestDir, "_sources.txt"), []byte("meta"), 0o600); err != nil {
 		t.Fatalf("write sources: %v", err)
 	}
 
@@ -76,17 +76,17 @@ func TestReadDocFromRoot_PrefersMarkdown(t *testing.T) {
 	date := "2025-11-30"
 	latestDir := filepath.Join(base, date)
 
-	if err := os.MkdirAll(latestDir, 0o755); err != nil {
+	if err := os.MkdirAll(latestDir, 0o750); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 	if err := os.Symlink(date, filepath.Join(base, "latest")); err != nil {
 		t.Fatalf("symlink: %v", err)
 	}
 
-	if err := os.WriteFile(filepath.Join(latestDir, "page.md"), []byte("from-md"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(latestDir, "page.md"), []byte("from-md"), 0o600); err != nil {
 		t.Fatalf("write md: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(latestDir, "page.html"), []byte("<p>from-html</p>"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(latestDir, "page.html"), []byte("<p>from-html</p>"), 0o600); err != nil {
 		t.Fatalf("write html: %v", err)
 	}
 
@@ -105,13 +105,13 @@ func TestReadDocFromRoot_FallbackToHTML(t *testing.T) {
 	date := "2025-11-30"
 	latestDir := filepath.Join(base, date)
 
-	if err := os.MkdirAll(latestDir, 0o755); err != nil {
+	if err := os.MkdirAll(latestDir, 0o750); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 	if err := os.Symlink(date, filepath.Join(base, "latest")); err != nil {
 		t.Fatalf("symlink: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(latestDir, "page.html"), []byte("<p>only-html</p>"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(latestDir, "page.html"), []byte("<p>only-html</p>"), 0o600); err != nil {
 		t.Fatalf("write html: %v", err)
 	}
 

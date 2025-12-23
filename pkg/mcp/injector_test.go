@@ -20,7 +20,7 @@ func TestInjector_Inject(t *testing.T) {
 		},
 	}
 	data, _ := json.Marshal(initialConfig)
-	if err := os.WriteFile(configPath, data, 0644); err != nil {
+	if err := os.WriteFile(configPath, data, 0o600); err != nil {
 		t.Fatalf("Failed to write initial config: %v", err)
 	}
 

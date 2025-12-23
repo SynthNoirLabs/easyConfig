@@ -110,6 +110,7 @@ func (s *DiscoveryService) ListProfiles() ([]ProfileSummary, error) {
 		if e.IsDir() || filepath.Ext(e.Name()) != jsonExt {
 			continue
 		}
+		//nolint:gosec // G304: Path constructed from user input (profile name)
 		data, err := os.ReadFile(filepath.Join(root, e.Name()))
 		if err != nil {
 			continue
@@ -139,7 +140,7 @@ func (s *DiscoveryService) ApplyProfile(name string) ([]string, error) {
 	var written []string
 
 	for _, item := range prof.Items {
-		if err := os.MkdirAll(filepath.Dir(item.Path), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(item.Path), 0o750); err != nil {
 			return written, fmt.Errorf("create dirs for %s: %w", item.Path, err)
 		}
 		if err := s.SaveConfig(item.Path, item.Content); err != nil {
@@ -166,6 +167,7 @@ func (s *DiscoveryService) loadProfile(name string) (*Profile, error) {
 	if err != nil {
 		return nil, err
 	}
+	//nolint:gosec // G304: Path constructed from user input (profile name)
 	data, err := os.ReadFile(filepath.Join(root, name+".json"))
 	if err != nil {
 		return nil, fmt.Errorf("profile not found: %w", err)

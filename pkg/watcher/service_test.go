@@ -12,7 +12,7 @@ func TestWatcherService(t *testing.T) {
 	// Create a temporary directory for testing
 	tempDir := t.TempDir()
 	testFile := filepath.Join(tempDir, "test.txt")
-	if err := os.WriteFile(testFile, []byte("initial"), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte("initial"), 0o600); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
@@ -85,7 +85,7 @@ func TestWatcherService_StartAndClose(t *testing.T) {
 	// defer os.RemoveAll(tempDir) // t.TempDir automatically cleans up
 
 	testFile := filepath.Join(tempDir, "watch_test.txt")
-	if err := os.WriteFile(testFile, []byte("initial"), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte("initial"), 0o600); err != nil {
 		t.Fatalf("Failed to write initial file: %v", err)
 	}
 	if err := service.Add(testFile); err != nil {
@@ -94,7 +94,7 @@ func TestWatcherService_StartAndClose(t *testing.T) {
 
 	// Modify the file to trigger event
 	time.Sleep(50 * time.Millisecond)
-	if err := os.WriteFile(testFile, []byte("modified"), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte("modified"), 0o600); err != nil {
 		t.Fatalf("Failed to write modified file: %v", err)
 	}
 

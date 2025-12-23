@@ -49,7 +49,7 @@ func TestSaveAndApplyProfile(t *testing.T) {
 	}()
 
 	proj := filepath.Join(tmp, "proj")
-	if err := os.MkdirAll(proj, 0o755); err != nil {
+	if err := os.MkdirAll(proj, 0o750); err != nil {
 		t.Fatal(err)
 	}
 

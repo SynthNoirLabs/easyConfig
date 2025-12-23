@@ -38,7 +38,7 @@ func (p *CodexProvider) Create(scope Scope, projectPath string) (string, error) 
 		return "", fmt.Errorf("unsupported scope")
 	}
 
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return "", fmt.Errorf("failed to create dir: %w", err)
 	}
 	if FileExists(path) {

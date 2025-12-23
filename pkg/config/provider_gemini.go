@@ -43,7 +43,7 @@ func (p *GeminiProvider) Create(scope Scope, projectPath string) (string, error)
 	}
 
 	// Ensure directory exists
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
 

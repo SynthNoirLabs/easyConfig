@@ -78,7 +78,7 @@ func (i *Injector) createConfigFile(path string, serverName string, config Serve
 
 func (i *Injector) writeConfigFile(path string, data map[string]interface{}) error {
 	// Ensure directory exists
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 

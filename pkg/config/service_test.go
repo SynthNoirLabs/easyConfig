@@ -31,10 +31,10 @@ func TestDiscoveryService(t *testing.T) {
 	// Test DiscoverAll
 	// Create a dummy config to be discovered
 	claudeDir := filepath.Join(tempHome, ".claude")
-	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+	if err := os.MkdirAll(claudeDir, 0o750); err != nil {
 		t.Fatalf("Failed to create claude dir: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(claudeDir, "settings.json"), []byte("{}"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(claudeDir, "settings.json"), []byte("{}"), 0o600); err != nil {
 		t.Fatalf("Failed to write settings.json: %v", err)
 	}
 

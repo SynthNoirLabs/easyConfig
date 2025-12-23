@@ -23,7 +23,7 @@ func (p *PlandexProvider) Create(scope Scope, projectPath string) (string, error
 		return "", fmt.Errorf("project path is required")
 	}
 	dir := filepath.Join(projectPath, ".plandex")
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o750); err != nil {
 		return "", fmt.Errorf("failed to create dir: %w", err)
 	}
 	path := filepath.Join(dir, "config.json")

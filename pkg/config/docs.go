@@ -135,6 +135,7 @@ func ReadDocFromRoot(root, provider, slug, format string) (string, error) {
 		if !FileExists(path) {
 			continue
 		}
+		//nolint:gosec // G304: Path constructed from user input (provider, slug)
 		data, err := os.ReadFile(path)
 		if err != nil {
 			return "", fmt.Errorf("read doc: %w", err)
