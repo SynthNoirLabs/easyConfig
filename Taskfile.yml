@@ -19,13 +19,25 @@ tasks:
     cmds:
       - golangci-lint run
 
+  test:go:
+    desc: Run Go backend tests
+    cmds:
+      - go test ./...
+
   lint:web:
     desc: Lint Web frontend (Biome)
     cmds:
       - npx @biomejs/biome check frontend/src frontend/vite.config.ts
 
+  type-check:
+    desc: Type-check Web frontend (TypeScript)
+    cmds:
+      - npm run type-check --prefix frontend
+
   lint:
-    desc: Run all linters
+    desc: Run all linters and checks
     cmds:
       - task: lint:go
       - task: lint:web
+      - task: type-check
+      - task: test:go

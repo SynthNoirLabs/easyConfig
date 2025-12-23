@@ -20,7 +20,7 @@ linters:
     - unparam
     - whitespace
     # - gocyclo # Cyclomatic complexity - can be noisy for existing code
-    # - gosec   # Security checker - good to enable later
+    - gosec   # Security checker
 
 linters-settings:
   gofmt:
