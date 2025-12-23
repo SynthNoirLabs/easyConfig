@@ -16,6 +16,7 @@ Usage:
     --gitlab-project komod0/easyconfig \
     --state open \
     --with-comments \
+    --close-when-closed \
     --yes
 """
 
@@ -182,6 +183,12 @@ def create_gitlab_note(project_id: int, issue_iid: int, body: str, token: str, d
     url = f"{GITLAB_API}/projects/{project_id}/issues/{issue_iid}/notes"
     http_json("POST", url, gl_headers(token), {"body": body})
 
+def close_gitlab_issue(project_id: int, issue_iid: int, token: str, dry_run: bool) -> None:
+    if dry_run:
+        return
+    url = f"{GITLAB_API}/projects/{project_id}/issues/{issue_iid}"
+    http_json("PUT", url, gl_headers(token), {"state_event": "close"})
+
 
 def format_issue_description(issue: Issue) -> str:
     header = (
@@ -208,9 +215,16 @@ def main() -> int:
     parser.add_argument("--gitlab-project", required=True, help="namespace/path, e.g. komod0/easyconfig")
     parser.add_argument("--state", default="open", choices=["open", "closed", "all"])
     parser.add_argument("--with-comments", action="store_true")
+    parser.add_argument("--close-when-closed", action="store_true", help="Close GitLab issue if GitHub issue is closed")
     parser.add_argument("--rate-limit-sleep", type=float, default=0.2)
     parser.add_argument("--yes", action="store_true", help="Actually create issues (otherwise dry-run)")
     parser.add_argument("--out", default="migration-issue-map.json", help="Write mapping JSON to this file")
+    parser.add_argument(
+        "--skip-map",
+        action="append",
+        default=[],
+        help="Path to a previous mapping JSON file; GitHub issue numbers in it will be skipped",
+    )
 
     args = parser.parse_args()
 
@@ -228,6 +242,19 @@ def main() -> int:
 
     issues = fetch_github_issues(args.github_repo, gh_token, args.state)
     issues.sort(key=lambda i: i.number)
+
+    skip_numbers: set[int] = set()
+    for p in args.skip_map:
+        try:
+            data = json.load(open(p, "r", encoding="utf-8"))
+            for entry in data.get("issues", []):
+                n = entry.get("github_number")
+                if isinstance(n, int):
+                    skip_numbers.add(n)
+        except FileNotFoundError:
+            continue
+        except Exception as ex:
+            eprint(f"Warning: failed to read --skip-map {p}: {ex}")
 
     mapping: Dict[str, Any] = {
         "github_repo": args.github_repo,
@@ -247,6 +274,8 @@ def main() -> int:
         ensure_gitlab_label(project_id, lbl, gl_token, dry_run)
 
     for issue in issues:
+        if issue.number in skip_numbers:
+            continue
         desc = format_issue_description(issue)
         eprint(f"#{issue.number} -> creating GitLab issue: {issue.title}")
         created = create_gitlab_issue(project_id, issue.title, desc, issue.labels, gl_token, dry_run)
@@ -266,6 +295,9 @@ def main() -> int:
                 create_gitlab_note(project_id, iid, note, gl_token, dry_run)
                 time.sleep(args.rate_limit_sleep)
 
+        if args.close_when_closed and issue.state == "closed" and created is not None:
+            close_gitlab_issue(project_id, int(created["iid"]), gl_token, dry_run)
+
         time.sleep(args.rate_limit_sleep)
 
     with open(args.out, "w", encoding="utf-8") as f:
@@ -278,4 +310,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
