@@ -38,6 +38,7 @@ func TestInjector_Inject(t *testing.T) {
 	}
 
 	// Verify injection
+	//nolint:gosec // G304: configPath is constructed from t.TempDir().
 	content, _ := os.ReadFile(configPath)
 	var config map[string]interface{}
 	if err := json.Unmarshal(content, &config); err != nil {

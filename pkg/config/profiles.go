@@ -98,8 +98,6 @@ func (s *DiscoveryService) ListProfiles() ([]ProfileSummary, error) {
 		return nil, err
 	}
 
-	const jsonExt = ".json"
-
 	entries, err := os.ReadDir(root)
 	if err != nil && !os.IsNotExist(err) {
 		return nil, err

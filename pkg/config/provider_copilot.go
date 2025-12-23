@@ -81,7 +81,7 @@ func (p *CopilotProvider) Discover(projectPath string) ([]Item, error) {
 				return false
 			}
 			base := filepath.Base(path)
-			if strings.HasPrefix(base, "copilot") && (strings.HasSuffix(base, ".md") || strings.HasSuffix(base, ".json")) {
+			if strings.HasPrefix(base, "copilot") && (strings.HasSuffix(base, ".md") || strings.HasSuffix(base, jsonExt)) {
 				return true
 			}
 			// in .github directory
@@ -93,7 +93,7 @@ func (p *CopilotProvider) Discover(projectPath string) ([]Item, error) {
 			switch filepath.Ext(pth) {
 			case ".md":
 				format = FormatMD
-			case ".json":
+			case jsonExt:
 				format = FormatJSON
 			}
 			add(Item{

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"time"
@@ -46,7 +47,16 @@ func (f *Fetcher) FetchAllSchemas(outputDir string) error {
 }
 
 func (f *Fetcher) fetchAndSave(url, outputDir, filename string) error {
-	resp, err := http.Get(url)
+	parsed, err := validateHTTPSURL(url)
+	if err != nil {
+		return err
+	}
+	if filepath.Base(filename) != filename {
+		return fmt.Errorf("invalid filename: must not contain path separators")
+	}
+
+	//nolint:gosec // G107: URL is validated and comes from the internal registry.
+	resp, err := f.client.Get(parsed.String())
 	if err != nil {
 		return fmt.Errorf("failed to fetch schema: %w", err)
 	}
@@ -66,7 +76,8 @@ func (f *Fetcher) fetchAndSave(url, outputDir, filename string) error {
 	}
 
 	// Create file
-	file, err := os.Create(outputPath)
+	//nolint:gosec // G304: outputPath is created under a caller-chosen outputDir with a validated base filename.
+	file, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 	if err != nil {
 		return fmt.Errorf("failed to create file: %w", err)
 	}
@@ -80,4 +91,18 @@ func (f *Fetcher) fetchAndSave(url, outputDir, filename string) error {
 	}
 
 	return nil
+}
+
+func validateHTTPSURL(raw string) (*url.URL, error) {
+	parsed, err := url.Parse(raw)
+	if err != nil {
+		return nil, fmt.Errorf("invalid url: %w", err)
+	}
+	if parsed.Scheme != "https" {
+		return nil, fmt.Errorf("invalid url: scheme must be https")
+	}
+	if parsed.Host == "" {
+		return nil, fmt.Errorf("invalid url: missing host")
+	}
+	return parsed, nil
 }

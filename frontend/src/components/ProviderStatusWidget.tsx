@@ -1,16 +1,15 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { GetProviderStatuses } from "../../wailsjs/go/main/App";
-import { config } from "../../wailsjs/go/models";
+import type { config } from "../../wailsjs/go/models";
 import ProviderStatusDrawer from "./ProviderStatusDrawer";
 import "./ProviderStatusWidget.css";
 
 const ProviderStatusWidget: React.FC = () => {
   const [statuses, setStatuses] = useState<config.ProviderStatus[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<config.ProviderStatus | null>(
-    null,
-  );
+  const [selectedStatus, setSelectedStatus] =
+    useState<config.ProviderStatus | null>(null);
 
   useEffect(() => {
     const fetchStatuses = async () => {

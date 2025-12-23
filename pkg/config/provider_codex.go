@@ -161,7 +161,6 @@ func (p *CodexProvider) Discover(projectPath string) ([]Item, error) {
 
 	// 3. System Managed Config
 	sysManaged := "/etc/codex/managed_config.toml"
-	const goosWindows = "windows"
 	if runtime.GOOS == goosWindows {
 		if home != "" {
 			sysManaged = filepath.Join(home, ".codex", "managed_config.toml")

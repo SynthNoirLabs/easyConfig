@@ -25,6 +25,7 @@ func NewInjector() *Injector {
 // Inject adds or updates an MCP server configuration in the target file
 func (i *Injector) Inject(configPath string, serverName string, config ServerConfig) error {
 	// 1. Read the file
+	//nolint:gosec // G304: configPath is an explicit target path chosen by the caller.
 	content, err := os.ReadFile(configPath)
 	if err != nil {
 		if os.IsNotExist(err) {

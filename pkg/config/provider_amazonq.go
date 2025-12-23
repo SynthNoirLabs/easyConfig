@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	"easyConfig/pkg/util/paths"
@@ -29,11 +28,7 @@ func (p *AmazonQProvider) Create(scope Scope, _ string) (string, error) {
 		if home == "" {
 			return "", fmt.Errorf("home directory not found")
 		}
-		if runtime.GOOS == "windows" {
-			path = filepath.Join(home, ".aws", "amazonq", "mcp.json")
-		} else {
-			path = filepath.Join(home, ".aws", "amazonq", "mcp.json")
-		}
+		path = filepath.Join(home, ".aws", "amazonq", "mcp.json")
 	default:
 		return "", fmt.Errorf("unsupported scope for Amazon Q (only global supported)")
 	}

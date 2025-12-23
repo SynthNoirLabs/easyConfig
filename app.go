@@ -152,7 +152,7 @@ func (a *App) InstallMCPPackage(pkgJSON string) error {
 
 	// Create mcp-servers directory if it doesn't exist
 	mcpDir := filepath.Join(configDir, "mcp-servers")
-	if err := os.MkdirAll(mcpDir, 0755); err != nil {
+	if err := os.MkdirAll(mcpDir, 0o750); err != nil {
 		return fmt.Errorf("failed to create mcp-servers directory: %w", err)
 	}
 
@@ -176,7 +176,7 @@ func (a *App) InstallMCPPackage(pkgJSON string) error {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	if err := os.WriteFile(filePath, data, 0644); err != nil {
+	if err := os.WriteFile(filePath, data, 0o600); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 

@@ -95,6 +95,7 @@ func TestIntegration_CLI_Interaction(t *testing.T) {
 	}
 
 	// 3. Verify file on disk (simulating CLI reading it)
+	//nolint:gosec // G304: configPath is constructed from t.TempDir().
 	savedContent, err := os.ReadFile(configPath)
 	if err != nil {
 		t.Fatalf("Failed to read file from disk: %v", err)

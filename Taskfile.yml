@@ -27,7 +27,7 @@ tasks:
   lint:web:
     desc: Lint Web frontend (Biome)
     cmds:
-      - npx @biomejs/biome check frontend/src frontend/vite.config.ts
+      - npm --prefix frontend exec -- biome check frontend/src frontend/vite.config.ts
 
   type-check:
     desc: Type-check Web frontend (TypeScript)

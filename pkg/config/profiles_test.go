@@ -82,6 +82,7 @@ func TestSaveAndApplyProfile(t *testing.T) {
 		t.Fatalf("apply profile: %v", err)
 	}
 
+	//nolint:gosec // G304: cfgPath is constructed from t.TempDir().
 	out, err := os.ReadFile(cfgPath)
 	if err != nil {
 		t.Fatal(err)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -20,6 +21,27 @@ const (
 // Installer handles MCP package installation and verification
 type Installer struct {
 	timeout time.Duration
+}
+
+var packageNameRE = regexp.MustCompile(`^[A-Za-z0-9@][A-Za-z0-9@/._-]*$`)
+
+func validatePackageName(packageName string) error {
+	if packageName == "" || len(packageName) > 200 {
+		return fmt.Errorf("invalid package name")
+	}
+	if strings.ContainsAny(packageName, " \t\r\n") {
+		return fmt.Errorf("invalid package name: contains whitespace")
+	}
+	if strings.HasPrefix(packageName, "-") {
+		return fmt.Errorf("invalid package name: cannot start with '-'")
+	}
+	if strings.Contains(packageName, "..") {
+		return fmt.Errorf("invalid package name: cannot contain '..'")
+	}
+	if !packageNameRE.MatchString(packageName) {
+		return fmt.Errorf("invalid package name: contains unsupported characters")
+	}
+	return nil
 }
 
 // NewInstaller creates a new Installer with default timeout
@@ -61,7 +83,12 @@ func (i *Installer) VerifyNodePackage(ctx context.Context, packageName string) e
 	ctx, cancel := context.WithTimeout(ctx, i.timeout)
 	defer cancel()
 
+	if err := validatePackageName(packageName); err != nil {
+		return err
+	}
+
 	// npx -y <package>@latest --help
+	//nolint:gosec // G204: packageName is validated by validatePackageName.
 	cmd := exec.CommandContext(ctx, "npx", "-y", packageName+"@latest", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -75,7 +102,12 @@ func (i *Installer) VerifyPythonPackage(ctx context.Context, packageName string)
 	ctx, cancel := context.WithTimeout(ctx, i.timeout)
 	defer cancel()
 
+	if err := validatePackageName(packageName); err != nil {
+		return err
+	}
+
 	// Try uvx first
+	//nolint:gosec // G204: packageName is validated by validatePackageName.
 	cmd := exec.CommandContext(ctx, "uvx", packageName, "--help")
 	firstOutput, firstErr := cmd.CombinedOutput()
 	if firstErr == nil {
@@ -83,6 +115,7 @@ func (i *Installer) VerifyPythonPackage(ctx context.Context, packageName string)
 	}
 
 	// Fallback to uv tool run
+	//nolint:gosec // G204: packageName is validated by validatePackageName.
 	cmd = exec.CommandContext(ctx, "uv", "tool", "run", packageName, "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
