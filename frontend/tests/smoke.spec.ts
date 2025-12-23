@@ -1,6 +1,28 @@
 import { expect, test } from "@playwright/test";
 
 test("app shell renders and views toggle when available", async ({ page }) => {
+  // Mock Wails Runtime & Backend
+  await page.addInitScript(() => {
+    window.runtime = {
+      EventsOnMultiple: () => {},
+      EventsOn: () => {},
+      // Add other runtime methods if needed
+    };
+    window.go = {
+      main: {
+        App: {
+          DiscoverConfigs: async () => [], // Return empty config list
+          GetProviderStatuses: async () => [],
+          ListProfiles: async () => [],
+          ListWorkflowTemplates: async () => [],
+          GetSupportedWorkflows: async () => [],
+          ListDocs: async () => [],
+          FetchPopularServers: async () => [],
+        },
+      },
+    };
+  });
+
   await page.goto("/");
   await expect(page.locator("#root")).toBeVisible();
 
