@@ -30,6 +30,7 @@ go:lint:
   image: golangci/golangci-lint:v1.64.6
   script:
     - mkdir -p frontend/dist
+    - touch frontend/dist/.keep
     - golangci-lint run ./...
 
 go:test:
@@ -37,6 +38,7 @@ go:test:
   image: golang:1.24
   script:
     - mkdir -p frontend/dist
+    - touch frontend/dist/.keep
     - go test ./...
 
 frontend:lint:
