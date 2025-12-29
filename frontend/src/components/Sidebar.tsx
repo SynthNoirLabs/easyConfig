@@ -6,6 +6,7 @@ import {
   FileJson,
   LayoutGrid,
   Plus,
+  ShieldCheck,
   Store,
   Trash2,
   Workflow,
@@ -16,10 +17,16 @@ import { toast } from "sonner";
 import {
   ApplyProfile,
   DeleteProfile,
+  ListBackups,
   ListProfiles,
+  PreviewApplyProfile,
+  RestoreBackup,
   SaveProfile,
 } from "../../wailsjs/go/main/App";
-import type { config, config as configModels } from "../../wailsjs/go/models";
+import type {
+  config,
+  config as configModels,
+} from "../../wailsjs/go/models";
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { useConfig } from "../context/ConfigContext";
 import ProviderStatusWidget from "./ProviderStatusWidget";
@@ -47,6 +54,14 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<configModels.ProfileSummary[]>([]);
   const [selectedProfile, setSelectedProfile] = useState<string>("");
+  const [isApplyConfirmOpen, setIsApplyConfirmOpen] = useState(false);
+  const [applyChanges, setApplyChanges] = useState<configModels.ConfigChange[]>(
+    [],
+  );
+  const [backups, setBackups] = useState<configModels.Backup[]>([]);
+  const [selectedFileForBackups, setSelectedFileForBackups] = useState<
+    string | null
+  >(null);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -154,15 +169,19 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const handleApplyProfile = async () => {
+  const handlePreviewApplyProfile = async () => {
     if (!selectedProfile) return;
-    if (
-      !confirm(
-        `Apply profile ${selectedProfile}? This overwrites existing configs.`,
-      )
-    ) {
-      return;
+    try {
+      const changes = await PreviewApplyProfile(selectedProfile);
+      setApplyChanges(changes);
+      setIsApplyConfirmOpen(true);
+    } catch (err) {
+      toast.error(`Failed to preview profile: ${err}`);
     }
+  };
+
+  const handleConfirmApplyProfile = async () => {
+    if (!selectedProfile) return;
     try {
       const written = await ApplyProfile(selectedProfile);
       toast.success(
@@ -171,7 +190,15 @@ const Sidebar: React.FC<SidebarProps> = ({
       setSelectedPath(null);
     } catch (err) {
       toast.error(`Failed to apply profile: ${err}`);
+    } finally {
+      setIsApplyConfirmOpen(false);
+      setApplyChanges([]);
     }
+  };
+
+  const handleCancelApply = () => {
+    setIsApplyConfirmOpen(false);
+    setApplyChanges([]);
   };
 
   const handleSaveProfile = async () => {
@@ -201,6 +228,37 @@ const Sidebar: React.FC<SidebarProps> = ({
     } catch (err) {
       toast.error(`Failed to delete profile: ${err}`);
     }
+  };
+
+  const handleListBackups = async (
+    e: React.MouseEvent,
+    item: config.Item,
+  ) => {
+    e.stopPropagation();
+    try {
+      const backupList = await ListBackups(item.path);
+      setBackups(backupList);
+      setSelectedFileForBackups(item.path);
+    } catch (err) {
+      toast.error(`Failed to list backups: ${err}`);
+    }
+  };
+
+  const handleRestoreBackup = async (backupPath: string) => {
+    if (!confirm("Restore this backup? The current file will be overwritten."))
+      return;
+    try {
+      await RestoreBackup(backupPath);
+      toast.success("Backup restored");
+      handleCloseBackups();
+    } catch (err) {
+      toast.error(`Failed to restore backup: ${err}`);
+    }
+  };
+
+  const handleCloseBackups = () => {
+    setSelectedFileForBackups(null);
+    setBackups([]);
   };
 
   return (
@@ -275,7 +333,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <button
             type="button"
             className="btn-secondary"
-            onClick={handleApplyProfile}
+            onClick={handlePreviewApplyProfile}
             disabled={!selectedProfile}
           >
             Apply
@@ -350,6 +408,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                         >
                           <ExternalLink size={14} />
                         </button>
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          onClick={(e) => handleListBackups(e, item)}
+                          title="List backups"
+                        >
+                          <ShieldCheck size={14} />
+                        </button>
                       </div>
                       <button
                         type="button"
@@ -368,6 +434,70 @@ const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </div>
       <ProviderStatusWidget />
+
+      {isApplyConfirmOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Apply Profile: {selectedProfile}</h2>
+            <p>The following changes will be made:</p>
+            <div className="changes-list">
+              {applyChanges.map((change) => (
+                <div key={change.path} className="change-item">
+                  <span className={`status-${change.status}`}>{change.status}</span>
+                  <span className="change-path">{change.path}</span>
+                </div>
+              ))}
+            </div>
+            <div className="modal-actions">
+              <button type="button" className="btn-secondary" onClick={handleCancelApply}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleConfirmApplyProfile}
+              >
+                Confirm & Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedFileForBackups && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Backups for {selectedFileForBackups}</h2>
+            <div className="backups-list">
+              {backups.length > 0 ? (
+                backups.map((backup) => (
+                  <div key={backup.path} className="backup-item">
+                    <span>{new Date(backup.timestamp).toLocaleString()}</span>
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => handleRestoreBackup(backup.path)}
+                    >
+                      Restore
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p>No backups found.</p>
+              )}
+            </div>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCloseBackups}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
