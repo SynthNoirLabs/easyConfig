@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,7 +40,7 @@ func TestIntegration_Discovery(t *testing.T) {
 
 	// 3. Run Discovery
 	ds := config.NewDiscoveryService(nil)
-	items, err := ds.DiscoverAll(tempProject)
+	items, err := ds.DiscoverAll(context.Background(), tempProject)
 	if err != nil {
 		t.Fatalf("DiscoverAll failed: %v", err)
 	}

@@ -69,7 +69,7 @@ func (a *App) Greet(name string) string {
 
 // DiscoverConfigs returns all the discovered configurations
 func (a *App) DiscoverConfigs(projectPath string) ([]config.Item, error) {
-	items, err := a.discoveryService.DiscoverAll(projectPath)
+	items, err := a.discoveryService.DiscoverAll(a.ctx, projectPath)
 	if err != nil {
 		return nil, err
 	}
