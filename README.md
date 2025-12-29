@@ -50,3 +50,7 @@ EasyConfig is a centralized dashboard for managing configuration files for vario
 ## 🤝 Contributing
 
 See `TASKS.md` for the current backlog and project status.
+
+### Adding a New Provider
+
+EasyConfig is designed to be extensible. If you'd like to add a new provider, please see the [Provider Development Guide](docs/PROVIDERS.md).
