@@ -90,6 +90,10 @@ export function SaveWorkflow(arg1, arg2) {
   return window['go']['main']['App']['SaveWorkflow'](arg1, arg2);
 }
 
+export function SearchAll(arg1, arg2) {
+  return window['go']['main']['App']['SearchAll'](arg1, arg2);
+}
+
 export function SetSecret(arg1, arg2) {
   return window['go']['main']['App']['SetSecret'](arg1, arg2);
 }

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import "./App.css";
 import type { config } from "../wailsjs/go/models";
 import AddConfigModal from "./components/AddConfigModal";
+import CommandPalette from "./components/CommandPalette";
 import ComparisonViewer from "./components/ComparisonViewer";
 import ConfigEditor from "./components/ConfigEditor";
 import ConfigWizard from "./components/ConfigWizard";
@@ -16,14 +17,19 @@ import Workflows from "./components/Workflows";
 import { useConfig } from "./context/ConfigContext";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
+type SelectableItem = config.Item & { initialLine?: number };
+
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
-  const [selectedItem, setSelectedItem] = useState<config.Item | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(
+    null,
+  );
   const [comparisonItems, setComparisonItems] = useState<
     [config.Item, config.Item] | null
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [currentView, setCurrentView] = useState<
     "configs" | "workflows" | "marketplace" | "docs"
   >("configs");
@@ -31,6 +37,7 @@ function AppContent() {
   const handleSelectConfig = (item: config.Item) => {
     setSelectedItem(item);
     setComparisonItems(null); // Exit comparison mode when a single item is selected
+    setCurrentView("configs");
   };
 
   const handleCompareConfigs = (item1: config.Item, item2: config.Item) => {
@@ -38,9 +45,29 @@ function AppContent() {
     setSelectedItem(null); // Deselect single item view
   };
 
+  const handleSearch = (path: string, line?: number) => {
+    const item = configs.find((c) => c.path === path);
+    if (item) {
+      setSelectedItem({ ...item, initialLine: line });
+      setCurrentView("configs");
+    }
+    setIsCommandPaletteOpen(false);
+  };
+
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false);
@@ -137,6 +164,13 @@ function AppContent() {
         isOpen={isShortcutsModalOpen}
         onClose={() => setIsShortcutsModalOpen(false)}
       />
+
+      {isCommandPaletteOpen && (
+        <CommandPalette
+          onSelect={handleSearch}
+          onClose={() => setIsCommandPaletteOpen(false)}
+        />
+      )}
     </>
   );
 }

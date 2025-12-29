@@ -403,6 +403,11 @@ func (a *App) SaveExportedProfiles(path string, data []byte) error {
 	return os.WriteFile(path, data, 0600)
 }
 
+// SearchAll searches across all config files
+func (a *App) SearchAll(query string, options config.SearchOptions) ([]config.SearchResult, error) {
+	return a.discoveryService.SearchAll(query, options)
+}
+
 // GetProviderStatuses returns the health status of all registered providers.
 func (a *App) GetProviderStatuses() []config.ProviderStatus {
 	return a.discoveryService.GetProviderStatuses()
