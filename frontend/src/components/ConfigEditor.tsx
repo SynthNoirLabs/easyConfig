@@ -2,6 +2,7 @@ import Editor from "@monaco-editor/react";
 import {
   Code,
   Eye,
+  GitCompare,
   LayoutTemplate,
   RefreshCw,
   RotateCcw,
@@ -15,6 +16,7 @@ import { toast } from "sonner"; // Import sonner toast
 import type { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
 import "./ConfigEditor.css";
+import DiffViewer from "./DiffViewer";
 import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
 import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
 
@@ -46,7 +48,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<"code" | "form" | "preview">("code");
+  const [viewMode, setViewMode] = useState<
+    "code" | "form" | "preview" | "compare"
+  >("code");
 
   const isMarkdown =
     configItem.format.toLowerCase() === "markdown" ||
@@ -157,7 +161,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <span className="file-path">{configItem.path}</span>
         </div>
         <div className="editor-actions">
-          {(hasSpecificEditor || isMarkdown) && (
+          {(hasSpecificEditor || isMarkdown || isDirty) && (
             <>
               <div className="view-toggle">
                 <button
@@ -188,6 +192,15 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
                     <Eye size={16} />
                   </button>
                 )}
+                <button
+                  type="button"
+                  className={`btn-toggle ${viewMode === "compare" ? "active" : ""}`}
+                  onClick={() => setViewMode("compare")}
+                  title="Compare Changes"
+                  disabled={!isDirty}
+                >
+                  <GitCompare size={16} />
+                </button>
               </div>
               <div className="separator" />
             </>
@@ -228,6 +241,12 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           <div className="editor-loading">Loading...</div>
         ) : error ? (
           <div className="editor-error">{error}</div>
+        ) : viewMode === "compare" ? (
+          <DiffViewer
+            original={originalContent}
+            modified={content}
+            language={getLanguage(configItem.format)}
+          />
         ) : viewMode === "form" && hasSpecificEditor ? (
           configItem.provider === "Claude Code" ? (
             <ClaudeConfigEditor

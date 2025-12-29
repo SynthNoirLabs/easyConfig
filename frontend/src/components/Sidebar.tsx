@@ -4,6 +4,7 @@ import {
   Copy,
   ExternalLink,
   FileJson,
+  GitCompare,
   LayoutGrid,
   Plus,
   ShieldCheck,
@@ -29,6 +30,7 @@ import type {
 } from "../../wailsjs/go/models";
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { useConfig } from "../context/ConfigContext";
+import ProfilePreview from "./ProfilePreview";
 import ProviderStatusWidget from "./ProviderStatusWidget";
 import "./Sidebar.css";
 
@@ -40,6 +42,7 @@ interface SidebarProps {
   onViewChange: (
     view: "configs" | "workflows" | "marketplace" | "docs",
   ) => void;
+  onCompare: (item1: config.Item, item2: config.Item) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -48,6 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onAdd,
   currentView,
   onViewChange,
+  onCompare,
 }) => {
   const { deleteConfig } = useConfig();
   const { readConfig } = useConfig();
@@ -62,6 +66,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [selectedFileForBackups, setSelectedFileForBackups] = useState<
     string | null
   >(null);
+  const [comparisonSource, setComparisonSource] = useState<config.Item | null>(
+    null,
+  );
+  const [isPreviewingProfile, setIsPreviewingProfile] = useState(false);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -107,9 +115,22 @@ const Sidebar: React.FC<SidebarProps> = ({
     .filter((group) => Object.values(group.providers).flat().length > 0);
 
   const handleItemClick = (item: config.Item) => {
-    setSelectedPath(item.path);
-    onViewChange("configs"); // Switch to configs view when selecting a file
-    onSelect(item);
+    if (comparisonSource) {
+      if (comparisonSource.path !== item.path) {
+        onCompare(comparisonSource, item);
+      }
+      setComparisonSource(null); // Exit comparison mode
+    } else {
+      setSelectedPath(item.path);
+      onViewChange("configs"); // Switch to configs view when selecting a file
+      onSelect(item);
+    }
+  };
+
+  const handleStartCompare = (e: React.MouseEvent, item: config.Item) => {
+    e.stopPropagation();
+    setComparisonSource(item);
+    toast.info(`Select another configuration to compare with ${item.name}`);
   };
 
   const handleDelete = async (e: React.MouseEvent, item: config.Item) => {
@@ -193,6 +214,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     } finally {
       setIsApplyConfirmOpen(false);
       setApplyChanges([]);
+      setIsPreviewingProfile(false);
     }
   };
 
@@ -262,180 +284,190 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="sidebar">
-      <nav className="sidebar-section" aria-labelledby="main-menu-heading">
-        <h3 id="main-menu-heading" className="sidebar-section-title">
-          Menu
-        </h3>
-        <button
-          type="button"
-          className={`sidebar-nav-item ${currentView === "configs" && !selectedPath ? "active" : ""}`}
-          onClick={() => {
-            onViewChange("configs");
-            setSelectedPath(null); // Deselect specific file to show dashboard/empty state
-          }}
-        >
-          <LayoutGrid size={18} />
-          <span>Dashboard</span>
-        </button>
-        <button
-          type="button"
-          className={`sidebar-nav-item ${currentView === "workflows" ? "active" : ""}`}
-          onClick={() => onViewChange("workflows")}
-        >
-          <Workflow size={18} />
-          <span>Workflows</span>
-        </button>
-        <button
-          type="button"
-          className={`sidebar-nav-item ${currentView === "marketplace" ? "active" : ""}`}
-          onClick={() => onViewChange("marketplace")}
-        >
-          <Store size={18} />
-          <span>Marketplace</span>
-        </button>
-        <button
-          type="button"
-          className={`sidebar-nav-item ${currentView === "docs" ? "active" : ""}`}
-          onClick={() => onViewChange("docs")}
-        >
-          <BookOpen size={18} />
-          <span>Docs</span>
-        </button>
-      </nav>
-
-      <div className="sidebar-divider" />
-
-      <div className="sidebar-header">
-        <h2 className="sidebar-title">Configurations</h2>
-        <button
-          type="button"
-          className="btn-icon"
-          onClick={onAdd}
-          aria-label="Add Configuration"
-        >
-          <Plus size={16} />
-        </button>
-      </div>
-
-      <div className="profiles-bar">
-        <select
-          className="profile-select"
-          value={selectedProfile}
-          onChange={(e) => setSelectedProfile(e.target.value)}
-        >
-          <option value="">Select profile</option>
-          {profiles.map((p) => (
-            <option key={p.name} value={p.name}>
-              {p.name} ({p.itemCount})
-            </option>
-          ))}
-        </select>
-        <div className="profile-actions">
+    <>
+      <div className="sidebar">
+        <nav className="sidebar-section" aria-labelledby="main-menu-heading">
+          <h3 id="main-menu-heading" className="sidebar-section-title">
+            Menu
+          </h3>
           <button
             type="button"
-            className="btn-secondary"
-            onClick={handlePreviewApplyProfile}
-            disabled={!selectedProfile}
+            className={`sidebar-nav-item ${currentView === "configs" && !selectedPath ? "active" : ""}`}
+            onClick={() => {
+              onViewChange("configs");
+              setSelectedPath(null);
+            }}
           >
-            Apply
+            <LayoutGrid size={18} />
+            <span>Dashboard</span>
           </button>
           <button
             type="button"
-            className="btn-secondary"
-            onClick={handleSaveProfile}
+            className={`sidebar-nav-item ${currentView === "workflows" ? "active" : ""}`}
+            onClick={() => onViewChange("workflows")}
           >
-            Save current
+            <Workflow size={18} />
+            <span>Workflows</span>
           </button>
           <button
             type="button"
-            className="btn-secondary"
-            onClick={handleDeleteProfile}
-            disabled={!selectedProfile}
+            className={`sidebar-nav-item ${currentView === "marketplace" ? "active" : ""}`}
+            onClick={() => onViewChange("marketplace")}
           >
-            Delete
+            <Store size={18} />
+            <span>Marketplace</span>
+          </button>
+          <button
+            type="button"
+            className={`sidebar-nav-item ${currentView === "docs" ? "active" : ""}`}
+            onClick={() => onViewChange("docs")}
+          >
+            <BookOpen size={18} />
+            <span>Docs</span>
+          </button>
+        </nav>
+
+        <div className="sidebar-divider" />
+
+        <div className="sidebar-header">
+          <h2 className="sidebar-title">Configurations</h2>
+          <button
+            type="button"
+            className="btn-icon"
+            onClick={onAdd}
+            aria-label="Add Configuration"
+          >
+            <Plus size={16} />
           </button>
         </div>
-      </div>
 
-      <div className="sidebar-content">
-        {groupedByScope.map(({ scope, providers }) => (
-          <div key={scope} className="sidebar-scope">
-            <div className="sidebar-scope-header">
-              <span className="sidebar-scope-title">
-                {scopeLabels[scope] ?? scope}
-              </span>
-            </div>
-            {Object.entries(providers).map(([provider, providerItems]) => (
-              <div key={`${scope}-${provider}`} className="sidebar-group">
-                <div className="sidebar-group-header">
-                  <span className="sidebar-group-title">{provider}</span>
-                </div>
-                <div className="sidebar-group-items">
-                  {providerItems.map((item) => (
-                    <div
-                      key={item.path}
-                      className={`sidebar-item ${selectedPath === item.path && currentView === "configs" ? "sidebar-item-active" : ""}`}
-                    >
-                      <button
-                        type="button"
-                        className="sidebar-item-main"
-                        onClick={() => handleItemClick(item)}
-                      >
-                        <FileJson size={14} className="sidebar-item-icon" />
-                        <span className="sidebar-item-name">{item.name}</span>
-                      </button>
-                      <div className="sidebar-item-actions">
-                        <button
-                          type="button"
-                          className="btn-ghost"
-                          onClick={(e) => handleCopyPath(e, item)}
-                          aria-label="Copy path"
-                        >
-                          <Copy size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-ghost"
-                          onClick={(e) => handleCopyContent(e, item)}
-                          aria-label="Copy content"
-                        >
-                          <Clipboard size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-ghost"
-                          onClick={(e) => handleOpenExternal(e, item)}
-                          aria-label="Open externally"
-                        >
-                          <ExternalLink size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-ghost"
-                          onClick={(e) => handleListBackups(e, item)}
-                          title="List backups"
-                        >
-                          <ShieldCheck size={14} />
-                        </button>
-                      </div>
-                      <button
-                        type="button"
-                        className="btn-delete-icon"
-                        onClick={(e) => handleDelete(e, item)}
-                        aria-label={`Delete ${item.name}`}
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <div className="profiles-bar">
+          <select
+            className="profile-select"
+            value={selectedProfile}
+            onChange={(e) => setSelectedProfile(e.target.value)}
+          >
+            <option value="">Select profile</option>
+            {profiles.map((p) => (
+              <option key={p.name} value={p.name}>
+                {p.name} ({p.itemCount})
+              </option>
             ))}
+          </select>
+          <div className="profile-actions">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handlePreviewApplyProfile}
+              disabled={!selectedProfile}
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleSaveProfile}
+            >
+              Save current
+            </button>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleDeleteProfile}
+              disabled={!selectedProfile}
+            >
+              Delete
+            </button>
           </div>
-        ))}
+        </div>
+
+        <div className="sidebar-content">
+          {groupedByScope.map(({ scope, providers }) => (
+            <div key={scope} className="sidebar-scope">
+              <div className="sidebar-scope-header">
+                <span className="sidebar-scope-title">
+                  {scopeLabels[scope] ?? scope}
+                </span>
+              </div>
+              {Object.entries(providers).map(([provider, providerItems]) => (
+                <div key={`${scope}-${provider}`} className="sidebar-group">
+                  <div className="sidebar-group-header">
+                    <span className="sidebar-group-title">{provider}</span>
+                  </div>
+                  <div className="sidebar-group-items">
+                    {providerItems.map((item) => (
+                      <div
+                        key={item.path}
+                        className={`sidebar-item ${selectedPath === item.path && currentView === "configs" ? "sidebar-item-active" : ""}`}
+                      >
+                        <button
+                          type="button"
+                          className="sidebar-item-main"
+                          onClick={() => handleItemClick(item)}
+                        >
+                          <FileJson size={14} className="sidebar-item-icon" />
+                          <span className="sidebar-item-name">{item.name}</span>
+                        </button>
+                        <div className="sidebar-item-actions">
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleCopyPath(e, item)}
+                            aria-label="Copy path"
+                          >
+                            <Copy size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleCopyContent(e, item)}
+                            aria-label="Copy content"
+                          >
+                            <Clipboard size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleStartCompare(e, item)}
+                            aria-label="Compare"
+                          >
+                            <GitCompare size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleOpenExternal(e, item)}
+                            aria-label="Open externally"
+                          >
+                            <ExternalLink size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleListBackups(e, item)}
+                            aria-label="List backups"
+                          >
+                            <ShieldCheck size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-delete-icon"
+                            onClick={(e) => handleDelete(e, item)}
+                            aria-label={`Delete ${item.name}`}
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <ProviderStatusWidget />
       </div>
-      <ProviderStatusWidget />
 
       {isApplyConfirmOpen && (
         <div className="modal-overlay">
@@ -500,7 +532,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
       )}
-    </div>
+
+      {isPreviewingProfile && (
+        <ProfilePreview
+          profileName={selectedProfile}
+          onClose={() => setIsPreviewingProfile(false)}
+          onApply={handleConfirmApplyProfile}
+        />
+      )}
+    </>
   );
 };
 
