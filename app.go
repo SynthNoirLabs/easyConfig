@@ -8,7 +8,9 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
+	"easyConfig/pkg/cache"
 	"easyConfig/pkg/config"
 	"easyConfig/pkg/install"
 	"easyConfig/pkg/marketplaces"
@@ -30,6 +32,7 @@ type App struct {
 	workflowGen      *workflows.Generator
 	secretsManager   *workflows.SecretsManager
 	mcpInjector      *mcp.Injector
+	cache            *cache.Cache
 }
 
 // NewApp creates a new App application struct
@@ -50,6 +53,7 @@ func (a *App) startup(ctx context.Context) {
 	a.workflowGen = workflows.NewGenerator()
 	a.secretsManager = workflows.NewSecretsManager()
 	a.mcpInjector = mcp.NewInjector()
+	a.cache = cache.New()
 	if a.watcherService != nil {
 		a.watcherService.Start(ctx)
 	}
@@ -238,8 +242,46 @@ func (a *App) InstallMCPPackage(pkgJSON string) error {
 	return a.mcpInjector.Inject(configPath, packageName, mcpConfig)
 }
 
-// FetchPopularServers fetches popular MCP servers from Smithery and Awesome lists
+const (
+	marketplaceCacheKey = "marketplace_popular_servers"
+	marketplaceCacheTTL = 1 * time.Hour
+)
+
+// FetchPopularServers fetches popular MCP servers from Smithery and Awesome lists, using a cache.
 func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
+	// 1. Check cache
+	cachedData, found, stale := a.cache.Get(marketplaceCacheKey)
+
+	if found {
+		slog.Info("Marketplace cache status", "found", found, "stale", stale)
+		// Try to cast it
+		if packages, ok := cachedData.([]marketplaces.MCPPackage); ok {
+			// 2a. If found and stale, return stale data but start a background refresh
+			if stale {
+				go func() {
+					slog.Info("Refreshing stale marketplace cache in background")
+					_, err := a.fetchAndCachePopularServers()
+					if err != nil {
+						slog.Error("Failed to refresh marketplace cache in background", "error", err)
+					} else {
+						slog.Info("Successfully refreshed marketplace cache")
+					}
+				}()
+			}
+			// 2b. If found (stale or not), return the cached data
+			return packages, nil
+		}
+		// If type assertion fails, treat as a cache miss
+		slog.Warn("Cache data for marketplace is corrupt, ignoring")
+	}
+
+	// 3. If not found, fetch from network
+	slog.Info("Marketplace cache miss, fetching from network")
+	return a.fetchAndCachePopularServers()
+}
+
+// fetchAndCachePopularServers contains the actual logic to fetch and then cache the data.
+func (a *App) fetchAndCachePopularServers() ([]marketplaces.MCPPackage, error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var allPackages []marketplaces.MCPPackage
@@ -285,8 +327,10 @@ func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
 		}
 	}
 
-	// If we have at least some packages, return them even if one source failed
+	// If we have at least some packages, cache and return them, even if one source failed
 	if len(uniquePackages) > 0 {
+		slog.Info("Successfully fetched marketplace data, updating cache", "items", len(uniquePackages))
+		a.cache.Set(marketplaceCacheKey, uniquePackages, marketplaceCacheTTL)
 		return uniquePackages, nil
 	}
 
@@ -295,7 +339,32 @@ func (a *App) FetchPopularServers() ([]marketplaces.MCPPackage, error) {
 		return nil, fmt.Errorf("failed to fetch servers: %v", errors)
 	}
 
+	// No packages and no errors, return empty slice and cache it to prevent retries for a while
+	slog.Info("No marketplace packages found, caching empty result")
+	a.cache.Set(marketplaceCacheKey, uniquePackages, marketplaceCacheTTL)
 	return uniquePackages, nil
+}
+
+// MarketplaceCacheStatus represents the status of the marketplace cache.
+type MarketplaceCacheStatus struct {
+	IsCached bool `json:"isCached"`
+	IsStale  bool `json:"isStale"`
+}
+
+// GetMarketplaceCacheStatus returns the current status of the marketplace data cache.
+func (a *App) GetMarketplaceCacheStatus() MarketplaceCacheStatus {
+	_, found, stale := a.cache.Get(marketplaceCacheKey)
+	return MarketplaceCacheStatus{
+		IsCached: found,
+		IsStale:  stale,
+	}
+}
+
+// RefreshMarketplaceCache forces a refresh of the marketplace data.
+func (a *App) RefreshMarketplaceCache() ([]marketplaces.MCPPackage, error) {
+	slog.Info("Manual marketplace cache refresh triggered")
+	a.cache.Delete(marketplaceCacheKey)
+	return a.fetchAndCachePopularServers()
 }
 
 // GenerateWorkflow generates a GitHub Actions workflow content
