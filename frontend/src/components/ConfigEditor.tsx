@@ -1,3 +1,4 @@
+import type { editor } from "monaco-editor";
 import Editor from "@monaco-editor/react";
 import {
   Code,
@@ -8,7 +9,7 @@ import {
   Save,
 } from "lucide-react";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner"; // Import sonner toast
@@ -19,7 +20,7 @@ import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
 import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
 
 interface ConfigEditorProps {
-  configItem: config.Item;
+  configItem: config.Item & { initialLine?: number };
 }
 
 const getLanguage = (format: string) => {
@@ -47,6 +48,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"code" | "form" | "preview">("code");
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
   const isMarkdown =
     configItem.format.toLowerCase() === "markdown" ||
@@ -69,6 +71,17 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
       setViewMode("code");
     }
   }, [hasSpecificEditor, isMarkdown]);
+
+  const handleEditorDidMount = (editorInstance: editor.IStandaloneCodeEditor) => {
+    editorRef.current = editorInstance;
+    if (configItem.initialLine) {
+      editorInstance.revealLineInCenter(configItem.initialLine);
+      editorInstance.setPosition({
+        lineNumber: configItem.initialLine,
+        column: 1,
+      });
+    }
+  };
 
   const loadFile = useCallback(async () => {
     setIsLoading(true);
@@ -252,6 +265,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
             value={content}
             theme="vs-dark"
             onChange={handleEditorChange}
+            onMount={handleEditorDidMount}
             options={{
               minimap: { enabled: false },
               scrollBeyondLastLine: false,

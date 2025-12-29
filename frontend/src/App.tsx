@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import "./App.css";
 import type { config } from "../wailsjs/go/models";
 import AddConfigModal from "./components/AddConfigModal";
+import CommandPalette from "./components/CommandPalette";
 import ConfigEditor from "./components/ConfigEditor";
 import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
@@ -12,21 +13,47 @@ import Sidebar from "./components/Sidebar";
 import Workflows from "./components/Workflows";
 import { useConfig } from "./context/ConfigContext";
 
+type SelectableItem = config.Item & { initialLine?: number };
+
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
-  const [selectedItem, setSelectedItem] = useState<config.Item | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(
+    null,
+  );
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [currentView, setCurrentView] = useState<
     "configs" | "workflows" | "marketplace" | "docs"
   >("configs");
 
   const handleSelectConfig = (item: config.Item) => {
     setSelectedItem(item);
+    setCurrentView("configs");
+  };
+
+  const handleSearch = (path: string, line?: number) => {
+    const item = configs.find((c) => c.path === path);
+    if (item) {
+      setSelectedItem({ ...item, initialLine: line });
+      setCurrentView("configs");
+    }
+    setIsCommandPaletteOpen(false);
   };
 
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false);
@@ -98,6 +125,13 @@ function AppContent() {
         onClose={handleCloseAddModal}
         onSuccess={handleConfigAdded}
       />
+
+      {isCommandPaletteOpen && (
+        <CommandPalette
+          onSelect={handleSearch}
+          onClose={() => setIsCommandPaletteOpen(false)}
+        />
+      )}
     </>
   );
 }

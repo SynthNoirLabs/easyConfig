@@ -44,4 +44,6 @@ export function SaveProfile(arg1:string):Promise<void>;
 
 export function SaveWorkflow(arg1:string,arg2:string):Promise<void>;
 
+export function SearchAll(arg1:string,arg2:config.SearchOptions):Promise<Array<config.SearchResult>>;
+
 export function SetSecret(arg1:string,arg2:string):Promise<void>;

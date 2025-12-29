@@ -358,6 +358,11 @@ func (a *App) DeleteProfile(name string) error {
 	return a.discoveryService.DeleteProfile(name)
 }
 
+// SearchAll searches across all config files
+func (a *App) SearchAll(query string, options config.SearchOptions) ([]config.SearchResult, error) {
+	return a.discoveryService.SearchAll(query, options)
+}
+
 // GetProviderStatuses returns the health status of all registered providers.
 func (a *App) GetProviderStatuses() []config.ProviderStatus {
 	return a.discoveryService.GetProviderStatuses()
