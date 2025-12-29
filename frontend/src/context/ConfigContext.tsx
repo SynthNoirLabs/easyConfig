@@ -15,6 +15,7 @@ import {
 } from "../../wailsjs/go/main/App";
 import type { config } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
+import { debounce } from "../utils/debounce";
 
 interface ConfigContextType {
   configs: config.Item[];
@@ -95,12 +96,16 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchConfigs();
-    const off = EventsOn("config:changed", () => {
-      // optimistic immediate feedback
+
+    const debouncedRefresh = debounce(() => {
       toast.info("Configuration changed on disk. Refreshing…");
       void fetchConfigs();
-    });
+    }, 300);
+
+    const off = EventsOn("config:changed", debouncedRefresh);
+
     return () => {
+      debouncedRefresh.cancel();
       off();
     };
   }, [fetchConfigs]);
