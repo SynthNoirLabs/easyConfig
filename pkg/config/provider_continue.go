@@ -93,6 +93,14 @@ func (p *ContinueProvider) Discover(_ string) ([]Item, error) {
 	return items, nil
 }
 
+func (p *ContinueProvider) BinaryName() string {
+	return "continue"
+}
+
+func (p *ContinueProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *ContinueProvider) CheckStatus() ProviderStatus {
 	files, _ := p.Discover("")
 	return ProviderStatus{

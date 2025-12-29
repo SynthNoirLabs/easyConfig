@@ -70,6 +70,14 @@ func (p *AmazonQProvider) Discover(_ string) ([]Item, error) {
 	return items, nil
 }
 
+func (p *AmazonQProvider) BinaryName() string {
+	return "amazonq"
+}
+
+func (p *AmazonQProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *AmazonQProvider) CheckStatus() ProviderStatus {
 	files, _ := p.Discover("")
 	return ProviderStatus{

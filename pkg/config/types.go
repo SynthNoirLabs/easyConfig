@@ -50,6 +50,16 @@ type ProviderStatus struct {
 	LastChecked     string       `json:"lastChecked"` // ISO 8601 format
 }
 
+// ProviderStatusReport provides a detailed health check of a single provider.
+type ProviderStatusReport struct {
+	ProviderName string `json:"providerName"`
+	Installed    bool   `json:"installed"`  // Tool binary found
+	Configured   bool   `json:"configured"` // Config file exists
+	Valid        bool   `json:"valid"`      // Config passes validation
+	Message      string `json:"message"`    // Status description
+	Version      string `json:"version"`    // Tool version if available
+}
+
 // Provider defines the interface for a tool configuration provider
 type Provider interface {
 	// Name returns the unique name of the provider (e.g. "Claude Code")
@@ -63,4 +73,8 @@ type Provider interface {
 	Create(scope Scope, projectPath string) (string, error)
 	// CheckStatus performs a health check on the provider's configuration
 	CheckStatus() ProviderStatus
+	// BinaryName returns the name of the tool's binary.
+	BinaryName() string
+	// VersionArgs returns the arguments to pass to the binary to get its version.
+	VersionArgs() []string
 }
