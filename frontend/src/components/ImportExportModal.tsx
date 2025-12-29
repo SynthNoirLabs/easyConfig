@@ -7,6 +7,7 @@ import {
   ImportProfilesFromFile,
   ImportProfilesFromURL,
   ListProfiles,
+  SaveExportedProfiles,
 } from "../../wailsjs/go/main/App";
 import type { config } from "../../wailsjs/go/models";
 import { OpenFile, SaveFile } from "../../wailsjs/runtime/runtime";
@@ -48,13 +49,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
         filters: [{ displayName: "EasyConfig Profiles", pattern: "*.easyconfig" }],
       });
       if (path) {
-        // Wails SaveFile doesn't write content, we just get a path
-        // We need a way to write the data to the path. This is a limitation.
-        // For now, we'll copy to clipboard and notify the user.
-        await navigator.clipboard.writeText(new TextDecoder().decode(data));
-        toast.success(
-          "Export data copied to clipboard. Please save it to the selected file.",
-        );
+        await SaveExportedProfiles(path, Array.from(data));
+        toast.success("Profiles exported successfully!");
       }
     } catch (err) {
       toast.error(`Export failed: ${err}`);
