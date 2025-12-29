@@ -1,0 +1,76 @@
+.editor-settings-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  background-color: var(--background-color, #2a2a2a);
+  border: 1px solid var(--border-color, #444);
+  color: var(--text-color, #ccc);
+  border-radius: 4px;
+  padding: 15px;
+  z-index: 1000;
+  width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-color, #ccc);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-control input[type="range"] {
+  flex-grow: 1;
+}
+
+.settings-control span {
+  font-size: 12px;
+  color: var(--text-color-muted, #aaa);
+  min-width: 30px;
+  text-align: right;
+}
+
+.settings-control select {
+  width: 100%;
+  padding: 6px 8px;
+  background-color: var(--input-background, #333);
+  border: 1px solid var(--input-border, #555);
+  color: var(--input-text, #ddd);
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.settings-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color, #444);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings-footer .btn-secondary {
+  padding: 6px 12px;
+  font-size: 12px;
+  background-color: var(--button-background, #444);
+  color: var(--button-text, #ddd);
+}
+.settings-footer .btn-secondary:hover {
+  background-color: var(--button-hover-background, #555);
+}
