@@ -180,7 +180,35 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 					t.Fatalf("Failed to write git config: %v", err)
 				}
 			},
-			expectedCount: 2,
+			checkItems: func(t *testing.T, items []Item) {
+				// Git provider may discover 2 or 3 items depending on whether /etc/gitconfig exists
+				// We should have at least: global (.gitconfig) and project (.git/config)
+				// Optionally: system (/etc/gitconfig)
+				if len(items) < 2 {
+					t.Errorf("Expected at least 2 items (global + project), got %d", len(items))
+				}
+				if len(items) > 3 {
+					t.Errorf("Expected at most 3 items (global + project + system), got %d", len(items))
+				}
+
+				// Verify that we have the required scopes
+				hasGlobal := false
+				hasProject := false
+				for _, item := range items {
+					if item.Scope == ScopeGlobal {
+						hasGlobal = true
+					}
+					if item.Scope == ScopeProject {
+						hasProject = true
+					}
+				}
+				if !hasGlobal {
+					t.Error("Missing global scope config")
+				}
+				if !hasProject {
+					t.Error("Missing project scope config")
+				}
+			},
 		},
 		{
 			name:     "Aider Provider",
@@ -319,7 +347,8 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 				t.Fatalf("Discover failed: %v", err)
 			}
 
-			if len(items) != tt.expectedCount {
+			// Only check expectedCount if it's non-zero (allows checkItems to be used alone)
+			if tt.expectedCount > 0 && len(items) != tt.expectedCount {
 				t.Errorf("Expected %d items, got %d", tt.expectedCount, len(items))
 				for _, item := range items {
 					t.Logf("Found item: %+v", item)
