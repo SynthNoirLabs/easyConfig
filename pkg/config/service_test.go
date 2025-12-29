@@ -142,6 +142,14 @@ func (m *MockFailingProvider) CheckStatus() ProviderStatus {
 	}
 }
 
+func (m *MockFailingProvider) BinaryName() string {
+	return "failing"
+}
+
+func (m *MockFailingProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func TestGetUserHome(t *testing.T) {
 	home := GetUserHome()
 	if home == "" {

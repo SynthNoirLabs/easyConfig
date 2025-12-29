@@ -44,6 +44,14 @@ func (p *OpenAIProvider) Create(scope Scope, _ string) (string, error) {
 	return path, nil
 }
 
+func (p *OpenAIProvider) BinaryName() string {
+	return "openai"
+}
+
+func (p *OpenAIProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *OpenAIProvider) Discover(_ string) ([]Item, error) {
 	var items []Item
 

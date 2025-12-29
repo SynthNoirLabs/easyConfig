@@ -109,3 +109,11 @@ func (p *MentatProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *MentatProvider) BinaryName() string {
+	return "mentat"
+}
+
+func (p *MentatProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
