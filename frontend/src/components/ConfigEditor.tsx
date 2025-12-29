@@ -6,15 +6,23 @@ import {
   RefreshCw,
   RotateCcw,
   Save,
+  Settings,
 } from "lucide-react";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner"; // Import sonner toast
 import type { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
+import { useClickOutside } from "../hooks/useClickOutside";
+import {
+  type EditorPreferences,
+  defaultPreferences,
+  useEditorPreferences,
+} from "../hooks/useEditorPreferences";
 import "./ConfigEditor.css";
+import EditorSettings from "./EditorSettings";
 import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
 import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
 
@@ -47,6 +55,12 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"code" | "form" | "preview">("code");
+  const [prefs, updatePrefs] = useEditorPreferences();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const settingsRef = useClickOutside<HTMLDivElement>(() => {
+    setIsSettingsOpen(false);
+  });
 
   const isMarkdown =
     configItem.format.toLowerCase() === "markdown" ||
@@ -149,6 +163,34 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     setIsDirty(value !== originalContent);
   };
 
+  const editorOptions = useMemo(() => {
+    const format = configItem.format.toLowerCase();
+    const overrides: Partial<EditorPreferences> = {};
+
+    if (format === "yaml" || format === "json" || format === "toml") {
+      overrides.tabSize = 2;
+      overrides.insertSpaces = true;
+    }
+
+    if (isMarkdown) {
+      overrides.wordWrap = "on";
+    }
+
+    return {
+      ...prefs,
+      ...overrides,
+      minimap: { enabled: prefs.minimap },
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+    };
+  }, [prefs, configItem.format, isMarkdown]);
+
+  const handleResetPreferences = () => {
+    if (confirm("Reset editor preferences to default?")) {
+      updatePrefs(defaultPreferences);
+    }
+  };
+
   return (
     <div className="config-editor">
       <div className="editor-toolbar">
@@ -210,6 +252,16 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           >
             <RefreshCw size={16} />
           </button>
+
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            title="Editor Settings"
+          >
+            <Settings size={16} />
+          </button>
+
           <div className="separator" />
           <button
             type="button"
@@ -223,7 +275,14 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
         </div>
       </div>
 
-      <div className="editor-area">
+      <div className="editor-area" ref={settingsRef}>
+        {isSettingsOpen && (
+          <EditorSettings
+            preferences={prefs}
+            onChange={updatePrefs}
+            onReset={handleResetPreferences}
+          />
+        )}
         {isLoading ? (
           <div className="editor-loading">Loading...</div>
         ) : error ? (
@@ -250,14 +309,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
             defaultLanguage="plaintext"
             language={getLanguage(configItem.format)}
             value={content}
-            theme="vs-dark"
+            theme={prefs.theme}
             onChange={handleEditorChange}
-            options={{
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              fontSize: 14,
-              automaticLayout: true,
-            }}
+            options={editorOptions}
           />
         )}
       </div>

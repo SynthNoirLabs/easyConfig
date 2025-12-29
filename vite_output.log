@@ -1,9 +1,7 @@
 
-> frontend@0.0.0 dev
-> vite
+> frontend@0.0.0 preview
+> vite preview --host --port 4173
 
-
-  VITE v7.2.4  ready in 396 ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
+Port 4173 is in use, trying another one...
+  ➜  Local:   http://localhost:4174/
+  ➜  Network: http://192.168.0.2:4174/
