@@ -32,6 +32,7 @@ import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { useConfig } from "../context/ConfigContext";
 import ProfilePreview from "./ProfilePreview";
 import ProviderStatusWidget from "./ProviderStatusWidget";
+import ImportExportModal from "./ImportExportModal";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -70,6 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     null,
   );
   const [isPreviewingProfile, setIsPreviewingProfile] = useState(false);
+  const [isImportExportModalOpen, setIsImportExportModalOpen] = useState(false);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -339,6 +341,13 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             <Plus size={16} />
           </button>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setIsImportExportModalOpen(true)}
+          >
+            Import/Export
+          </button>
         </div>
 
         <div className="profiles-bar">
@@ -468,6 +477,10 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
         <ProviderStatusWidget />
       </div>
+      <ImportExportModal
+        isOpen={isImportExportModalOpen}
+        onClose={() => setIsImportExportModalOpen(false)}
+      />
 
       {isApplyConfirmOpen && (
         <div className="modal-overlay">
