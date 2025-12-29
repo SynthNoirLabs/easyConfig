@@ -14,9 +14,9 @@
         "noDangerouslySetInnerHtml": "off"
       },
       "a11y": {
-        "noStaticElementInteractions": "off",
-        "useKeyWithClickEvents": "off",
-        "useButtonType": "off"
+        "noStaticElementInteractions": "warn",
+        "useKeyWithClickEvents": "error",
+        "useButtonType": "error"
       }
     }
   }
