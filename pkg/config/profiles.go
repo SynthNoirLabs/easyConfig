@@ -57,6 +57,11 @@ func (s *DiscoveryService) SaveProfile(name, projectPath string) error {
 
 	var snaps []ProfileItem
 	for _, item := range items {
+		// Skip system-scoped files (users shouldn't modify system configs like /etc/gitconfig)
+		// This prevents permission errors when attempting to apply profiles
+		if item.Scope == ScopeSystem {
+			continue
+		}
 		content, err := s.ReadConfig(item.Path)
 		if err != nil {
 			// skip missing/unreadable files
