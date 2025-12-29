@@ -3,6 +3,7 @@ import {
   Download,
   Link,
   Search,
+  SearchX,
   Server,
   ShieldCheck,
   Star,
@@ -14,6 +15,7 @@ import {
   InstallMCPPackage,
 } from "../../wailsjs/go/main/App";
 import type { marketplaces } from "../../wailsjs/go/models";
+import { EmptyState } from "./EmptyState";
 import "./Marketplace.css";
 
 export default function Marketplace() {
@@ -100,7 +102,7 @@ export default function Marketplace() {
           <div className="spinner"></div>
           <p>Loading servers...</p>
         </div>
-      ) : (
+      ) : sortedServers.length > 0 ? (
         <div className="servers-grid">
           {sortedServers.map((server) => (
             <div
@@ -188,6 +190,12 @@ export default function Marketplace() {
             </div>
           ))}
         </div>
+      ) : (
+        <EmptyState
+          icon={SearchX}
+          title="No Results"
+          description="Try adjusting your search or filters."
+        />
       )}
     </div>
   );
