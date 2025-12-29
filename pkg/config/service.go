@@ -1,12 +1,14 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	toml "github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
@@ -16,6 +18,7 @@ import (
 type DiscoveryService struct {
 	providers []Provider
 	logger    *slog.Logger
+	mu        sync.RWMutex
 }
 
 // NewDiscoveryService creates a new service with default providers
@@ -52,22 +55,69 @@ func NewDiscoveryService(logger *slog.Logger) *DiscoveryService {
 
 // RegisterProvider adds a new provider to the service
 func (s *DiscoveryService) RegisterProvider(p Provider) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.providers = append(s.providers, p)
 }
 
-// DiscoverAll iterates through all registered providers and collects configs
+// DiscoverAll iterates through all registered providers and collects configs in parallel.
+// It respects the provided context for cancellation.
 // projectPath: The root directory of the current project (optional)
-func (s *DiscoveryService) DiscoverAll(projectPath string) ([]Item, error) {
-	var allConfigs []Item
+func (s *DiscoveryService) DiscoverAll(ctx context.Context, projectPath string) ([]Item, error) {
+	s.mu.RLock()
+	// Make a copy of the slice to avoid holding the lock during the entire operation
+	providers := make([]Provider, len(s.providers))
+	copy(providers, s.providers)
+	s.mu.RUnlock()
 
-	for _, p := range s.providers {
-		items, err := p.Discover(projectPath)
-		if err != nil {
-			// We log error but continue to next provider
-			s.logger.Error("Error discovering for provider", "provider", p.Name(), "error", err)
-			continue
+	var wg sync.WaitGroup
+	resultsChan := make(chan []Item, len(providers))
+
+	for _, p := range providers {
+		wg.Add(1)
+		go func(p Provider) {
+			defer wg.Done()
+
+			// Early exit if context is cancelled
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+
+			items, err := p.Discover(projectPath)
+			if err != nil {
+				s.logger.Error("Error discovering for provider", "provider", p.Name(), "error", err)
+				resultsChan <- nil // Send nil to signal completion with error
+				return
+			}
+
+			// Check context again before sending result to avoid blocking
+			select {
+			case resultsChan <- items:
+			case <-ctx.Done():
+			}
+		}(p)
+	}
+
+	// Goroutine to wait for all providers and then close the channel
+	go func() {
+		wg.Wait()
+		close(resultsChan)
+	}()
+
+	var allConfigs []Item
+	for items := range resultsChan {
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
 		}
-		allConfigs = append(allConfigs, items...)
+		if items != nil {
+			allConfigs = append(allConfigs, items...)
+		}
+	}
+
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
 
 	return allConfigs, nil
@@ -75,6 +125,8 @@ func (s *DiscoveryService) DiscoverAll(projectPath string) ([]Item, error) {
 
 // CreateConfig finds the provider and creates a new config file for the given scope
 func (s *DiscoveryService) CreateConfig(providerName string, scope Scope, projectPath string) (string, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	for _, p := range s.providers {
 		if p.Name() == providerName {
 			return p.Create(scope, projectPath)
@@ -175,6 +227,8 @@ func (s *DiscoveryService) SaveConfig(path, content string) error {
 
 // GetProviderStatuses iterates through all registered providers and returns their health status.
 func (s *DiscoveryService) GetProviderStatuses() []ProviderStatus {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	var statuses []ProviderStatus
 
 	for _, p := range s.providers {

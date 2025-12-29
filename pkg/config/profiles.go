@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -50,7 +51,7 @@ func (s *DiscoveryService) SaveProfile(name, projectPath string) error {
 		return err
 	}
 
-	items, err := s.DiscoverAll(projectPath)
+	items, err := s.DiscoverAll(context.Background(), projectPath)
 	if err != nil {
 		return fmt.Errorf("discovering configs: %w", err)
 	}

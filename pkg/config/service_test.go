@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -38,7 +39,7 @@ func TestDiscoveryService(t *testing.T) {
 		t.Fatalf("Failed to write settings.json: %v", err)
 	}
 
-	items, err := service.DiscoverAll(tempHome) // Pass project path (using tempHome for simplicity as it has .claude)
+	items, err := service.DiscoverAll(context.Background(), tempHome) // Pass project path (using tempHome for simplicity as it has .claude)
 	if err != nil {
 		t.Errorf("DiscoverAll failed: %v", err)
 	}
@@ -114,7 +115,7 @@ func TestDiscoveryService(t *testing.T) {
 	// Test DiscoverAll with failing provider
 	failingProvider := &MockFailingProvider{}
 	service.RegisterProvider(failingProvider)
-	items, err = service.DiscoverAll(tempHome)
+	items, err = service.DiscoverAll(context.Background(), tempHome)
 	if err != nil {
 		t.Errorf("DiscoverAll should not fail even if one provider fails: %v", err)
 	}
