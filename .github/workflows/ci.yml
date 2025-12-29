@@ -84,10 +84,11 @@ jobs:
           cd frontend
           npm run lint
 
-      - name: Playwright smoke
+      - name: Frontend unit tests
         run: |
           cd frontend
-          npm run test:e2e
+          npm test -- --run
+
 
   build-and-test-ubuntu-smoke:
     # Lightweight hosted fallback / periodic check on ubuntu-latest.
