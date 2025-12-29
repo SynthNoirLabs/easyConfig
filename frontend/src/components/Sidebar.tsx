@@ -263,8 +263,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <div className="sidebar">
-      <div className="sidebar-section">
-        <h3 className="sidebar-section-title">Menu</h3>
+      <nav className="sidebar-section" aria-labelledby="main-menu-heading">
+        <h3 id="main-menu-heading" className="sidebar-section-title">
+          Menu
+        </h3>
         <button
           type="button"
           className={`sidebar-nav-item ${currentView === "configs" && !selectedPath ? "active" : ""}`}
@@ -300,7 +302,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <BookOpen size={18} />
           <span>Docs</span>
         </button>
-      </div>
+      </nav>
 
       <div className="sidebar-divider" />
 
@@ -310,7 +312,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           type="button"
           className="btn-icon"
           onClick={onAdd}
-          title="Add Configuration"
+          aria-label="Add Configuration"
         >
           <Plus size={16} />
         </button>
@@ -388,7 +390,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           type="button"
                           className="btn-ghost"
                           onClick={(e) => handleCopyPath(e, item)}
-                          title="Copy path"
+                          aria-label="Copy path"
                         >
                           <Copy size={14} />
                         </button>
@@ -396,7 +398,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           type="button"
                           className="btn-ghost"
                           onClick={(e) => handleCopyContent(e, item)}
-                          title="Copy content"
+                          aria-label="Copy content"
                         >
                           <Clipboard size={14} />
                         </button>
@@ -404,7 +406,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           type="button"
                           className="btn-ghost"
                           onClick={(e) => handleOpenExternal(e, item)}
-                          title="Open externally"
+                          aria-label="Open externally"
                         >
                           <ExternalLink size={14} />
                         </button>
@@ -421,7 +423,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         type="button"
                         className="btn-delete-icon"
                         onClick={(e) => handleDelete(e, item)}
-                        title="Delete"
+                        aria-label={`Delete ${item.name}`}
                       >
                         <Trash2 size={12} />
                       </button>

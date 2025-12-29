@@ -1,5 +1,7 @@
+import { X } from "lucide-react";
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import FocusTrap from "focus-trap-react";
 import { CreateConfig } from "../../wailsjs/go/main/App";
 import { useConfig } from "../context/ConfigContext";
 import "./AddConfigModal.css";
@@ -77,14 +79,25 @@ const AddConfigModal: React.FC<AddConfigModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h3>Add Configuration</h3>
-          <button type="button" className="btn-close" onClick={onClose}>
-            &times;
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
+      <FocusTrap>
+        <div
+          className="modal-content"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-config-title"
+        >
+          <div className="modal-header">
+            <h3 id="add-config-title">Add Configuration</h3>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={onClose}
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <form onSubmit={handleSubmit}>
           <div className="modal-body">
             {error && <div className="modal-error">{error}</div>}
 
@@ -135,8 +148,9 @@ const AddConfigModal: React.FC<AddConfigModalProps> = ({
               {isSubmitting ? "Creating..." : "Create"}
             </button>
           </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      </FocusTrap>
     </div>
   );
 };

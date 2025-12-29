@@ -164,7 +164,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
                   type="button"
                   className={`btn-toggle ${viewMode === "code" ? "active" : ""}`}
                   onClick={() => setViewMode("code")}
-                  title="Code View"
+                  aria-label="Code View"
                 >
                   <Code size={16} />
                 </button>
@@ -173,7 +173,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
                     type="button"
                     className={`btn-toggle ${viewMode === "form" ? "active" : ""}`}
                     onClick={() => setViewMode("form")}
-                    title="Form View"
+                    aria-label="Form View"
                   >
                     <LayoutTemplate size={16} />
                   </button>
@@ -183,7 +183,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
                     type="button"
                     className={`btn-toggle ${viewMode === "preview" ? "active" : ""}`}
                     onClick={() => setViewMode("preview")}
-                    title="Preview"
+                    aria-label="Preview"
                   >
                     <Eye size={16} />
                   </button>
@@ -197,7 +197,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
             className="btn-secondary"
             onClick={handleReset}
             disabled={!isDirty || isLoading}
-            title="Reset to last saved"
+            aria-label="Reset to last saved"
           >
             <RotateCcw size={16} />
           </button>
@@ -206,7 +206,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
             className="btn-secondary"
             onClick={handleReload}
             disabled={isLoading}
-            title="Reload from disk"
+            aria-label="Reload from disk"
           >
             <RefreshCw size={16} />
           </button>
