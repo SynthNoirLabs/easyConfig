@@ -164,6 +164,31 @@ func (s *DiscoveryService) DeleteProfile(name string) error {
 	return os.Remove(filepath.Join(root, name+".json"))
 }
 
+// GetProfileContent returns the content of a single file from a profile.
+func (s *DiscoveryService) GetProfileContent(profileName, filePath string) (string, error) {
+	prof, err := s.loadProfile(profileName)
+	if err != nil {
+		return "", err
+	}
+
+	for _, item := range prof.Items {
+		if item.Path == filePath {
+			return item.Content, nil
+		}
+	}
+
+	return "", fmt.Errorf("file not found in profile")
+}
+
+// ListProfileFiles returns the list of files in a profile.
+func (s *DiscoveryService) ListProfileFiles(profileName string) ([]ProfileItem, error) {
+	prof, err := s.loadProfile(profileName)
+	if err != nil {
+		return nil, err
+	}
+	return prof.Items, nil
+}
+
 func (s *DiscoveryService) loadProfile(name string) (*Profile, error) {
 	name = sanitizeProfileName(name)
 	root, err := profilesRoot()

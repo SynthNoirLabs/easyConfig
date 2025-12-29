@@ -34,6 +34,10 @@ export function GenerateWorkflow(arg1, arg2) {
   return window['go']['main']['App']['GenerateWorkflow'](arg1, arg2);
 }
 
+export function GetProfileContent(arg1, arg2) {
+  return window['go']['main']['App']['GetProfileContent'](arg1, arg2);
+}
+
 export function GetProviderStatuses() {
   return window['go']['main']['App']['GetProviderStatuses']();
 }
@@ -52,6 +56,10 @@ export function InstallMCPPackage(arg1) {
 
 export function ListDocs() {
   return window['go']['main']['App']['ListDocs']();
+}
+
+export function ListProfileFiles(arg1) {
+  return window['go']['main']['App']['ListProfileFiles'](arg1);
 }
 
 export function ListProfiles() {

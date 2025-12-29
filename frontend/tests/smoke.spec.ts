@@ -12,6 +12,7 @@ test("app shell renders and views toggle when available", async ({ page }) => {
       main: {
         App: {
           DiscoverConfigs: async () => [], // Return empty config list
+          ReadConfig: async () => "mock file content",
           GetProviderStatuses: async () => [],
           ListProfiles: async () => [],
           ListWorkflowTemplates: async () => [],

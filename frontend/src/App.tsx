@@ -3,6 +3,7 @@ import { Toaster, toast } from "sonner";
 import "./App.css";
 import type { config } from "../wailsjs/go/models";
 import AddConfigModal from "./components/AddConfigModal";
+import ComparisonViewer from "./components/ComparisonViewer";
 import ConfigEditor from "./components/ConfigEditor";
 import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
@@ -15,6 +16,9 @@ import { useConfig } from "./context/ConfigContext";
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
   const [selectedItem, setSelectedItem] = useState<config.Item | null>(null);
+  const [comparisonItems, setComparisonItems] = useState<
+    [config.Item, config.Item] | null
+  >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<
     "configs" | "workflows" | "marketplace" | "docs"
@@ -22,6 +26,12 @@ function AppContent() {
 
   const handleSelectConfig = (item: config.Item) => {
     setSelectedItem(item);
+    setComparisonItems(null); // Exit comparison mode when a single item is selected
+  };
+
+  const handleCompareConfigs = (item1: config.Item, item2: config.Item) => {
+    setComparisonItems([item1, item2]);
+    setSelectedItem(null); // Deselect single item view
   };
 
   const handleOpenAddModal = () => {
@@ -54,6 +64,16 @@ function AppContent() {
   }
 
   const renderContent = () => {
+    if (comparisonItems) {
+      return (
+        <ComparisonViewer
+          item1={comparisonItems[0]}
+          item2={comparisonItems[1]}
+          onClose={() => setComparisonItems(null)}
+        />
+      );
+    }
+
     switch (currentView) {
       case "workflows":
         return <Workflows />;
@@ -87,6 +107,7 @@ function AppContent() {
             onAdd={handleOpenAddModal}
             currentView={currentView}
             onViewChange={setCurrentView}
+            onCompare={handleCompareConfigs}
           />
         }
       >

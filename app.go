@@ -358,6 +358,14 @@ func (a *App) DeleteProfile(name string) error {
 	return a.discoveryService.DeleteProfile(name)
 }
 
+func (a *App) GetProfileContent(profileName, filePath string) (string, error) {
+	return a.discoveryService.GetProfileContent(profileName, filePath)
+}
+
+func (a *App) ListProfileFiles(profileName string) ([]config.ProfileItem, error) {
+	return a.discoveryService.ListProfileFiles(profileName)
+}
+
 // GetProviderStatuses returns the health status of all registered providers.
 func (a *App) GetProviderStatuses() []config.ProviderStatus {
 	return a.discoveryService.GetProviderStatuses()
