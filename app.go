@@ -482,6 +482,11 @@ func (a *App) GetProviderStatuses() []config.ProviderStatus {
 	return a.discoveryService.GetProviderStatuses()
 }
 
+// GetAllProviderStatuses returns the detailed health status of all registered providers.
+func (a *App) GetAllProviderStatuses() []config.ProviderStatusReport {
+	return a.discoveryService.GetAllProviderStatuses()
+}
+
 // ListDocs returns the locally synced documentation pages grouped by provider.
 // It scans docs/vendor/<provider>/latest and reports available .md/.html pages.
 func (a *App) ListDocs() ([]config.DocsProvider, error) {

@@ -50,6 +50,14 @@ func (p *CodexProvider) Create(scope Scope, projectPath string) (string, error) 
 	return path, nil
 }
 
+func (p *CodexProvider) BinaryName() string {
+	return "codex"
+}
+
+func (p *CodexProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *CodexProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
 	home := paths.GetHomeDir()

@@ -35,6 +35,14 @@ func (d *dummyProvider) CheckStatus() ProviderStatus {
 	}
 }
 
+func (d *dummyProvider) BinaryName() string {
+	return "dummy"
+}
+
+func (d *dummyProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func TestSaveAndApplyProfile(t *testing.T) {
 	tmp := t.TempDir()
 	// isolate config dir

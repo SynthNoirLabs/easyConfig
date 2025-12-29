@@ -49,6 +49,14 @@ func (p *AiderProvider) Create(scope Scope, projectPath string) (string, error) 
 	return path, nil
 }
 
+func (p *AiderProvider) BinaryName() string {
+	return "aider"
+}
+
+func (p *AiderProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *AiderProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
 	home := paths.GetHomeDir()

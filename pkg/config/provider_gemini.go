@@ -218,6 +218,14 @@ func detectFormat(path string) Format {
 	return FormatTXT
 }
 
+func (p *GeminiProvider) BinaryName() string {
+	return "gemini"
+}
+
+func (p *GeminiProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *GeminiProvider) CheckStatus() ProviderStatus {
 	status := ProviderStatus{
 		ProviderName: p.Name(),

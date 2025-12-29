@@ -75,3 +75,11 @@ func (p *PlandexProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *PlandexProvider) BinaryName() string {
+	return "plandex"
+}
+
+func (p *PlandexProvider) VersionArgs() []string {
+	return []string{"--version"}
+}

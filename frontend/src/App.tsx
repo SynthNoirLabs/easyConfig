@@ -8,6 +8,7 @@ import ComparisonViewer from "./components/ComparisonViewer";
 import ConfigEditor from "./components/ConfigEditor";
 import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
+import HealthDashboard from "./components/HealthDashboard";
 import Layout from "./components/Layout";
 import Marketplace from "./components/Marketplace";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -31,7 +32,7 @@ function AppContent() {
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [currentView, setCurrentView] = useState<
-    "configs" | "workflows" | "marketplace" | "docs"
+    "configs" | "health" | "workflows" | "marketplace" | "docs"
   >("configs");
 
   const handleSelectConfig = (item: config.Item) => {
@@ -111,6 +112,8 @@ function AppContent() {
     }
 
     switch (currentView) {
+      case "health":
+        return <HealthDashboard />;
       case "workflows":
         return <Workflows />;
       case "docs":

@@ -61,3 +61,11 @@ func (p *OpenHandsProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *OpenHandsProvider) BinaryName() string {
+	return "openhands"
+}
+
+func (p *OpenHandsProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
