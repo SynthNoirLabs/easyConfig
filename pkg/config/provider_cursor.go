@@ -88,6 +88,14 @@ func (p *CursorProvider) Discover(projectPath string) ([]Item, error) {
 	return items, nil
 }
 
+func (p *CursorProvider) BinaryName() string {
+	return "cursor"
+}
+
+func (p *CursorProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *CursorProvider) CheckStatus() ProviderStatus {
 	files, _ := p.Discover("")
 	return ProviderStatus{

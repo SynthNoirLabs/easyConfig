@@ -133,3 +133,11 @@ func (p *CrushProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *CrushProvider) BinaryName() string {
+	return "crush"
+}
+
+func (p *CrushProvider) VersionArgs() []string {
+	return []string{"--version"}
+}

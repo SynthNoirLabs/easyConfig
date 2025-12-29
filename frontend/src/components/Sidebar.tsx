@@ -6,6 +6,7 @@ import {
   FileJson,
   LayoutGrid,
   Plus,
+  ShieldCheck,
   Store,
   Trash2,
   Workflow,
@@ -29,9 +30,9 @@ interface SidebarProps {
   items: config.Item[];
   onSelect: (item: config.Item) => void;
   onAdd: () => void;
-  currentView: "configs" | "workflows" | "marketplace" | "docs";
+  currentView: "configs" | "health" | "workflows" | "marketplace" | "docs";
   onViewChange: (
-    view: "configs" | "workflows" | "marketplace" | "docs",
+    view: "configs" | "health" | "workflows" | "marketplace" | "docs",
   ) => void;
 }
 
@@ -217,6 +218,14 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <LayoutGrid size={18} />
           <span>Dashboard</span>
+        </button>
+        <button
+          type="button"
+          className={`sidebar-nav-item ${currentView === "health" ? "active" : ""}`}
+          onClick={() => onViewChange("health")}
+        >
+          <ShieldCheck size={18} />
+          <span>Health</span>
         </button>
         <button
           type="button"

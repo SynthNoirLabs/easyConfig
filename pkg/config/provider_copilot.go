@@ -120,3 +120,11 @@ func (p *CopilotProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *CopilotProvider) BinaryName() string {
+	return "gh"
+}
+
+func (p *CopilotProvider) VersionArgs() []string {
+	return []string{"copilot", "--version"}
+}

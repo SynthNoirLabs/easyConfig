@@ -44,6 +44,14 @@ func (p *JulesProvider) Create(scope Scope, _ string) (string, error) {
 	return path, nil
 }
 
+func (p *JulesProvider) BinaryName() string {
+	return "jules"
+}
+
+func (p *JulesProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *JulesProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
 	home := paths.GetHomeDir()

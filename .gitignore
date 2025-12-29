@@ -35,3 +35,4 @@ Thumbs.db
 .jules/
 gha-creds-*.json
 frontend/test-results/
+*.log

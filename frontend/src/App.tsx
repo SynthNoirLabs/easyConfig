@@ -6,6 +6,7 @@ import AddConfigModal from "./components/AddConfigModal";
 import ConfigEditor from "./components/ConfigEditor";
 import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
+import HealthDashboard from "./components/HealthDashboard";
 import Layout from "./components/Layout";
 import Marketplace from "./components/Marketplace";
 import Sidebar from "./components/Sidebar";
@@ -17,7 +18,7 @@ function AppContent() {
   const [selectedItem, setSelectedItem] = useState<config.Item | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<
-    "configs" | "workflows" | "marketplace" | "docs"
+    "configs" | "health" | "workflows" | "marketplace" | "docs"
   >("configs");
 
   const handleSelectConfig = (item: config.Item) => {
@@ -55,6 +56,8 @@ function AppContent() {
 
   const renderContent = () => {
     switch (currentView) {
+      case "health":
+        return <HealthDashboard />;
       case "workflows":
         return <Workflows />;
       case "docs":
