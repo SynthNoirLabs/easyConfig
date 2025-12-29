@@ -4,6 +4,8 @@ import {
   Copy,
   ExternalLink,
   FileJson,
+  FileQuestion,
+  FolderOpen,
   LayoutGrid,
   Plus,
   Store,
@@ -22,6 +24,7 @@ import {
 import type { config, config as configModels } from "../../wailsjs/go/models";
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { useConfig } from "../context/ConfigContext";
+import { EmptyState } from "./EmptyState";
 import ProviderStatusWidget from "./ProviderStatusWidget";
 import "./Sidebar.css";
 
@@ -259,113 +262,145 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="profiles-bar">
-        <select
-          className="profile-select"
-          value={selectedProfile}
-          onChange={(e) => setSelectedProfile(e.target.value)}
-        >
-          <option value="">Select profile</option>
-          {profiles.map((p) => (
-            <option key={p.name} value={p.name}>
-              {p.name} ({p.itemCount})
-            </option>
-          ))}
-        </select>
-        <div className="profile-actions">
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={handleApplyProfile}
-            disabled={!selectedProfile}
-          >
-            Apply
-          </button>
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={handleSaveProfile}
-          >
-            Save current
-          </button>
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={handleDeleteProfile}
-            disabled={!selectedProfile}
-          >
-            Delete
-          </button>
-        </div>
+        {profiles.length > 0 ? (
+          <>
+            <select
+              className="profile-select"
+              value={selectedProfile}
+              onChange={(e) => setSelectedProfile(e.target.value)}
+            >
+              <option value="">Select profile</option>
+              {profiles.map((p) => (
+                <option key={p.name} value={p.name}>
+                  {p.name} ({p.itemCount})
+                </option>
+              ))}
+            </select>
+            <div className="profile-actions">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleApplyProfile}
+                disabled={!selectedProfile}
+              >
+                Apply
+              </button>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleSaveProfile}
+              >
+                Save current
+              </button>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleDeleteProfile}
+                disabled={!selectedProfile}
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="sidebar-empty-state-wrapper">
+            <EmptyState
+              icon={FolderOpen}
+              title="No Profiles Yet"
+              description="Profiles let you save and apply configuration sets. Create your first profile to get started."
+              action={{
+                label: "Create Profile",
+                onClick: handleSaveProfile,
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <div className="sidebar-content">
-        {groupedByScope.map(({ scope, providers }) => (
-          <div key={scope} className="sidebar-scope">
-            <div className="sidebar-scope-header">
-              <span className="sidebar-scope-title">
-                {scopeLabels[scope] ?? scope}
-              </span>
-            </div>
-            {Object.entries(providers).map(([provider, providerItems]) => (
-              <div key={`${scope}-${provider}`} className="sidebar-group">
-                <div className="sidebar-group-header">
-                  <span className="sidebar-group-title">{provider}</span>
-                </div>
-                <div className="sidebar-group-items">
-                  {providerItems.map((item) => (
-                    <div
-                      key={item.path}
-                      className={`sidebar-item ${selectedPath === item.path && currentView === "configs" ? "sidebar-item-active" : ""}`}
-                    >
-                      <button
-                        type="button"
-                        className="sidebar-item-main"
-                        onClick={() => handleItemClick(item)}
+        {items.length === 0 ? (
+          <div className="sidebar-empty-state-wrapper">
+            <EmptyState
+              icon={FileQuestion}
+              title="No Configurations Found"
+              description="No AI CLI tools detected. Install a supported tool or add a configuration manually."
+              action={{
+                label: "Add Configuration",
+                onClick: onAdd,
+              }}
+            />
+          </div>
+        ) : (
+          groupedByScope.map(({ scope, providers }) => (
+            <div key={scope} className="sidebar-scope">
+              <div className="sidebar-scope-header">
+                <span className="sidebar-scope-title">
+                  {scopeLabels[scope] ?? scope}
+                </span>
+              </div>
+              {Object.entries(providers).map(([provider, providerItems]) => (
+                <div key={`${scope}-${provider}`} className="sidebar-group">
+                  <div className="sidebar-group-header">
+                    <span className="sidebar-group-title">{provider}</span>
+                  </div>
+                  <div className="sidebar-group-items">
+                    {providerItems.map((item) => (
+                      <div
+                        key={item.path}
+                        className={`sidebar-item ${selectedPath === item.path && currentView === "configs" ? "sidebar-item-active" : ""}`}
                       >
-                        <FileJson size={14} className="sidebar-item-icon" />
-                        <span className="sidebar-item-name">{item.name}</span>
-                      </button>
-                      <div className="sidebar-item-actions">
                         <button
                           type="button"
-                          className="btn-ghost"
-                          onClick={(e) => handleCopyPath(e, item)}
-                          title="Copy path"
+                          className="sidebar-item-main"
+                          onClick={() => handleItemClick(item)}
                         >
-                          <Copy size={14} />
+                          <FileJson size={14} className="sidebar-item-icon" />
+                          <span className="sidebar-item-name">
+                            {item.name}
+                          </span>
                         </button>
+                        <div className="sidebar-item-actions">
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleCopyPath(e, item)}
+                            title="Copy path"
+                          >
+                            <Copy size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleCopyContent(e, item)}
+                            title="Copy content"
+                          >
+                            <Clipboard size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-ghost"
+                            onClick={(e) => handleOpenExternal(e, item)}
+                            title="Open externally"
+                          >
+                            <ExternalLink size={14} />
+                          </button>
+                        </div>
                         <button
                           type="button"
-                          className="btn-ghost"
-                          onClick={(e) => handleCopyContent(e, item)}
-                          title="Copy content"
+                          className="btn-delete-icon"
+                          onClick={(e) => handleDelete(e, item)}
+                          title="Delete"
                         >
-                          <Clipboard size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-ghost"
-                          onClick={(e) => handleOpenExternal(e, item)}
-                          title="Open externally"
-                        >
-                          <ExternalLink size={14} />
+                          <Trash2 size={12} />
                         </button>
                       </div>
-                      <button
-                        type="button"
-                        className="btn-delete-icon"
-                        onClick={(e) => handleDelete(e, item)}
-                        title="Delete"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))}
+              ))}
+            </div>
+          ))
+        )}
       </div>
       <ProviderStatusWidget />
     </div>
