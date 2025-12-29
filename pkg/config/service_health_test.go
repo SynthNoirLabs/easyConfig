@@ -40,6 +40,14 @@ func (m *MockProvider) CheckStatus() ProviderStatus {
 	return status
 }
 
+func (m *MockProvider) BinaryName() string {
+	return m.name
+}
+
+func (m *MockProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func TestGetProviderStatuses(t *testing.T) {
 	// Setup
 	ds := NewDiscoveryService(nil) // logger is nil for test simplicity

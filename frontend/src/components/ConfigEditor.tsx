@@ -1,3 +1,4 @@
+import type { editor } from "monaco-editor";
 import Editor from "@monaco-editor/react";
 import {
   Code,
@@ -7,21 +8,30 @@ import {
   RefreshCw,
   RotateCcw,
   Save,
+  Settings,
 } from "lucide-react";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner"; // Import sonner toast
 import type { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
+import { useClickOutside } from "../hooks/useClickOutside";
+import {
+  type EditorPreferences,
+  defaultPreferences,
+  useEditorPreferences,
+} from "../hooks/useEditorPreferences";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import "./ConfigEditor.css";
 import DiffViewer from "./DiffViewer";
+import EditorSettings from "./EditorSettings";
 import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
 import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
 
 interface ConfigEditorProps {
-  configItem: config.Item;
+  configItem: config.Item & { initialLine?: number };
 }
 
 const getLanguage = (format: string) => {
@@ -51,6 +61,13 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const [viewMode, setViewMode] = useState<
     "code" | "form" | "preview" | "compare"
   >("code");
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [prefs, updatePrefs] = useEditorPreferences();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const settingsRef = useClickOutside<HTMLDivElement>(() => {
+    setIsSettingsOpen(false);
+  });
 
   const isMarkdown =
     configItem.format.toLowerCase() === "markdown" ||
@@ -63,6 +80,39 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     (configItem.provider === "OpenCode" &&
       configItem.fileName === "opencode.json");
 
+  const handleSave = useCallback(async () => {
+    if (!isDirty) return;
+    setIsSaving(true);
+    try {
+      if (configItem.format === "json") {
+        try {
+          JSON.parse(content);
+        } catch (_e) {
+          toast.error("Invalid JSON format. Please fix errors before saving.");
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      await saveConfig(configItem.path, content);
+      setOriginalContent(content);
+      setIsDirty(false);
+      toast.success("Configuration saved successfully!");
+    } catch (err) {
+      console.error("Error saving file:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to save file.");
+    } finally {
+      setIsSaving(false);
+    }
+  }, [content, configItem.path, saveConfig, isDirty]);
+
+  useKeyboardShortcuts({
+    "ctrl+s": handleSave,
+    "ctrl+1": () => setViewMode("code"),
+    "ctrl+2": () => hasSpecificEditor && setViewMode("form"),
+    "ctrl+3": () => isMarkdown && setViewMode("preview"),
+  });
+
   useEffect(() => {
     // Default to form view if available
     if (hasSpecificEditor) {
@@ -73,6 +123,17 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
       setViewMode("code");
     }
   }, [hasSpecificEditor, isMarkdown]);
+
+  const handleEditorDidMount = (editorInstance: editor.IStandaloneCodeEditor) => {
+    editorRef.current = editorInstance;
+    if (configItem.initialLine) {
+      editorInstance.revealLineInCenter(configItem.initialLine);
+      editorInstance.setPosition({
+        lineNumber: configItem.initialLine,
+        column: 1,
+      });
+    }
+  };
 
   const loadFile = useCallback(async () => {
     setIsLoading(true);
@@ -104,31 +165,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     loadFile();
   }, [loadFile]);
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      if (configItem.format === "json") {
-        try {
-          JSON.parse(content);
-        } catch (_e) {
-          toast.error("Invalid JSON format. Please fix errors before saving.");
-          setIsSaving(false);
-          return;
-        }
-      }
-
-      await saveConfig(configItem.path, content);
-      setOriginalContent(content);
-      setIsDirty(false);
-      toast.success("Configuration saved successfully!");
-    } catch (err) {
-      console.error("Error saving file:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to save file.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleReset = () => {
     if (confirm("Discard unsaved changes?")) {
       setContent(originalContent);
@@ -151,6 +187,34 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   const handleEditorChange = (value: string | undefined) => {
     setContent(value || "");
     setIsDirty(value !== originalContent);
+  };
+
+  const editorOptions = useMemo(() => {
+    const format = configItem.format.toLowerCase();
+    const overrides: Partial<EditorPreferences> = {};
+
+    if (format === "yaml" || format === "json" || format === "toml") {
+      overrides.tabSize = 2;
+      overrides.insertSpaces = true;
+    }
+
+    if (isMarkdown) {
+      overrides.wordWrap = "on";
+    }
+
+    return {
+      ...prefs,
+      ...overrides,
+      minimap: { enabled: prefs.minimap },
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+    };
+  }, [prefs, configItem.format, isMarkdown]);
+
+  const handleResetPreferences = () => {
+    if (confirm("Reset editor preferences to default?")) {
+      updatePrefs(defaultPreferences);
+    }
   };
 
   return (
@@ -223,6 +287,16 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
           >
             <RefreshCw size={16} />
           </button>
+
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            title="Editor Settings"
+          >
+            <Settings size={16} />
+          </button>
+
           <div className="separator" />
           <button
             type="button"
@@ -236,7 +310,14 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
         </div>
       </div>
 
-      <div className="editor-area">
+      <div className="editor-area" ref={settingsRef}>
+        {isSettingsOpen && (
+          <EditorSettings
+            preferences={prefs}
+            onChange={updatePrefs}
+            onReset={handleResetPreferences}
+          />
+        )}
         {isLoading ? (
           <div className="editor-loading">Loading...</div>
         ) : error ? (
@@ -269,14 +350,10 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
             defaultLanguage="plaintext"
             language={getLanguage(configItem.format)}
             value={content}
-            theme="vs-dark"
+            theme={prefs.theme}
             onChange={handleEditorChange}
-            options={{
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              fontSize: 14,
-              automaticLayout: true,
-            }}
+            onMount={handleEditorDidMount}
+            options={editorOptions}
           />
         )}
       </div>

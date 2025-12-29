@@ -395,3 +395,11 @@ func (p *ClaudeProvider) CheckStatus() ProviderStatus {
 
 	return status
 }
+
+func (p *ClaudeProvider) BinaryName() string {
+	return "claude"
+}
+
+func (p *ClaudeProvider) VersionArgs() []string {
+	return []string{"--version"}
+}

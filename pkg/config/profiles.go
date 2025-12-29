@@ -374,7 +374,7 @@ func (s *DiscoveryService) loadProfile(name string) (*Profile, error) {
 	return &prof, nil
 }
 
-func profilesRoot() (string, error) {
+var profilesRoot = func() (string, error) {
 	base := paths.GetConfigDir("easyconfig")
 	if base == "" {
 		return "", fmt.Errorf("could not determine config dir")

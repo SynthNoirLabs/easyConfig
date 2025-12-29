@@ -51,6 +51,14 @@ func (p *GitProvider) Create(scope Scope, projectPath string) (string, error) {
 	return path, nil
 }
 
+func (p *GitProvider) BinaryName() string {
+	return "git"
+}
+
+func (p *GitProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *GitProvider) Discover(projectPath string) ([]Item, error) {
 	var items []Item
 	home := paths.GetHomeDir()
