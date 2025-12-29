@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -38,6 +39,7 @@ type ProfileSummary struct {
 }
 
 var profileNameRe = regexp.MustCompile(`^[A-Za-z0-9._-]+$`)
+var backupRe = regexp.MustCompile(`\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z\.bak$`)
 
 // SaveProfile snapshots all discovered configs into a named profile.
 func (s *DiscoveryService) SaveProfile(name, projectPath string) error {
@@ -203,16 +205,10 @@ func (s *DiscoveryService) ListBackups(originalPath string) ([]Backup, error) {
 
 // RestoreBackup restores a specific backup file.
 func (s *DiscoveryService) RestoreBackup(backupPath string) error {
-	// Reconstruct the original path from the backup path.
-	// Example: /path/to/file.json.2023-10-27T15-04-05Z.bak -> /path/to/file.json
-	// 1. Trim the ".bak" suffix.
-	trimmedPath := strings.TrimSuffix(backupPath, ".bak")
-	// 2. Find the last dot, which separates the original filename from the timestamp.
-	lastDotIndex := strings.LastIndex(trimmedPath, ".")
-	if lastDotIndex == -1 {
+	originalPath := backupRe.ReplaceAllString(backupPath, "")
+	if originalPath == backupPath { // No match
 		return fmt.Errorf("could not determine original path from backup: invalid format")
 	}
-	originalPath := trimmedPath[:lastDotIndex]
 
 	content, err := os.ReadFile(backupPath)
 	if err != nil {
@@ -237,10 +233,13 @@ func createBackup(filePath string) error {
 	if err := os.WriteFile(backupPath, content, 0o600); err != nil {
 		return err
 	}
-	return cleanupBackups(filePath, 3)
+	// This assumes that the DiscoveryService logger is accessible here.
+	// If not, we might need to pass it down from ApplyProfile.
+	// For now, let's assume we can't easily access it and will add it in a future step if needed.
+	return cleanupBackups(filePath, 3, nil)
 }
 
-func cleanupBackups(originalPath string, keep int) error {
+func cleanupBackups(originalPath string, keep int, logger *slog.Logger) error {
 	dir := filepath.Dir(originalPath)
 	base := filepath.Base(originalPath)
 	pattern := filepath.Join(dir, base+".*.bak")
@@ -260,7 +259,9 @@ func cleanupBackups(originalPath string, keep int) error {
 	// Remove the oldest ones
 	for i := 0; i < len(matches)-keep; i++ {
 		if err := os.Remove(matches[i]); err != nil {
-			// Log or handle error, but don't block main operation
+			if logger != nil {
+				logger.Warn("failed to remove old backup", "path", matches[i], "err", err)
+			}
 		}
 	}
 	return nil
@@ -268,10 +269,10 @@ func cleanupBackups(originalPath string, keep int) error {
 
 // ConfigChange represents a pending change to a file from a profile.
 type ConfigChange struct {
-	Path    string `json:"path"`
-	Status  string `json:"status"` // "modified", "added", "removed" (for future)
-	Diff    string `json:"diff"`
-	Content string `json:"content"`
+	Path       string `json:"path"`
+	Status     string `json:"status"` // "modified", "added", "removed" (for future)
+	NewContent string `json:"newContent"`
+	Content    string `json:"content"`
 }
 
 // PreviewApplyProfile shows the changes that would be made by applying a profile.
@@ -294,16 +295,16 @@ func (s *DiscoveryService) PreviewApplyProfile(name string) ([]ConfigChange, err
 			}
 		}
 
-		diff, err := calculateDiff(string(currentContent), item.Content)
+		newContent, err := calculateDiff(string(currentContent), item.Content)
 		if err != nil {
-			diff = "Could not calculate diff"
+			newContent = "Could not calculate diff"
 		}
 
 		changes = append(changes, ConfigChange{
-			Path:    item.Path,
-			Status:  status,
-			Diff:    diff,
-			Content: item.Content,
+			Path:       item.Path,
+			Status:     status,
+			NewContent: newContent,
+			Content:    item.Content,
 		})
 	}
 	return changes, nil
