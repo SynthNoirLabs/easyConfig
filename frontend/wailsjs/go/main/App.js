@@ -34,6 +34,10 @@ export function GenerateWorkflow(arg1, arg2) {
   return window['go']['main']['App']['GenerateWorkflow'](arg1, arg2);
 }
 
+export function GetMarketplaceCacheStatus() {
+  return window['go']['main']['App']['GetMarketplaceCacheStatus']();
+}
+
 export function GetProviderStatuses() {
   return window['go']['main']['App']['GetProviderStatuses']();
 }
@@ -68,6 +72,10 @@ export function ReadConfig(arg1) {
 
 export function ReadDoc(arg1, arg2, arg3) {
   return window['go']['main']['App']['ReadDoc'](arg1, arg2, arg3);
+}
+
+export function RefreshMarketplaceCache() {
+  return window['go']['main']['App']['RefreshMarketplaceCache']();
 }
 
 export function SaveConfig(arg1, arg2) {

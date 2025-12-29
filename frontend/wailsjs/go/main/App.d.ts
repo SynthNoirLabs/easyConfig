@@ -3,6 +3,7 @@
 import {config} from '../models';
 import {marketplaces} from '../models';
 import {workflows} from '../models';
+import {main} from '../models';
 
 export function ApplyProfile(arg1:string):Promise<Array<string>>;
 
@@ -19,6 +20,8 @@ export function FetchPopularServers():Promise<Array<marketplaces.MCPPackage>>;
 export function FetchSchemas():Promise<void>;
 
 export function GenerateWorkflow(arg1:string,arg2:string):Promise<workflows.WorkflowResponse>;
+
+export function GetMarketplaceCacheStatus():Promise<main.MarketplaceCacheStatus>;
 
 export function GetProviderStatuses():Promise<Array<config.ProviderStatus>>;
 
@@ -37,6 +40,8 @@ export function ListWorkflowTemplates():Promise<Array<workflows.Template>>;
 export function ReadConfig(arg1:string):Promise<string>;
 
 export function ReadDoc(arg1:string,arg2:string,arg3:string):Promise<string>;
+
+export function RefreshMarketplaceCache():Promise<Array<marketplaces.MCPPackage>>;
 
 export function SaveConfig(arg1:string,arg2:string):Promise<void>;
 

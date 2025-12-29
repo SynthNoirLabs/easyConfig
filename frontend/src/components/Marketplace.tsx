@@ -2,6 +2,7 @@ import {
   BadgeCheck,
   Download,
   Link,
+  RefreshCw,
   Search,
   Server,
   ShieldCheck,
@@ -11,9 +12,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   FetchPopularServers,
+  GetMarketplaceCacheStatus,
   InstallMCPPackage,
+  RefreshMarketplaceCache,
 } from "../../wailsjs/go/main/App";
-import type { marketplaces } from "../../wailsjs/go/models";
+import type { main, marketplaces } from "../../wailsjs/go/models";
 import "./Marketplace.css";
 
 export default function Marketplace() {
@@ -22,8 +25,21 @@ export default function Marketplace() {
   const [searchQuery, setSearchQuery] = useState("");
   const [installing, setInstalling] = useState<string | null>(null);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [cacheStatus, setCacheStatus] =
+    useState<main.MarketplaceCacheStatus | null>(null);
+
+  const checkCacheStatus = useCallback(async () => {
+    try {
+      const status = await GetMarketplaceCacheStatus();
+      setCacheStatus(status);
+    } catch (err) {
+      // Don't bother the user with this, just log it
+      console.error("Failed to get cache status:", err);
+    }
+  }, []);
 
   const loadServers = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await FetchPopularServers();
       setServers(data || []);
@@ -31,12 +47,28 @@ export default function Marketplace() {
       toast.error("Failed to load marketplace servers");
     } finally {
       setLoading(false);
+      checkCacheStatus();
     }
-  }, []);
+  }, [checkCacheStatus]);
 
   useEffect(() => {
     loadServers();
   }, [loadServers]);
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    toast.info("Refreshing marketplace data...");
+    try {
+      const data = await RefreshMarketplaceCache();
+      setServers(data || []);
+      toast.success("Marketplace data refreshed.");
+      await checkCacheStatus(); // Re-check status after refresh
+    } catch (err) {
+      toast.error(`Failed to refresh marketplace: ${err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInstall = async (pkg: marketplaces.MCPPackage) => {
     setInstalling(pkg.name);
@@ -68,6 +100,13 @@ export default function Marketplace() {
     [filteredServers],
   );
 
+  const getCacheStatusMessage = () => {
+    if (!cacheStatus?.isCached) return null;
+    if (cacheStatus.isStale)
+      return "Displaying cached data. Refreshing in background...";
+    return "Data is cached.";
+  };
+
   return (
     <div className="marketplace-container">
       <div className="marketplace-header">
@@ -92,7 +131,19 @@ export default function Marketplace() {
           >
             <ShieldCheck size={14} /> Verified only
           </button>
+          <button
+            type="button"
+            className="btn-refresh"
+            onClick={handleRefresh}
+            title="Refresh marketplace data"
+            disabled={loading}
+          >
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+          </button>
         </div>
+      </div>
+      <div className="marketplace-subheader">
+        <span className="cache-status">{getCacheStatusMessage()}</span>
       </div>
 
       {loading ? (
