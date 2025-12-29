@@ -195,6 +195,25 @@ export namespace config {
 
 }
 
+export namespace main {
+
+	export class MarketplaceCacheStatus {
+	    isCached: boolean;
+	    isStale: boolean;
+
+	    static createFrom(source: any = {}) {
+	        return new MarketplaceCacheStatus(source);
+	    }
+
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.isCached = source["isCached"];
+	        this.isStale = source["isStale"];
+	    }
+	}
+
+}
+
 export namespace marketplaces {
 	
 	export class MCPPackage {
