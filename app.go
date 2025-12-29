@@ -378,6 +378,11 @@ func (a *App) ListProfileFiles(profileName string) ([]config.ProfileItem, error)
 	return a.discoveryService.ListProfileFiles(profileName)
 }
 
+// SearchAll searches across all config files
+func (a *App) SearchAll(query string, options config.SearchOptions) ([]config.SearchResult, error) {
+	return a.discoveryService.SearchAll(query, options)
+}
+
 // GetProviderStatuses returns the health status of all registered providers.
 func (a *App) GetProviderStatuses() []config.ProviderStatus {
 	return a.discoveryService.GetProviderStatuses()
