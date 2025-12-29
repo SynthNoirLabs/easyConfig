@@ -63,3 +63,11 @@ func (p *SweepProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *SweepProvider) BinaryName() string {
+	return "sweep"
+}
+
+func (p *SweepProvider) VersionArgs() []string {
+	return []string{"--version"}
+}

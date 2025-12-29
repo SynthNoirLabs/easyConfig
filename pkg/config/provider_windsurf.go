@@ -109,6 +109,14 @@ func (p *WindsurfProvider) Discover(_ string) ([]Item, error) {
 	return items, nil
 }
 
+func (p *WindsurfProvider) BinaryName() string {
+	return "windsurf"
+}
+
+func (p *WindsurfProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
+
 func (p *WindsurfProvider) CheckStatus() ProviderStatus {
 	files, _ := p.Discover("")
 	return ProviderStatus{

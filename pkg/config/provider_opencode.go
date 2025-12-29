@@ -148,3 +148,11 @@ func (p *OpenCodeProvider) CheckStatus() ProviderStatus {
 		LastChecked:     time.Now().Format(time.RFC3339),
 	}
 }
+
+func (p *OpenCodeProvider) BinaryName() string {
+	return "opencode"
+}
+
+func (p *OpenCodeProvider) VersionArgs() []string {
+	return []string{"--version"}
+}
