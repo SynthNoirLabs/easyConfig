@@ -8,6 +8,7 @@ import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
 import Layout from "./components/Layout";
 import Marketplace from "./components/Marketplace";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Sidebar from "./components/Sidebar";
 import Workflows from "./components/Workflows";
 import { useConfig } from "./context/ConfigContext";
@@ -81,16 +82,20 @@ function AppContent() {
     <>
       <Layout
         sidebar={
-          <Sidebar
-            items={configs}
-            onSelect={handleSelectConfig}
-            onAdd={handleOpenAddModal}
-            currentView={currentView}
-            onViewChange={setCurrentView}
-          />
+          <ErrorBoundary>
+            <Sidebar
+              items={configs}
+              onSelect={handleSelectConfig}
+              onAdd={handleOpenAddModal}
+              currentView={currentView}
+              onViewChange={setCurrentView}
+            />
+          </ErrorBoundary>
         }
       >
-        <div className="app-content">{renderContent()}</div>
+        <div className="app-content">
+          <ErrorBoundary>{renderContent()}</ErrorBoundary>
+        </div>
       </Layout>
 
       <AddConfigModal
