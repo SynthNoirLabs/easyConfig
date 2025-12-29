@@ -181,9 +181,8 @@ func TestProviders_Discover_TableDriven(t *testing.T) {
 				}
 			},
 			checkItems: func(t *testing.T, items []Item) {
-				// Git provider may discover 2 or 3 items depending on whether /etc/gitconfig exists
-				// We should have at least: global (.gitconfig) and project (.git/config)
-				// Optionally: system (/etc/gitconfig)
+				// Git provider discovers 2-3 items: global (~/.gitconfig), project (.git/config),
+				// and optionally system (/etc/gitconfig) if it exists
 				if len(items) < 2 {
 					t.Errorf("Expected at least 2 items (global + project), got %d", len(items))
 				}
