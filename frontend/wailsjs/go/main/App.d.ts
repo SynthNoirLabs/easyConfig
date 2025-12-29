@@ -20,6 +20,8 @@ export function FetchSchemas():Promise<void>;
 
 export function GenerateWorkflow(arg1:string,arg2:string):Promise<workflows.WorkflowResponse>;
 
+export function GetProfileContent(arg1:string,arg2:string):Promise<string>;
+
 export function GetProviderStatuses():Promise<Array<config.ProviderStatus>>;
 
 export function GetSupportedWorkflows():Promise<Array<string>>;
@@ -29,6 +31,8 @@ export function Greet(arg1:string):Promise<string>;
 export function InstallMCPPackage(arg1:string):Promise<void>;
 
 export function ListDocs():Promise<Array<config.DocsProvider>>;
+
+export function ListProfileFiles(arg1:string):Promise<Array<config.ProfileItem>>;
 
 export function ListProfiles():Promise<Array<config.ProfileSummary>>;
 

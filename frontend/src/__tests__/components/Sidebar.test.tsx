@@ -26,6 +26,11 @@ vi.mock("../../../src/components/ProviderStatusWidget", () => ({
   default: () => <div>ProviderStatusWidget</div>,
 }));
 
+// Mock ProfilePreview to avoid issues with the new component
+vi.mock("../../../src/components/ProfilePreview", () => ({
+  default: () => <div>ProfilePreview</div>,
+}));
+
 test("Sidebar renders navigation buttons", () => {
   render(
     <Sidebar
@@ -34,6 +39,7 @@ test("Sidebar renders navigation buttons", () => {
       onAdd={() => {}}
       currentView="configs"
       onViewChange={() => {}}
+      onCompare={() => {}}
     />,
   );
 
