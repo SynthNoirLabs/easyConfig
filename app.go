@@ -358,6 +358,31 @@ func (a *App) DeleteProfile(name string) error {
 	return a.discoveryService.DeleteProfile(name)
 }
 
+// ExportProfiles exports the specified profiles to a JSON byte slice.
+func (a *App) ExportProfiles(names []string) ([]byte, error) {
+	return a.discoveryService.ExportProfiles(names)
+}
+
+// ExportAllProfiles exports all profiles to a JSON byte slice.
+func (a *App) ExportAllProfiles() ([]byte, error) {
+	return a.discoveryService.ExportAllProfiles()
+}
+
+// ImportProfilesFromFile imports profiles from a local file.
+func (a *App) ImportProfilesFromFile(path, strategy string) ([]config.ImportResult, error) {
+	return a.discoveryService.ImportProfilesFromFile(path, config.ImportStrategy(strategy))
+}
+
+// ImportProfilesFromURL imports profiles from a URL.
+func (a *App) ImportProfilesFromURL(url, strategy string) ([]config.ImportResult, error) {
+	return a.discoveryService.ImportProfilesFromURL(url, config.ImportStrategy(strategy))
+}
+
+// SaveExportedProfiles writes the exported profiles data to a file.
+func (a *App) SaveExportedProfiles(path string, data []byte) error {
+	return os.WriteFile(path, data, 0600)
+}
+
 // GetProviderStatuses returns the health status of all registered providers.
 func (a *App) GetProviderStatuses() []config.ProviderStatus {
 	return a.discoveryService.GetProviderStatuses()

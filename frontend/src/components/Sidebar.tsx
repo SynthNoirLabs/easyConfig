@@ -23,6 +23,7 @@ import type { config, config as configModels } from "../../wailsjs/go/models";
 import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
 import { useConfig } from "../context/ConfigContext";
 import ProviderStatusWidget from "./ProviderStatusWidget";
+import ImportExportModal from "./ImportExportModal";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -47,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<configModels.ProfileSummary[]>([]);
   const [selectedProfile, setSelectedProfile] = useState<string>("");
+  const [isImportExportModalOpen, setIsImportExportModalOpen] = useState(false);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -295,8 +297,19 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             Delete
           </button>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setIsImportExportModalOpen(true)}
+          >
+            Import/Export
+          </button>
         </div>
       </div>
+      <ImportExportModal
+        isOpen={isImportExportModalOpen}
+        onClose={() => setIsImportExportModalOpen(false)}
+      />
 
       <div className="sidebar-content">
         {groupedByScope.map(({ scope, providers }) => (
