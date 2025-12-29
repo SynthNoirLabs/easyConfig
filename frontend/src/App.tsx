@@ -8,14 +8,17 @@ import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
 import Layout from "./components/Layout";
 import Marketplace from "./components/Marketplace";
+import ShortcutsModal from "./components/ShortcutsModal";
 import Sidebar from "./components/Sidebar";
 import Workflows from "./components/Workflows";
 import { useConfig } from "./context/ConfigContext";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
   const [selectedItem, setSelectedItem] = useState<config.Item | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<
     "configs" | "workflows" | "marketplace" | "docs"
   >("configs");
@@ -36,6 +39,11 @@ function AppContent() {
     await refreshConfigs();
     toast.success("Configuration created successfully");
   };
+
+  useKeyboardShortcuts({
+    "ctrl+n": handleOpenAddModal,
+    "?": () => setIsShortcutsModalOpen((prev) => !prev),
+  });
 
   if (loading) {
     return (
@@ -97,6 +105,11 @@ function AppContent() {
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         onSuccess={handleConfigAdded}
+      />
+
+      <ShortcutsModal
+        isOpen={isShortcutsModalOpen}
+        onClose={() => setIsShortcutsModalOpen(false)}
       />
     </>
   );

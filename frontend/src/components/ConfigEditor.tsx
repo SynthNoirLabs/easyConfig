@@ -14,6 +14,7 @@ import remarkGfm from "remark-gfm";
 import { toast } from "sonner"; // Import sonner toast
 import type { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import "./ConfigEditor.css";
 import ClaudeConfigEditor from "./editors/ClaudeConfigEditor";
 import OpenCodeConfigEditor from "./editors/OpenCodeConfigEditor";
@@ -59,6 +60,39 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     (configItem.provider === "OpenCode" &&
       configItem.fileName === "opencode.json");
 
+  const handleSave = useCallback(async () => {
+    if (!isDirty) return;
+    setIsSaving(true);
+    try {
+      if (configItem.format === "json") {
+        try {
+          JSON.parse(content);
+        } catch (_e) {
+          toast.error("Invalid JSON format. Please fix errors before saving.");
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      await saveConfig(configItem.path, content);
+      setOriginalContent(content);
+      setIsDirty(false);
+      toast.success("Configuration saved successfully!");
+    } catch (err) {
+      console.error("Error saving file:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to save file.");
+    } finally {
+      setIsSaving(false);
+    }
+  }, [content, configItem.path, saveConfig, isDirty]);
+
+  useKeyboardShortcuts({
+    "ctrl+s": handleSave,
+    "ctrl+1": () => setViewMode("code"),
+    "ctrl+2": () => hasSpecificEditor && setViewMode("form"),
+    "ctrl+3": () => isMarkdown && setViewMode("preview"),
+  });
+
   useEffect(() => {
     // Default to form view if available
     if (hasSpecificEditor) {
@@ -99,31 +133,6 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
   useEffect(() => {
     loadFile();
   }, [loadFile]);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      if (configItem.format === "json") {
-        try {
-          JSON.parse(content);
-        } catch (_e) {
-          toast.error("Invalid JSON format. Please fix errors before saving.");
-          setIsSaving(false);
-          return;
-        }
-      }
-
-      await saveConfig(configItem.path, content);
-      setOriginalContent(content);
-      setIsDirty(false);
-      toast.success("Configuration saved successfully!");
-    } catch (err) {
-      console.error("Error saving file:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to save file.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const handleReset = () => {
     if (confirm("Discard unsaved changes?")) {
