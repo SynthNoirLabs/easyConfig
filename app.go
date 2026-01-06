@@ -16,6 +16,7 @@ import (
 	"easyConfig/pkg/marketplaces"
 	"easyConfig/pkg/mcp"
 	"easyConfig/pkg/schema"
+	"easyConfig/pkg/settings"
 	"easyConfig/pkg/util/paths"
 	"easyConfig/pkg/watcher"
 	"easyConfig/pkg/workflows"
@@ -25,6 +26,7 @@ import (
 type App struct {
 	ctx              context.Context
 	discoveryService *config.DiscoveryService
+	settingsService  *settings.Service
 	watcherService   *watcher.Service
 	installer        *install.Installer
 	smitheryClient   *marketplaces.SmitheryClient
@@ -45,7 +47,15 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	logger := slog.Default()
-	a.discoveryService = config.NewDiscoveryService(logger)
+
+	var err error
+	a.settingsService, err = settings.NewService()
+	if err != nil {
+		logger.Error("Failed to initialize settings service", "error", err)
+		// We can still continue, but dynamic providers won't work.
+	}
+
+	a.discoveryService = config.NewDiscoveryService(logger, a.settingsService)
 	a.watcherService = watcher.NewService()
 	a.installer = install.NewInstaller()
 	a.smitheryClient = marketplaces.NewSmitheryClient()
@@ -506,4 +516,22 @@ func (a *App) ReadDoc(provider, slug, format string) (string, error) {
 		return "", fmt.Errorf("get working dir: %w", err)
 	}
 	return config.ReadDocFromRoot(root, provider, slug, format)
+}
+
+// --- Settings ---
+
+// GetSettings returns the current application settings.
+func (a *App) GetSettings() (*settings.Settings, error) {
+	if a.settingsService == nil {
+		return nil, fmt.Errorf("settings service not initialized")
+	}
+	return a.settingsService.Get(), nil
+}
+
+// SaveSettings saves the application settings.
+func (a *App) SaveSettings(s *settings.Settings) error {
+	if a.settingsService == nil {
+		return fmt.Errorf("settings service not initialized")
+	}
+	return a.settingsService.Save(s)
 }

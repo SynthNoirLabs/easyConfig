@@ -7,6 +7,7 @@ import {
   GitCompare,
   LayoutGrid,
   Plus,
+  Settings,
   ShieldCheck,
   Store,
   Trash2,
@@ -39,9 +40,9 @@ interface SidebarProps {
   items: config.Item[];
   onSelect: (item: config.Item) => void;
   onAdd: () => void;
-  currentView: "configs" | "workflows" | "marketplace" | "docs";
+  currentView: "configs" | "workflows" | "marketplace" | "docs" | "settings" | "health";
   onViewChange: (
-    view: "configs" | "workflows" | "marketplace" | "docs",
+    view: "configs" | "workflows" | "marketplace" | "docs" | "settings" | "health",
   ) => void;
   onCompare: (item1: config.Item, item2: config.Item) => void;
 }
@@ -326,6 +327,14 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             <BookOpen size={18} />
             <span>Docs</span>
+          </button>
+          <button
+            type="button"
+            className={`sidebar-nav-item ${currentView === "settings" ? "active" : ""}`}
+            onClick={() => onViewChange("settings")}
+          >
+            <Settings size={18} />
+            <span>Settings</span>
           </button>
         </nav>
 

@@ -25,7 +25,7 @@ func TestExportProfiles(t *testing.T) {
 	os.WriteFile(filepath.Join(profilesDir, "test-profile.json"), data, 0644)
 
 	// Create a DiscoveryService that points to the temp directory
-	service := NewDiscoveryService(nil)
+	service := NewDiscoveryService(nil, nil)
 	// Override the profilesRoot function to use our temp dir
 	originalProfilesRoot := profilesRoot
 	profilesRoot = func() (string, error) { return profilesDir, nil }

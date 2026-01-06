@@ -14,6 +14,7 @@ import Marketplace from "./components/Marketplace";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ShortcutsModal from "./components/ShortcutsModal";
 import Sidebar from "./components/Sidebar";
+import { SettingsPage } from "./components/SettingsPage";
 import Workflows from "./components/Workflows";
 import { useConfig } from "./context/ConfigContext";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
@@ -32,7 +33,7 @@ function AppContent() {
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [currentView, setCurrentView] = useState<
-    "configs" | "health" | "workflows" | "marketplace" | "docs"
+    "configs" | "health" | "workflows" | "marketplace" | "docs" | "settings"
   >("configs");
 
   const handleSelectConfig = (item: config.Item) => {
@@ -120,6 +121,8 @@ function AppContent() {
         return <Docs />;
       case "marketplace":
         return <Marketplace />;
+      case "settings":
+        return <SettingsPage />;
       default:
         return selectedItem ? (
           <ConfigEditor configItem={selectedItem} />

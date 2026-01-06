@@ -2,6 +2,7 @@ package config
 
 import (
 	"bufio"
+	"context"
 	"os"
 	"regexp"
 	"strings"
@@ -32,7 +33,7 @@ type SearchOptions struct {
 // SearchAll searches across all discovered configuration files for a given query.
 func (s *DiscoveryService) SearchAll(query string, options SearchOptions) ([]SearchResult, error) {
 	var results []SearchResult
-	items, err := s.DiscoverAll("") // Assuming projectPath is not needed for search
+	items, err := s.DiscoverAll(context.Background(), "") // Assuming projectPath is not needed for search
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"easyConfig/pkg/settings"
 )
 
 func TestDiscoveryService(t *testing.T) {
@@ -20,12 +22,19 @@ func TestDiscoveryService(t *testing.T) {
 	}()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	service := NewDiscoveryService(logger)
+
+	// Create a mock settings service for testing dynamic providers
+	settingsService, err := newMockSettingsService(t)
+	if err != nil {
+		t.Fatalf("Failed to create mock settings service: %v", err)
+	}
+
+	service := NewDiscoveryService(logger, settingsService)
 
 	// Test RegisterProvider
 	// (Already registered in NewDiscoveryService, but let's check if we can add a dummy one if needed,
 	// or just rely on default ones)
-	if len(service.providers) == 0 {
+	if len(service.providers) <= 1 {
 		t.Error("Expected default providers to be registered")
 	}
 
@@ -156,4 +165,48 @@ func TestGetUserHome(t *testing.T) {
 	if home == "" {
 		t.Error("Expected non-empty home dir")
 	}
+}
+
+// newMockSettingsService creates a settings service pointed at a temporary directory
+// and pre-populates it with a dynamic provider definition.
+func newMockSettingsService(t *testing.T) (*settings.Service, error) {
+	t.Helper()
+	tempDir := t.TempDir()
+
+	// Create a subdirectory for the provider definitions
+	providerDir := filepath.Join(tempDir, "providers")
+	if err := os.MkdirAll(providerDir, 0750); err != nil {
+		return nil, err
+	}
+
+	// Create a dummy provider definition
+	defContent := `
+name: My Awesome Tool
+binaryName: awesome
+versionArgs: ["--version"]
+files:
+  - name: Global Config
+    fileName: .awesome/config.json
+    scope: global
+    format: json
+`
+	defPath := filepath.Join(providerDir, "my_awesome_tool.yaml")
+	if err := os.WriteFile(defPath, []byte(defContent), 0600); err != nil {
+		return nil, err
+	}
+
+	// Override config dir to use the temp dir for the settings service
+	originalConfigDir := os.Getenv("XDG_CONFIG_HOME")
+	t.Setenv("XDG_CONFIG_HOME", tempDir)
+	defer os.Setenv("XDG_CONFIG_HOME", originalConfigDir)
+
+	s, err := settings.NewService()
+	if err != nil {
+		return nil, err
+	}
+	if err := s.Save(&settings.Settings{ProviderScanDirs: []string{providerDir}}); err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }

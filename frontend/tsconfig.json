@@ -14,10 +14,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "types": ["vitest/globals"]
+    "jsx": "react-jsx"
   },
-  "include": ["src", "wailsjs", "src/tests"],
+  "include": ["src", "wailsjs"],
   "references": [
     {
       "path": "./tsconfig.node.json"

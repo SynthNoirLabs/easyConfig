@@ -1,4 +1,4 @@
-package config
+package examples
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"easyConfig/pkg/config"
 	"easyConfig/pkg/util/paths"
 )
 
@@ -25,22 +26,22 @@ func (p *MyToolProvider) Name() string {
 }
 
 // Discover finds all the configuration files for the provider.
-func (p *MyToolProvider) Discover(projectPath string) ([]Item, error) {
-	var items []Item
+func (p *MyToolProvider) Discover(projectPath string) ([]config.Item, error) {
+	var items []config.Item
 	home := paths.GetHomeDir()
 
 	// Global scope
 	if home != "" {
 		globalPath := filepath.Join(home, ".mytool", "config.json")
 		// FileExists is a helper function in the config package
-		if FileExists(globalPath) {
-			items = append(items, Item{
+		if config.FileExists(globalPath) {
+			items = append(items, config.Item{
 				Provider: p.Name(),
 				Name:     "Global Config",
 				FileName: "config.json",
 				Path:     globalPath,
-				Scope:    ScopeGlobal,
-				Format:   FormatJSON,
+				Scope:    config.ScopeGlobal,
+				Format:   config.FormatJSON,
 				Exists:   true,
 			})
 		}
@@ -49,14 +50,14 @@ func (p *MyToolProvider) Discover(projectPath string) ([]Item, error) {
 	// Project scope
 	if projectPath != "" {
 		projectPath := filepath.Join(projectPath, ".mytool.json")
-		if FileExists(projectPath) {
-			items = append(items, Item{
+		if config.FileExists(projectPath) {
+			items = append(items, config.Item{
 				Provider: p.Name(),
 				Name:     "Project Config",
 				FileName: ".mytool.json",
 				Path:     projectPath,
-				Scope:    ScopeProject,
-				Format:   FormatJSON,
+				Scope:    config.ScopeProject,
+				Format:   config.FormatJSON,
 				Exists:   true,
 			})
 		}
@@ -66,18 +67,18 @@ func (p *MyToolProvider) Discover(projectPath string) ([]Item, error) {
 }
 
 // Create creates a new configuration file for the provider.
-func (p *MyToolProvider) Create(scope Scope, projectPath string) (string, error) {
+func (p *MyToolProvider) Create(scope config.Scope, projectPath string) (string, error) {
 	defaultContent := "{}"
 	var path string
 
 	switch scope {
-	case ScopeGlobal:
+	case config.ScopeGlobal:
 		home := paths.GetHomeDir()
 		if home == "" {
 			return "", fmt.Errorf("home directory not found")
 		}
 		path = filepath.Join(home, ".mytool", "config.json")
-	case ScopeProject:
+	case config.ScopeProject:
 		if projectPath == "" {
 			return "", fmt.Errorf("project path is required")
 		}
@@ -89,7 +90,7 @@ func (p *MyToolProvider) Create(scope Scope, projectPath string) (string, error)
 	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return "", fmt.Errorf("failed to create dir: %w", err)
 	}
-	if FileExists(path) {
+	if config.FileExists(path) {
 		return "", fmt.Errorf("file exists: %s", path)
 	}
 	if err := os.WriteFile(path, []byte(defaultContent), 0o600); err != nil {
@@ -99,15 +100,15 @@ func (p *MyToolProvider) Create(scope Scope, projectPath string) (string, error)
 }
 
 // CheckStatus performs a health check on the provider's configuration.
-func (p *MyToolProvider) CheckStatus() ProviderStatus {
-	status := ProviderStatus{
+func (p *MyToolProvider) CheckStatus() config.ProviderStatus {
+	status := config.ProviderStatus{
 		ProviderName: p.Name(),
 		LastChecked:  time.Now().Format(time.RFC3339),
 	}
 
 	home := paths.GetHomeDir()
 	if home == "" {
-		status.Health = StatusUnhealthy
+		status.Health = config.StatusUnhealthy
 		status.StatusMessage = "Home directory not found."
 		return status
 	}
@@ -116,13 +117,21 @@ func (p *MyToolProvider) CheckStatus() ProviderStatus {
 	files, _ := p.Discover("")
 	status.DiscoveredFiles = files
 
-	if !FileExists(globalPath) {
-		status.Health = StatusUnhealthy
+	if !config.FileExists(globalPath) {
+		status.Health = config.StatusUnhealthy
 		status.StatusMessage = "Global config not found. Use 'Create' to set one up."
 	} else {
-		status.Health = StatusHealthy
+		status.Health = config.StatusHealthy
 		status.StatusMessage = "Configuration files found."
 	}
 
 	return status
+}
+
+func (p *MyToolProvider) BinaryName() string {
+	return "mytool"
+}
+
+func (p *MyToolProvider) VersionArgs() []string {
+	return []string{"--version"}
 }
