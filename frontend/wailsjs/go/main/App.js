@@ -22,6 +22,14 @@ export function DiscoverConfigs(arg1) {
   return window['go']['main']['App']['DiscoverConfigs'](arg1);
 }
 
+export function ExportAllProfiles() {
+  return window['go']['main']['App']['ExportAllProfiles']();
+}
+
+export function ExportProfiles(arg1) {
+  return window['go']['main']['App']['ExportProfiles'](arg1);
+}
+
 export function FetchPopularServers() {
   return window['go']['main']['App']['FetchPopularServers']();
 }
@@ -34,12 +42,24 @@ export function GenerateWorkflow(arg1, arg2) {
   return window['go']['main']['App']['GenerateWorkflow'](arg1, arg2);
 }
 
+export function GetAllProviderStatuses() {
+  return window['go']['main']['App']['GetAllProviderStatuses']();
+}
+
+export function GetMarketplaceCacheStatus() {
+  return window['go']['main']['App']['GetMarketplaceCacheStatus']();
+}
+
 export function GetProfileContent(arg1, arg2) {
   return window['go']['main']['App']['GetProfileContent'](arg1, arg2);
 }
 
 export function GetProviderStatuses() {
   return window['go']['main']['App']['GetProviderStatuses']();
+}
+
+export function GetSettings() {
+  return window['go']['main']['App']['GetSettings']();
 }
 
 export function GetSupportedWorkflows() {
@@ -50,8 +70,20 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
+export function ImportProfilesFromFile(arg1, arg2) {
+  return window['go']['main']['App']['ImportProfilesFromFile'](arg1, arg2);
+}
+
+export function ImportProfilesFromURL(arg1, arg2) {
+  return window['go']['main']['App']['ImportProfilesFromURL'](arg1, arg2);
+}
+
 export function InstallMCPPackage(arg1) {
   return window['go']['main']['App']['InstallMCPPackage'](arg1);
+}
+
+export function ListBackups(arg1) {
+  return window['go']['main']['App']['ListBackups'](arg1);
 }
 
 export function ListDocs() {
@@ -70,6 +102,10 @@ export function ListWorkflowTemplates() {
   return window['go']['main']['App']['ListWorkflowTemplates']();
 }
 
+export function PreviewApplyProfile(arg1) {
+  return window['go']['main']['App']['PreviewApplyProfile'](arg1);
+}
+
 export function ReadConfig(arg1) {
   return window['go']['main']['App']['ReadConfig'](arg1);
 }
@@ -78,12 +114,28 @@ export function ReadDoc(arg1, arg2, arg3) {
   return window['go']['main']['App']['ReadDoc'](arg1, arg2, arg3);
 }
 
+export function RefreshMarketplaceCache() {
+  return window['go']['main']['App']['RefreshMarketplaceCache']();
+}
+
+export function RestoreBackup(arg1) {
+  return window['go']['main']['App']['RestoreBackup'](arg1);
+}
+
 export function SaveConfig(arg1, arg2) {
   return window['go']['main']['App']['SaveConfig'](arg1, arg2);
 }
 
+export function SaveExportedProfiles(arg1, arg2) {
+  return window['go']['main']['App']['SaveExportedProfiles'](arg1, arg2);
+}
+
 export function SaveProfile(arg1) {
   return window['go']['main']['App']['SaveProfile'](arg1);
+}
+
+export function SaveSettings(arg1) {
+  return window['go']['main']['App']['SaveSettings'](arg1);
 }
 
 export function SaveWorkflow(arg1, arg2) {

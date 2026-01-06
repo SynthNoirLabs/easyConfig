@@ -14,7 +14,7 @@ func TestImportProfiles(t *testing.T) {
 	os.MkdirAll(profilesDir, 0755)
 
 	// Create a DiscoveryService that points to the temp directory
-	service := NewDiscoveryService(nil)
+	service := NewDiscoveryService(nil, nil)
 	originalProfilesRoot := profilesRoot
 	profilesRoot = func() (string, error) { return profilesDir, nil }
 	defer func() { profilesRoot = originalProfilesRoot }()

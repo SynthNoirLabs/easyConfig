@@ -50,7 +50,7 @@ func (m *MockProvider) VersionArgs() []string {
 
 func TestGetProviderStatuses(t *testing.T) {
 	// Setup
-	ds := NewDiscoveryService(nil) // logger is nil for test simplicity
+	ds := NewDiscoveryService(nil, nil) // logger and settings are nil for test simplicity
 	ds.providers = []Provider{
 		&MockProvider{name: "HealthyProvider", healthy: true, files: []Item{{Name: "file1"}}},
 		&MockProvider{name: "UnhealthyProvider", healthy: false},

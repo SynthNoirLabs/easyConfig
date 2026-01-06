@@ -7,6 +7,7 @@ import {
   FileJson,
   Plus,
   Search,
+  Settings,
   ShoppingBag,
   Terminal,
   Workflow,
@@ -132,6 +133,14 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <BookOpen size={18} />
           <span>Docs</span>
+        </button>
+        <button
+          type="button"
+          className={`nav-item ${currentView === "settings" ? "active" : ""}`}
+          onClick={() => onViewChange("settings")}
+        >
+          <Settings size={18} />
+          <span>Settings</span>
         </button>
       </nav>
 

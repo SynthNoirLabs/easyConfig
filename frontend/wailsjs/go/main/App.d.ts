@@ -3,6 +3,8 @@
 import {config} from '../models';
 import {marketplaces} from '../models';
 import {workflows} from '../models';
+import {main} from '../models';
+import {settings} from '../models';
 
 export function ApplyProfile(arg1:string):Promise<Array<string>>;
 
@@ -14,21 +16,37 @@ export function DeleteProfile(arg1:string):Promise<void>;
 
 export function DiscoverConfigs(arg1:string):Promise<Array<config.Item>>;
 
+export function ExportAllProfiles():Promise<Array<number>>;
+
+export function ExportProfiles(arg1:Array<string>):Promise<Array<number>>;
+
 export function FetchPopularServers():Promise<Array<marketplaces.MCPPackage>>;
 
 export function FetchSchemas():Promise<void>;
 
 export function GenerateWorkflow(arg1:string,arg2:string):Promise<workflows.WorkflowResponse>;
 
+export function GetAllProviderStatuses():Promise<Array<config.ProviderStatusReport>>;
+
+export function GetMarketplaceCacheStatus():Promise<main.MarketplaceCacheStatus>;
+
 export function GetProfileContent(arg1:string,arg2:string):Promise<string>;
 
 export function GetProviderStatuses():Promise<Array<config.ProviderStatus>>;
+
+export function GetSettings():Promise<settings.Settings>;
 
 export function GetSupportedWorkflows():Promise<Array<string>>;
 
 export function Greet(arg1:string):Promise<string>;
 
+export function ImportProfilesFromFile(arg1:string,arg2:string):Promise<Array<config.ImportResult>>;
+
+export function ImportProfilesFromURL(arg1:string,arg2:string):Promise<Array<config.ImportResult>>;
+
 export function InstallMCPPackage(arg1:string):Promise<void>;
+
+export function ListBackups(arg1:string):Promise<Array<config.Backup>>;
 
 export function ListDocs():Promise<Array<config.DocsProvider>>;
 
@@ -38,13 +56,23 @@ export function ListProfiles():Promise<Array<config.ProfileSummary>>;
 
 export function ListWorkflowTemplates():Promise<Array<workflows.Template>>;
 
+export function PreviewApplyProfile(arg1:string):Promise<Array<config.ConfigChange>>;
+
 export function ReadConfig(arg1:string):Promise<string>;
 
 export function ReadDoc(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function RefreshMarketplaceCache():Promise<Array<marketplaces.MCPPackage>>;
+
+export function RestoreBackup(arg1:string):Promise<void>;
+
 export function SaveConfig(arg1:string,arg2:string):Promise<void>;
 
+export function SaveExportedProfiles(arg1:string,arg2:Array<number>):Promise<void>;
+
 export function SaveProfile(arg1:string):Promise<void>;
+
+export function SaveSettings(arg1:settings.Settings):Promise<void>;
 
 export function SaveWorkflow(arg1:string,arg2:string):Promise<void>;
 

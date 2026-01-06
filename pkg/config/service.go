@@ -10,24 +10,27 @@ import (
 	"strings"
 	"sync"
 
+	"easyConfig/pkg/settings"
 	toml "github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
 
 // DiscoveryService manages the discovery of configurations across multiple providers
 type DiscoveryService struct {
-	providers []Provider
-	logger    *slog.Logger
-	mu        sync.RWMutex
+	providers       []Provider
+	logger          *slog.Logger
+	settingsService *settings.Service
+	mu              sync.RWMutex
 }
 
 // NewDiscoveryService creates a new service with default providers
-func NewDiscoveryService(logger *slog.Logger) *DiscoveryService {
+func NewDiscoveryService(logger *slog.Logger, settingsService *settings.Service) *DiscoveryService {
 	if logger == nil {
 		logger = slog.Default()
 	}
 	ds := &DiscoveryService{
-		logger: logger,
+		logger:          logger,
+		settingsService: settingsService,
 		providers: []Provider{
 			&ClaudeProvider{},
 			&JulesProvider{},
@@ -50,7 +53,38 @@ func NewDiscoveryService(logger *slog.Logger) *DiscoveryService {
 			&OpenHandsProvider{},
 		},
 	}
+	ds.loadDynamicProviders()
 	return ds
+}
+
+// loadDynamicProviders scans the directories specified in the settings and loads any dynamic providers found.
+func (s *DiscoveryService) loadDynamicProviders() {
+	if s.settingsService == nil {
+		return
+	}
+	cfg := s.settingsService.Get()
+	for _, dir := range cfg.ProviderScanDirs {
+		s.logger.Info("Scanning for dynamic providers", "directory", dir)
+		files, err := os.ReadDir(dir)
+		if err != nil {
+			s.logger.Error("Failed to read provider scan directory", "directory", dir, "error", err)
+			continue
+		}
+
+		for _, file := range files {
+			if !file.IsDir() && (strings.HasSuffix(file.Name(), ".yaml") || strings.HasSuffix(file.Name(), ".yml")) {
+				defPath := filepath.Join(dir, file.Name())
+				s.logger.Info("Found potential provider definition", "path", defPath)
+				provider, err := NewDynamicProvider(defPath)
+				if err != nil {
+					s.logger.Error("Failed to load dynamic provider", "path", defPath, "error", err)
+					continue
+				}
+				s.logger.Info("Registering dynamic provider", "name", provider.Name())
+				s.RegisterProvider(provider)
+			}
+		}
+	}
 }
 
 // RegisterProvider adds a new provider to the service

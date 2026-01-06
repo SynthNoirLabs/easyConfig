@@ -66,7 +66,7 @@ func TestSaveAndApplyProfile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	svc := NewDiscoveryService(nil)
+	svc := NewDiscoveryService(nil, nil)
 	svc.RegisterProvider(&dummyProvider{path: cfgPath})
 
 	if err := svc.SaveProfile("test-profile", proj); err != nil {
