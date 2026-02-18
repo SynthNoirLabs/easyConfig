@@ -18,6 +18,7 @@ jobs:
 
     - name: Run Claude Code Action for Review
       uses: anthropics/claude-code-action@v1
+      continue-on-error: true
       with:
         prompt: "/review"
         anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}

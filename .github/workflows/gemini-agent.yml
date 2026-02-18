@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Gemini Code Review
         uses: google-github-actions/run-gemini-cli@v0
+        continue-on-error: true
         with:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           prompt: 'Review this PR.'
@@ -49,6 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Gemini Issue Triage
         uses: google-github-actions/run-gemini-cli@v0
+        continue-on-error: true
         with:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           prompt: 'Triage this issue.'
@@ -61,6 +63,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Gemini Chat
         uses: google-github-actions/run-gemini-cli@v0
+        continue-on-error: true
         with:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           prompt: 'Reply to this comment: ${{ github.event.comment.body }}'
