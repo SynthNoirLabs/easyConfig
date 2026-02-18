@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import React from "react";
-import { test, expect, vi } from "vitest";
+import { expect, test, vi } from "vitest";
 import Sidebar from "../../../src/components/Sidebar";
 
 // Mock the useConfig hook
@@ -12,6 +12,7 @@ vi.mock("../../../src/context/ConfigContext", () => ({
 }));
 
 // Mock Wails runtime
+// @ts-ignore
 window.go = {
   main: {
     App: {
@@ -43,7 +44,8 @@ test("Sidebar renders navigation buttons", () => {
     />,
   );
 
-  expect(screen.getByText("Dashboard")).toBeInTheDocument();
+  // Expect Health instead of Dashboard
+  expect(screen.getByText("Health")).toBeInTheDocument();
   expect(screen.getByText("Workflows")).toBeInTheDocument();
   expect(screen.getByText("Marketplace")).toBeInTheDocument();
   expect(screen.getByText("Docs")).toBeInTheDocument();

@@ -13,10 +13,7 @@ const EditorSettings: React.FC<EditorSettingsProps> = ({
   onChange,
   onReset,
 }) => {
-  const handleValueChange = (
-    key: keyof EditorPreferences,
-    value: unknown,
-  ) => {
+  const handleValueChange = (key: keyof EditorPreferences, value: unknown) => {
     onChange({ [key]: value });
   };
 

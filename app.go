@@ -474,7 +474,7 @@ func (a *App) SaveExportedProfiles(path string, data []byte) error {
 
 // SearchAll searches across all config files
 func (a *App) SearchAll(query string, options config.SearchOptions) ([]config.SearchResult, error) {
-	return a.discoveryService.SearchAll(query, options)
+	return a.discoveryService.SearchAll(a.ctx, query, options)
 }
 
 // GetProviderStatuses returns the health status of all registered providers.

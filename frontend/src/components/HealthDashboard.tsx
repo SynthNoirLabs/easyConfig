@@ -1,25 +1,26 @@
 import { RefreshCw } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { GetAllProviderStatuses } from "../../wailsjs/go/main/App";
+import { GetProviderStatuses } from "../../wailsjs/go/main/App";
 import type { config } from "../../wailsjs/go/models";
-import StatusCard from "./StatusCard";
 import "./HealthDashboard.css";
+import StatusCard from "./StatusCard";
 
 const HealthDashboard: React.FC = () => {
-  const [statuses, setStatuses] = useState<config.ProviderStatusReport[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [statuses, setStatuses] = useState<config.ProviderStatus[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStatuses = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await GetAllProviderStatuses();
+      const result = await GetProviderStatuses();
       setStatuses(result);
     } catch (err) {
-      setError("Failed to fetch provider statuses.");
-      console.error(err);
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch status reports",
+      );
     } finally {
       setLoading(false);
     }
@@ -27,44 +28,33 @@ const HealthDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchStatuses();
+    const interval = setInterval(fetchStatuses, 30000); // Auto-refresh every 30s
+    return () => clearInterval(interval);
   }, [fetchStatuses]);
 
-  const handleCardClick = (status: config.ProviderStatusReport) => {
-    // For now, we'll just log the status.
-    // In the future, this could open a detailed view.
-    console.log("Card clicked:", status);
-  };
+  if (error) {
+    return (
+      <div className="health-dashboard-error">
+        <p>Error loading dashboard: {error}</p>
+        <button type="button" onClick={fetchStatuses}>Retry</button>
+      </div>
+    );
+  }
 
   return (
     <div className="health-dashboard">
       <div className="dashboard-header">
         <h1>Provider Health Dashboard</h1>
-        <button onClick={fetchStatuses} disabled={loading}>
+        <button type="button" onClick={fetchStatuses} disabled={loading}>
           <RefreshCw size={16} />
           {loading ? "Refreshing..." : "Refresh All"}
         </button>
       </div>
 
-      {loading && <p>Loading statuses...</p>}
-      {error && <p className="error-message">{error}</p>}
-
-      {!loading && !error && (
-        <div className="status-grid">
-          {statuses.map((status) => (
-            <StatusCard
-              key={status.providerName}
-              status={status}
-              onClick={() => handleCardClick(status)}
-            />
-          ))}
-        </div>
-      )}
-
-      <div className="dashboard-legend">
-        <span>✓ Ready</span>
-        <span>⚠ Warning</span>
-        <span>✗ Error</span>
-        <span>○ Not Installed</span>
+      <div className="status-grid">
+        {statuses.map((status) => (
+          <StatusCard key={status.providerName} status={status} />
+        ))}
       </div>
     </div>
   );

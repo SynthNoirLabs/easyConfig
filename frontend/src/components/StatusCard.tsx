@@ -1,46 +1,76 @@
-import { AlertTriangle, CheckCircle, HelpCircle, XCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  FileText,
+  HelpCircle,
+  XCircle,
+} from "lucide-react";
 import type React from "react";
-import "./StatusCard.css";
+import { useState } from "react";
 import type { config } from "../../wailsjs/go/models";
+import ProviderStatusDrawer from "./ProviderStatusDrawer";
+import "./StatusCard.css";
 
 interface StatusCardProps {
-  status: config.ProviderStatusReport;
-  onClick: () => void;
+  status: config.ProviderStatus;
 }
 
-const getStatusLevel = (status: config.ProviderStatusReport) => {
-  if (status.installed && status.configured) return "ready";
-  if (status.installed && !status.configured) return "warning";
-  if (!status.installed) return "not-installed";
-  return "error";
-};
+const StatusCard: React.FC<StatusCardProps> = ({ status }) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-const StatusIcon = ({ status }: { status: config.ProviderStatusReport }) => {
-  const level = getStatusLevel(status);
-  switch (level) {
-    case "ready":
-      return <CheckCircle className="status-icon ready" />;
-    case "warning":
-      return <AlertTriangle className="status-icon warning" />;
-    case "error":
-      return <XCircle className="status-icon error" />;
-    case "not-installed":
-      return <HelpCircle className="status-icon not-installed" />;
-    default:
-      return <HelpCircle className="status-icon not-installed" />;
-  }
-};
+  const getStatusIcon = (health: string) => {
+    switch (health) {
+      case "healthy":
+        return <CheckCircle className="status-icon healthy" size={20} />;
+      case "warning":
+        return <AlertTriangle className="status-icon warning" size={20} />;
+      case "error":
+        return <XCircle className="status-icon error" size={20} />;
+      default:
+        return <HelpCircle className="status-icon unknown" size={20} />;
+    }
+  };
 
-const StatusCard: React.FC<StatusCardProps> = ({ status, onClick }) => {
-  const level = getStatusLevel(status);
+  const getStatusClass = (health: string) => {
+    return `status-card ${health}`;
+  };
 
   return (
-    <div className={`status-card ${level}`} onClick={onClick}>
-      <StatusIcon status={status} />
-      <h4>{status.providerName}</h4>
-      <p>{status.message}</p>
-      {status.version && <span className="version">v{status.version}</span>}
-    </div>
+    <>
+      <div
+        className={getStatusClass(status.health)}
+        onClick={() => setIsDrawerOpen(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            setIsDrawerOpen(true);
+          }
+        }}
+      >
+        <div className="status-card-header">
+          {getStatusIcon(status.health)}
+          <h3>{status.providerName}</h3>
+        </div>
+        <div className="status-message">
+          <p>{status.statusMessage || "Operational"}</p>
+        </div>
+        <div className="status-meta">
+          <div className="meta-item">
+            <FileText size={14} />
+            <span>{status.discoveredFiles?.length || 0} Files</span>
+          </div>
+          <div className="meta-item">
+            <span>Last checked: {new Date(status.lastChecked).toLocaleTimeString()}</span>
+          </div>
+        </div>
+      </div>
+      <ProviderStatusDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        status={status}
+      />
+    </>
   );
 };
 

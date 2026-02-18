@@ -4,77 +4,72 @@ import type { config } from "../../wailsjs/go/models";
 import "./ProviderStatusDrawer.css";
 
 interface ProviderStatusDrawerProps {
-  status: config.ProviderStatus | null;
+  isOpen: boolean;
   onClose: () => void;
+  status: config.ProviderStatus;
 }
 
 const ProviderStatusDrawer: React.FC<ProviderStatusDrawerProps> = ({
-  status,
+  isOpen,
   onClose,
+  status,
 }) => {
-  if (!status) {
-    return null;
-  }
-
-  const getOnboardingSteps = (providerName: string) => {
-    // In a real app, this would be more dynamic
-    switch (providerName.toLowerCase()) {
-      case "claude code":
-        return (
-          <ul>
-            <li>Create a global config file at ~/.claude/settings.json</li>
-            <li>Add your API key to the configuration file.</li>
-            <li>Refer to the Claude documentation for more details.</li>
-          </ul>
-        );
-      case "gemini":
-        return (
-          <ul>
-            <li>Create a global config file at ~/.gemini/settings.json</li>
-            <li>Add your API key to the configuration file.</li>
-          </ul>
-        );
-      default:
-        return <p>No onboarding information available.</p>;
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <div className="status-drawer-overlay" onClick={onClose}>
-      <div className="status-drawer" onClick={(e) => e.stopPropagation()}>
+    <div className="status-drawer-overlay" onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      <div
+        className="status-drawer"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="status-drawer-header">
           <h3>{status.providerName} Status</h3>
-          <button type="button" onClick={onClose} className="btn-icon">
+          <button type="button" className="close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
         <div className="status-drawer-content">
-          <p>
-            <strong>Health:</strong>{" "}
-            <span className={`health-indicator ${status.health}`}>
-              {status.health}
-            </span>
-          </p>
-          <p>
-            <strong>Message:</strong> {status.statusMessage}
-          </p>
-          <p>
-            <strong>Last Checked:</strong>{" "}
-            {new Date(status.lastChecked).toLocaleString()}
-          </p>
-          {status.health === "unhealthy" && (
-            <div className="onboarding-checklist">
-              <h4>Onboarding Checklist</h4>
-              {getOnboardingSteps(status.providerName)}
-            </div>
-          )}
-          <div className="quick-actions">
-            <button type="button" className="btn">
-              Open Config File
-            </button>
-            <button type="button" className="btn">
-              Re-run Discovery
-            </button>
+          <div className="status-summary">
+            <p>
+              <strong>Health:</strong>{" "}
+              <span className={`status-badge ${status.health}`}>
+                {status.health.toUpperCase()}
+              </span>
+            </p>
+            <p>
+              <strong>Last Checked:</strong>{" "}
+              {new Date(status.lastChecked).toLocaleString()}
+            </p>
+            <p>
+              <strong>Message:</strong>{" "}
+              {status.statusMessage || "All systems operational."}
+            </p>
+          </div>
+
+          <div className="discovered-files">
+            <h4>Discovered Files ({status.discoveredFiles?.length || 0})</h4>
+            {status.discoveredFiles && status.discoveredFiles.length > 0 ? (
+              <ul>
+                {status.discoveredFiles.map((file) => (
+                  <li key={file.path}>
+                    <div className="file-info">
+                      <span className="file-name">{file.name}</span>
+                      <span className="file-path">{file.path}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="no-files">No configuration files found.</p>
+            )}
           </div>
         </div>
       </div>

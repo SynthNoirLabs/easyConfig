@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Ensure dist exists for Go embed
-        run: mkdir -p frontend/dist
+        run: mkdir -p frontend/dist && touch frontend/dist/.keep
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -102,6 +102,9 @@ jobs:
       PLAYWRIGHT_BROWSERS_PATH: 0
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ensure dist exists for Go embed
+        run: mkdir -p frontend/dist && touch frontend/dist/.keep
 
       - name: Set up Go
         uses: actions/setup-go@v5

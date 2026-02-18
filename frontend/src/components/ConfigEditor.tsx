@@ -1,4 +1,3 @@
-import type { editor } from "monaco-editor";
 import Editor from "@monaco-editor/react";
 import {
   Code,
@@ -10,6 +9,7 @@ import {
   Save,
   Settings,
 } from "lucide-react";
+import type { editor } from "monaco-editor";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -19,8 +19,8 @@ import type { config } from "../../wailsjs/go/models";
 import { useConfig } from "../context/ConfigContext";
 import { useClickOutside } from "../hooks/useClickOutside";
 import {
-  type EditorPreferences,
   defaultPreferences,
+  type EditorPreferences,
   useEditorPreferences,
 } from "../hooks/useEditorPreferences";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
@@ -104,7 +104,7 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     } finally {
       setIsSaving(false);
     }
-  }, [content, configItem.path, saveConfig, isDirty]);
+  }, [content, configItem.path, saveConfig, isDirty, configItem.format]);
 
   useKeyboardShortcuts({
     "ctrl+s": handleSave,
@@ -124,7 +124,9 @@ const ConfigEditor: React.FC<ConfigEditorProps> = ({ configItem }) => {
     }
   }, [hasSpecificEditor, isMarkdown]);
 
-  const handleEditorDidMount = (editorInstance: editor.IStandaloneCodeEditor) => {
+  const handleEditorDidMount = (
+    editorInstance: editor.IStandaloneCodeEditor,
+  ) => {
     editorRef.current = editorInstance;
     if (configItem.initialLine) {
       editorInstance.revealLineInCenter(configItem.initialLine);

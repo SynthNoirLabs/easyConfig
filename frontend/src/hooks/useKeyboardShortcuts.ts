@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 type ShortcutCallback = () => void;
 type ShortcutMap = Record<string, ShortcutCallback>;
@@ -9,10 +9,10 @@ const getShortcutKey = (e: KeyboardEvent): string => {
   const shift = e.shiftKey;
   const key = e.key.toLowerCase();
 
-  let shortcut = '';
-  if (meta) shortcut += 'ctrl+';
-  if (alt) shortcut += 'alt+';
-  if (shift) shortcut += 'shift+';
+  let shortcut = "";
+  if (meta) shortcut += "ctrl+";
+  if (alt) shortcut += "alt+";
+  if (shift) shortcut += "shift+";
   shortcut += key;
   return shortcut;
 };
@@ -27,9 +27,9 @@ export function useKeyboardShortcuts(shortcuts: ShortcutMap) {
       }
     };
 
-    window.addEventListener('keydown', handler);
+    window.addEventListener("keydown", handler);
     return () => {
-      window.removeEventListener('keydown', handler);
+      window.removeEventListener("keydown", handler);
     };
   }, [shortcuts]);
 }

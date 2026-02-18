@@ -1,6 +1,6 @@
 // frontend/src/components/ErrorFallback.tsx
-import React from 'react';
-import './ErrorFallback.css';
+import type React from "react";
+import "./ErrorFallback.css";
 
 interface ErrorFallbackProps {
   error: Error;
@@ -16,7 +16,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onRetry }) => {
         <summary>Error Details</summary>
         <pre>{error.message}</pre>
       </details>
-      <button onClick={onRetry}>Try Again</button>
+      <button type="button" onClick={onRetry}>Try Again</button>
     </div>
   );
 };

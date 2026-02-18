@@ -92,3 +92,29 @@
 .match-context {
   white-space: pre-wrap;
 }
+
+.file-header {
+  width: 100%;
+  text-align: left;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  display: block;
+}
+
+.match-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 8px 12px;
+  display: block;
+}
+
+.match-item:hover {
+  background-color: var(--hover-background);
+}

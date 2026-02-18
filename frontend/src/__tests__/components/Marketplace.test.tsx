@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
-import { test, expect, vi } from "vitest";
+import { expect, test, vi } from "vitest";
 import Marketplace from "../../../src/components/Marketplace";
 
 // Mock Wails bridge
@@ -14,8 +14,18 @@ window.go = {
 };
 
 const mockServers = [
-  { name: "Server A", description: "Description A", verified: true, tags: ["tag1"] },
-  { name: "Server B", description: "Description B", verified: false, tags: ["tag2"] },
+  {
+    name: "Server A",
+    description: "Description A",
+    verified: true,
+    tags: ["tag1"],
+  },
+  {
+    name: "Server B",
+    description: "Description B",
+    verified: false,
+    tags: ["tag2"],
+  },
 ];
 
 test("Marketplace renders and filters servers", async () => {

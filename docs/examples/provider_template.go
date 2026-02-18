@@ -1,3 +1,9 @@
+//go:build ignore
+// +build ignore
+
+// This file is an example template and is excluded from the build.
+// Copy it to pkg/config/ and remove the build constraint to use it.
+
 package config
 
 import (

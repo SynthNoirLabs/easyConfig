@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import "./App.css";
+import { Settings } from "lucide-react";
 import type { config } from "../wailsjs/go/models";
 import AddConfigModal from "./components/AddConfigModal";
 import CommandPalette from "./components/CommandPalette";
@@ -8,10 +9,10 @@ import ComparisonViewer from "./components/ComparisonViewer";
 import ConfigEditor from "./components/ConfigEditor";
 import ConfigWizard from "./components/ConfigWizard";
 import Docs from "./components/Docs";
+import ErrorBoundary from "./components/ErrorBoundary";
 import HealthDashboard from "./components/HealthDashboard";
 import Layout from "./components/Layout";
 import Marketplace from "./components/Marketplace";
-import ErrorBoundary from "./components/ErrorBoundary";
 import ShortcutsModal from "./components/ShortcutsModal";
 import Sidebar from "./components/Sidebar";
 import Workflows from "./components/Workflows";
@@ -22,9 +23,7 @@ type SelectableItem = config.Item & { initialLine?: number };
 
 function AppContent() {
   const { configs, loading, error, refreshConfigs } = useConfig();
-  const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(
-    null,
-  );
+  const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(null);
   const [comparisonItems, setComparisonItems] = useState<
     [config.Item, config.Item] | null
   >(null);
@@ -100,6 +99,22 @@ function AppContent() {
     );
   }
 
+  const getHeaderTitle = () => {
+    if (comparisonItems) return "Compare Configurations";
+    switch (currentView) {
+      case "health":
+        return "System Health";
+      case "workflows":
+        return "Workflows";
+      case "docs":
+        return "Documentation";
+      case "marketplace":
+        return "Marketplace";
+      default:
+        return selectedItem ? selectedItem.name : "Mission Control";
+    }
+  };
+
   const renderContent = () => {
     if (comparisonItems) {
       return (
@@ -125,7 +140,7 @@ function AppContent() {
           <ConfigEditor configItem={selectedItem} />
         ) : (
           <div className="empty-state">
-            <h2>Welcome to easyConfig</h2>
+            <h2>Welcome to EasyConfig</h2>
             <p>
               Select a configuration file to edit, or explore workflows and
               marketplace.
@@ -148,12 +163,28 @@ function AppContent() {
               currentView={currentView}
               onViewChange={setCurrentView}
               onCompare={handleCompareConfigs}
+              selectedItem={selectedItem}
             />
           </ErrorBoundary>
         }
       >
         <div className="app-content">
-          <ErrorBoundary>{renderContent()}</ErrorBoundary>
+          <header className="app-header">
+            <div className="header-left">
+              <h2 className="header-title">{getHeaderTitle()}</h2>
+              {currentView === "configs" && selectedItem && (
+                <span className="badge badge-active">Active</span>
+              )}
+            </div>
+            <div className="header-actions">
+              <button type="button" className="btn-icon" title="Settings">
+                <Settings size={18} />
+              </button>
+            </div>
+          </header>
+          <div className="main-scroll-area">
+            <ErrorBoundary>{renderContent()}</ErrorBoundary>
+          </div>
         </div>
       </Layout>
 
@@ -181,7 +212,7 @@ function AppContent() {
 function App() {
   return (
     <>
-      <Toaster richColors />
+      <Toaster richColors theme="dark" />
       <AppContent />
     </>
   );
