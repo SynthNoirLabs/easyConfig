@@ -103,6 +103,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Ensure dist exists for Go embed
+        run: mkdir -p frontend/dist
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
