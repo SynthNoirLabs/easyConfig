@@ -9,6 +9,7 @@ on:
     types: [created]
 
 permissions:
+  id-token: write
   contents: write
   pull-requests: write
   issues: write
@@ -32,7 +33,7 @@ jobs:
         uses: google-github-actions/run-gemini-cli@v0
         with:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          command: 'review'
+          prompt: 'Review this PR.'
 
   # 2. Automated Issue Triage
   # Runs on Issue Open OR when label 'gemini-triage' or 'agent:gemini' is added
@@ -50,7 +51,7 @@ jobs:
         uses: google-github-actions/run-gemini-cli@v0
         with:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          command: 'triage'
+          prompt: 'Triage this issue.'
 
   # 3. Interactive Chat (@gemini-cli)
   gemini-chat:
@@ -62,6 +63,4 @@ jobs:
         uses: google-github-actions/run-gemini-cli@v0
         with:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          command: 'chat'
-          issue_number: ${{ github.event.issue.number }}
-          comment_body: ${{ github.event.comment.body }}
+          prompt: 'Reply to this comment: ${{ github.event.comment.body }}'
