@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import "./ShortcutsModal.css";
 
 interface ShortcutsModalProps {
@@ -40,7 +40,10 @@ const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="shortcuts-modal-overlay" onClick={onClose}>
-      <div className="shortcuts-modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="shortcuts-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="shortcuts-modal-header">
           <h2>Keyboard Shortcuts</h2>
           <button type="button" className="close-button" onClick={onClose}>

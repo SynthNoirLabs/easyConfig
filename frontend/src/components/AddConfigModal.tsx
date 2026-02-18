@@ -1,7 +1,7 @@
+import FocusTrap from "focus-trap-react";
 import { X } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import FocusTrap from "focus-trap-react";
 import { CreateConfig } from "../../wailsjs/go/main/App";
 import { useConfig } from "../context/ConfigContext";
 import "./AddConfigModal.css";
@@ -98,56 +98,56 @@ const AddConfigModal: React.FC<AddConfigModalProps> = ({
             </button>
           </div>
           <form onSubmit={handleSubmit}>
-          <div className="modal-body">
-            {error && <div className="modal-error">{error}</div>}
+            <div className="modal-body">
+              {error && <div className="modal-error">{error}</div>}
 
-            <div className="form-group">
-              <label htmlFor="provider">Provider</label>
-              <select
-                id="provider"
-                value={provider}
-                onChange={(e) => setProvider(e.target.value)}
-              >
-                {providerOptions.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
-            </div>
+              <div className="form-group">
+                <label htmlFor="provider">Provider</label>
+                <select
+                  id="provider"
+                  value={provider}
+                  onChange={(e) => setProvider(e.target.value)}
+                >
+                  {providerOptions.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="scope">Scope</label>
-              <select
-                id="scope"
-                value={scope}
-                onChange={(e) => setScope(e.target.value)}
-              >
-                {SCOPES.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
+              <div className="form-group">
+                <label htmlFor="scope">Scope</label>
+                <select
+                  id="scope"
+                  value={scope}
+                  onChange={(e) => setScope(e.target.value)}
+                >
+                  {SCOPES.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn-submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Creating..." : "Create"}
-            </button>
-          </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn-submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating..." : "Create"}
+              </button>
+            </div>
           </form>
         </div>
       </FocusTrap>

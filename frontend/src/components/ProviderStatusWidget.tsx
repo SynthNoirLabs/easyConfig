@@ -23,7 +23,6 @@ const ProviderStatusWidget: React.FC = () => {
     };
 
     fetchStatuses();
-    // Refresh statuses every 30 seconds
     const interval = setInterval(fetchStatuses, 30000);
 
     return () => clearInterval(interval);
@@ -40,11 +39,11 @@ const ProviderStatusWidget: React.FC = () => {
   const getHealthColor = (health: string) => {
     switch (health) {
       case "healthy":
-        return "var(--green)";
+        return "var(--success)";
       case "unhealthy":
-        return "var(--red)";
+        return "var(--danger)";
       default:
-        return "var(--gray)";
+        return "var(--text-muted)";
     }
   };
 
@@ -76,10 +75,13 @@ const ProviderStatusWidget: React.FC = () => {
           ))}
         </div>
       </div>
-      <ProviderStatusDrawer
-        status={selectedStatus}
-        onClose={handleDrawerClose}
-      />
+      {selectedStatus && (
+        <ProviderStatusDrawer
+          isOpen={!!selectedStatus}
+          status={selectedStatus}
+          onClose={handleDrawerClose}
+        />
+      )}
     </>
   );
 };

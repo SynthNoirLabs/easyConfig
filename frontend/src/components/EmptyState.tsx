@@ -1,6 +1,6 @@
-import React from 'react';
-import { LucideIcon } from 'lucide-react';
-import '../styles/empty-state.css';
+import type { LucideIcon } from "lucide-react";
+import React from "react";
+import "../styles/empty-state.css";
 
 interface EmptyStateProps {
   icon: LucideIcon;
@@ -12,13 +12,18 @@ interface EmptyStateProps {
   };
 }
 
-export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action,
+}: EmptyStateProps) {
   return (
     <div className="empty-state">
       <Icon size={48} />
       <h3>{title}</h3>
       <p>{description}</p>
-      {action && <button onClick={action.onClick}>{action.label}</button>}
+      {action && <button type="button" onClick={action.onClick}>{action.label}</button>}
     </div>
   );
 }

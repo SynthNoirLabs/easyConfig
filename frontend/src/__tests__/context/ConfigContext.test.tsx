@@ -1,6 +1,6 @@
-import { renderHook, waitFor, act } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
-import { test, expect, vi } from "vitest";
+import { expect, test, vi } from "vitest";
 import { ConfigProvider, useConfig } from "../../../src/context/ConfigContext";
 
 // Mock Wails Go backend
