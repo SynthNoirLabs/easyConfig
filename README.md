@@ -50,6 +50,7 @@ EasyConfig is a centralized dashboard for managing configuration files for vario
 ## 🤝 Contributing
 
 See `TASKS.md` for the current backlog and project status.
+For a deep architectural, security, and production-readiness audit of the codebase, see [docs/REPOSITORY_REVIEW.md](docs/REPOSITORY_REVIEW.md).
 
 ### Adding a New Provider
 
