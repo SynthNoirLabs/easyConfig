@@ -4,7 +4,7 @@
 
 `easyConfig` is an ambitious Wails desktop application that tries to solve a real operational problem: every AI coding tool ships its own configuration format, storage location, and extension mechanism, and the project provides a single place to discover, edit, compare, back up, and extend those configs. The core architectural choice is sound. The Go backend uses a provider pattern in `pkg/config`, the React frontend uses a small Context-based state layer over Wails RPC bindings, and cross-cutting concerns such as MCP injection, schema fetching, profiles, workflows, and file watching are separated into dedicated packages. For a relatively small codebase, it already covers a broad surface area well.
 
-The codebase is not production-ready yet in its current form, mainly because the trust boundaries are still too soft for a configuration manager that touches secrets and writes arbitrary files on the user machine. Several critical concerns are backend path validation, secret handling via command-line arguments, incomplete platform/path normalization around Claude and MCP integration, and CI/build ergonomics that still require bootstrap workarounds such as creating `frontend/dist` before `go test ./...`. None of these problems require a rewrite, but they do require deliberate hardening before the application should be positioned as a secure daily driver.
+The codebase is not production-ready yet in its current form, mainly because the trust boundaries are still too soft for a configuration manager that touches secrets and writes arbitrary files on the user machine. The highest-risk issues are backend path validation, secret handling via command-line arguments, incomplete platform/path normalization around Claude and MCP integration, and CI/build ergonomics that still require bootstrap workarounds such as creating `frontend/dist` before `go test ./...`. None of these problems require a rewrite. They do, however, require deliberate hardening before the application should be positioned as a secure daily driver.
 
 ## 2. Architectural Strengths
 
@@ -15,6 +15,8 @@ The codebase is not production-ready yet in its current form, mainly because the
 - `frontend/src/context/ConfigContext.tsx` centralizes Wails calls and file-change subscriptions, so most components remain presentation-focused.
 
 This is a good fit for Wails. The bindings are simple, easy to regenerate, and easy to test in React by mocking `window.go` and `window.runtime`.
+
+State synchronization is also conceptually correct: the frontend loads via `DiscoverConfigs("")`, then subscribes to backend-emitted filesystem changes through `EventsOn("config:changed", ...)`. That is an efficient event model for a desktop app. The missing piece is richer partial-failure reporting, not the transport itself.
 
 ### Provider pattern is the right abstraction for the domain
 
@@ -56,6 +58,12 @@ That decomposition makes future hardening feasible because the security-sensitiv
 ### Restrictive file permissions are already part of the design
 
 Multiple write paths use `0600`, including config saves, MCP writes, and exported data. That is exactly the right default for agent configuration files, which often contain API keys or tokens. This is one of the better decisions in the codebase.
+
+### Configuration parsing is defensive in the main save path
+
+`pkg/config/service.go` validates JSON, YAML, and TOML before writing. That means the most common edit path already prevents accidental corruption for supported structured formats. Combined with the provider metadata (`FormatJSON`, `FormatTOML`, `FormatYAML`, etc.), this gives the application a reasonable base for multi-tool config editing.
+
+The weakness is consistency: save-time validation exists, but import/export, profile replay, and MCP installation do not apply the same depth of schema-aware validation. The project already has the beginning of the right pattern; it just needs to use it everywhere.
 
 ### Test coverage is broad for the repository size
 
@@ -189,7 +197,7 @@ This is operationally fragile:
 
 Recommendation:
 
-- commit a tiny placeholder file under `frontend/dist/.keep`, or
+- commit a tiny placeholder file at `frontend/dist/.keep`, or
 - move embed behind build tags / a runtime asset server strategy for tests.
 
 ### Medium: import from URL lacks provenance and size controls
@@ -202,6 +210,17 @@ Recommendation:
 - optional checksum/signature validation for shared profile bundles.
 
 This is not immediately RCE, but it is a weak ingestion point for a tool that may later be marketed as a secure config manager.
+
+### Medium: malformed configuration handling is tolerant but not normalized
+
+The codebase handles malformed files gracefully in several places, which is good for discovery UX. For example, provider discovery tends to continue after local failures, and `SaveConfig` rejects invalid JSON/YAML/TOML early. The issue is that the behavior is uneven:
+
+- discovery often logs and continues,
+- profile listing silently skips bad files,
+- import only validates top-level export shape/version, not provider-specific config shape,
+- diff/preview paths may continue with partial information.
+
+That means resilience exists, but users do not get a consistent model of what “valid” means across features.
 
 ### Medium: agentic CI workflows have overbroad trust and side effects
 
@@ -262,6 +281,8 @@ type SelectableItem = config.Item & { initialLine?: number };
 
 This is fine in isolation, but the broader risk is that generated Wails models and hand-authored UI assumptions can diverge quietly. The project should prefer thin view-model adapters close to component boundaries instead of mutating generated types in place across the UI.
 
+There is also a positive note here: the frontend is running with `strict: true` in `frontend/tsconfig.json`, and the inspected code does not rely on widespread `any` usage. The current typing story is better than many Wails projects; the debt is mostly around future drift, not current type collapse.
+
 ### Error handling favors “continue quietly” in too many places
 
 Examples:
@@ -281,6 +302,16 @@ The frontend shows good intent with keyboard shortcuts and modal structure, but 
 - icon-only settings button depends on `title`, which is weaker than an explicit accessible label.
 
 This is not catastrophic for an internal utility, but it is a production-readiness gap.
+
+### Testing exists across layers, but release-critical paths are underrepresented
+
+This repository is ahead of many similar projects because it already mixes Go unit tests, React/Vitest tests, and container-oriented integration tests. The problem is prioritization:
+
+- provider discovery is well represented,
+- general CRUD behavior is represented,
+- cross-platform path correctness, secrets handling, and path abuse cases are not represented proportionally to their risk.
+
+The testing strategy is good in breadth, but it needs to become sharper in risk weighting.
 
 ### Tests do not yet focus on abuse cases
 
@@ -369,7 +400,7 @@ The current CI already documents the fix implicitly: create `frontend/dist` befo
 
 Recommended improvements:
 
-1. include a checked-in placeholder file in `frontend/dist/`,
+1. include a checked-in placeholder file at `frontend/dist/.keep`,
 2. add a root bootstrap command to README/Taskfile that clearly states frontend deps are required for frontend lint/test/build,
 3. consider a lightweight preflight target:
 
