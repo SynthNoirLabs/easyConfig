@@ -1,29 +1,34 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
-import React from "react";
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, type Mock, test, vi } from "vitest";
 import { ConfigProvider, useConfig } from "../../../src/context/ConfigContext";
 
-// Mock Wails Go backend
-window.go = {
-  main: {
-    App: {
-      DiscoverConfigs: vi.fn(),
-      ReadConfig: vi.fn(),
-      SaveConfig: vi.fn(),
-      DeleteConfig: vi.fn(),
-    },
-  },
+const mockApp = {
+  DiscoverConfigs: vi.fn(),
+  ReadConfig: vi.fn(),
+  SaveConfig: vi.fn(),
+  DeleteConfig: vi.fn(),
 };
 
-// Mock Wails JS runtime
-window.runtime = {
-  EventsOn: vi.fn(() => () => {}), // Mock EventsOn to return a dummy 'off' function
-  EventsOnMultiple: vi.fn(() => () => {}),
-  EventsOnce: vi.fn(),
-  EventsEmit: vi.fn(),
-  WindowSetTitle: vi.fn(),
-  // Add other runtime functions if needed
-};
+beforeEach(() => {
+  window.go = {
+    main: {
+      App: mockApp,
+    },
+  } as Window["go"];
+
+  window.runtime = {
+    EventsOn: vi.fn(() => () => {}),
+    EventsOnMultiple: vi.fn(() => () => {}),
+    EventsOnce: vi.fn(),
+    EventsEmit: vi.fn(),
+    WindowSetTitle: vi.fn(),
+  } as Window["runtime"];
+
+  mockApp.DiscoverConfigs.mockReset();
+  mockApp.ReadConfig.mockReset();
+  mockApp.SaveConfig.mockReset();
+  mockApp.DeleteConfig.mockReset();
+});
 
 const mockConfigs = [
   {
@@ -37,7 +42,9 @@ const mockConfigs = [
 ];
 
 test("ConfigProvider fetches configs on mount", async () => {
-  window.go.main.App.DiscoverConfigs.mockResolvedValue(mockConfigs);
+  (window.go?.main?.App?.DiscoverConfigs as Mock).mockResolvedValue(
+    mockConfigs,
+  );
 
   const { result } = renderHook(() => useConfig(), {
     wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
@@ -50,10 +57,10 @@ test("ConfigProvider fetches configs on mount", async () => {
 });
 
 test("ConfigProvider handles deleting configs", async () => {
-  // Reset call counts for this test
-  window.go.main.App.DiscoverConfigs.mockClear();
-  window.go.main.App.DiscoverConfigs.mockResolvedValue(mockConfigs);
-  window.go.main.App.DeleteConfig.mockResolvedValue(undefined);
+  (window.go?.main?.App?.DiscoverConfigs as Mock).mockResolvedValue(
+    mockConfigs,
+  );
+  (window.go?.main?.App?.DeleteConfig as Mock).mockResolvedValue(undefined);
 
   const { result } = renderHook(() => useConfig(), {
     wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
@@ -63,16 +70,34 @@ test("ConfigProvider handles deleting configs", async () => {
   await waitFor(() => {
     expect(result.current.configs.length).toBe(1);
   });
-  expect(window.go.main.App.DiscoverConfigs).toHaveBeenCalledTimes(1);
+  expect(window.go?.main?.App?.DiscoverConfigs).toHaveBeenCalledTimes(1);
 
   // Trigger the delete action
   await act(async () => {
     await result.current.deleteConfig("/path/to/test.json");
   });
 
-  expect(window.go.main.App.DeleteConfig).toHaveBeenCalledWith(
+  expect(window.go?.main?.App?.DeleteConfig).toHaveBeenCalledWith(
     "/path/to/test.json",
   );
   // It refetches after delete
-  expect(window.go.main.App.DiscoverConfigs).toHaveBeenCalledTimes(2);
+  expect(window.go?.main?.App?.DiscoverConfigs).toHaveBeenCalledTimes(2);
+});
+
+test("ConfigProvider falls back to demo data without Wails", async () => {
+  delete (window as Window & { go?: unknown }).go;
+
+  const { result } = renderHook(() => useConfig(), {
+    wrapper: ({ children }) => <ConfigProvider>{children}</ConfigProvider>,
+  });
+
+  await waitFor(() => {
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.configs[0]?.name).toBe("Desktop MCP Config");
+  });
+
+  await expect(
+    result.current.readConfig("/demo/.claude/claude_desktop_config.json"),
+  ).resolves.toContain("mcpServers");
 });

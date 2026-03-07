@@ -3,6 +3,11 @@ import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { GetProviderStatuses } from "../../wailsjs/go/main/App";
 import type { config } from "../../wailsjs/go/models";
+import {
+  getDemoProviderStatuses,
+  isBrowserDemoMode,
+  isWailsUnavailableError,
+} from "../mocks/browserDemoData";
 import "./HealthDashboard.css";
 import StatusCard from "./StatusCard";
 
@@ -14,10 +19,20 @@ const HealthDashboard: React.FC = () => {
   const fetchStatuses = useCallback(async () => {
     setLoading(true);
     setError(null);
+    if (isBrowserDemoMode()) {
+      setStatuses(getDemoProviderStatuses());
+      setLoading(false);
+      return;
+    }
     try {
       const result = await GetProviderStatuses();
       setStatuses(result);
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        setStatuses(getDemoProviderStatuses());
+        setError(null);
+        return;
+      }
       setError(
         err instanceof Error ? err.message : "Failed to fetch status reports",
       );
@@ -36,7 +51,9 @@ const HealthDashboard: React.FC = () => {
     return (
       <div className="health-dashboard-error">
         <p>Error loading dashboard: {error}</p>
-        <button type="button" onClick={fetchStatuses}>Retry</button>
+        <button type="button" onClick={fetchStatuses}>
+          Retry
+        </button>
       </div>
     );
   }

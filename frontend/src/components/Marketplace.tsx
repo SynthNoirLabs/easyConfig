@@ -17,6 +17,11 @@ import {
   InstallMCPPackage,
 } from "../../wailsjs/go/main/App";
 import type { marketplaces } from "../../wailsjs/go/models";
+import {
+  getDemoMarketplacePackages,
+  isBrowserDemoMode,
+  isWailsUnavailableError,
+} from "../mocks/browserDemoData";
 import "./Marketplace.css";
 
 const Marketplace: React.FC = () => {
@@ -39,6 +44,14 @@ const Marketplace: React.FC = () => {
   const fetchMarketplace = useCallback(async () => {
     setLoading(true);
     setError(null);
+    if (isBrowserDemoMode()) {
+      const demoPackages = getDemoMarketplacePackages();
+      setCacheStatus({ isCached: true, isStale: false });
+      setPackages(demoPackages);
+      setFilteredPackages(demoPackages);
+      setLoading(false);
+      return;
+    }
     try {
       // Mock cache status check since backend method is missing
       // const status = await GetMarketplaceCacheStatus();
@@ -49,6 +62,14 @@ const Marketplace: React.FC = () => {
       setPackages(results || []);
       setFilteredPackages(results || []);
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        const demoPackages = getDemoMarketplacePackages();
+        setCacheStatus({ isCached: true, isStale: false });
+        setPackages(demoPackages);
+        setFilteredPackages(demoPackages);
+        setError(null);
+        return;
+      }
       console.error("Failed to fetch marketplace data:", err);
       setError("Failed to load marketplace packages. Please try again later.");
     } finally {
@@ -69,7 +90,7 @@ const Marketplace: React.FC = () => {
       // await RefreshMarketplaceCache();
       await fetchMarketplace();
       toast.success("Marketplace cache refreshed");
-    } catch (err) {
+    } catch (_err) {
       toast.error("Failed to refresh cache");
     } finally {
       setRefreshingCache(false);
@@ -101,9 +122,17 @@ const Marketplace: React.FC = () => {
   const handleInstall = async (pkg: marketplaces.MCPPackage) => {
     setInstalling(pkg.name);
     try {
+      if (isBrowserDemoMode()) {
+        toast.success(`Demo mode: queued ${pkg.name} for installation`);
+        return;
+      }
       await InstallMCPPackage(pkg.source); // Assuming source is the install arg
       toast.success(`Successfully installed ${pkg.name}`);
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        toast.success(`Demo mode: queued ${pkg.name} for installation`);
+        return;
+      }
       console.error(`Failed to install ${pkg.name}:`, err);
       toast.error(`Failed to install ${pkg.name}`);
     } finally {
@@ -123,7 +152,11 @@ const Marketplace: React.FC = () => {
           <Server size={48} />
           <h3>Connection Error</h3>
           <p>{error}</p>
-          <button type="button" onClick={fetchMarketplace} className="btn-retry">
+          <button
+            type="button"
+            onClick={fetchMarketplace}
+            className="btn-retry"
+          >
             Try Again
           </button>
         </div>
@@ -151,10 +184,7 @@ const Marketplace: React.FC = () => {
             disabled={refreshingCache || loading}
             title="Refresh Marketplace Data"
           >
-            <RefreshCw
-              size={18}
-              className={refreshingCache ? "spin" : ""}
-            />
+            <RefreshCw size={18} className={refreshingCache ? "spin" : ""} />
             Refresh
           </button>
         </div>
@@ -220,11 +250,7 @@ const Marketplace: React.FC = () => {
                   <div className="package-title-row">
                     <h3>{pkg.name}</h3>
                     {pkg.verified && (
-                      <Verified
-                        size={16}
-                        className="verified-badge"
-
-                      />
+                      <Verified size={16} className="verified-badge" />
                     )}
                   </div>
                 </div>
@@ -253,7 +279,7 @@ const Marketplace: React.FC = () => {
                   ))}
                   {(pkg.tags?.length || 0) > 3 && (
                     <span className="pkg-tag more">
-                      +{ (pkg.tags?.length || 0) - 3 }
+                      +{(pkg.tags?.length || 0) - 3}
                     </span>
                   )}
                 </div>

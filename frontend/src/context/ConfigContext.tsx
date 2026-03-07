@@ -15,6 +15,14 @@ import {
 } from "../../wailsjs/go/main/App";
 import type { config } from "../../wailsjs/go/models";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
+import {
+  deleteDemoConfig,
+  getDemoConfigs,
+  isBrowserDemoMode,
+  isWailsUnavailableError,
+  readDemoConfig,
+  saveDemoConfig,
+} from "../mocks/browserDemoData";
 import { debounce } from "../utils/debounce";
 
 interface ConfigContextType {
@@ -39,11 +47,21 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchConfigs = useCallback(async () => {
     setLoading(true);
     setError(null);
+    if (isBrowserDemoMode()) {
+      setConfigs(getDemoConfigs());
+      setLoading(false);
+      return;
+    }
     try {
       // DiscoverConfigs takes a projectPath. Empty string means discover in default locations.
       const items = await DiscoverConfigs("");
       setConfigs(items || []);
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        setConfigs(getDemoConfigs());
+        setError(null);
+        return;
+      }
       console.error("Failed to load configs:", err);
       setError(
         err instanceof Error ? err.message : "Failed to load configurations",
@@ -53,42 +71,58 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
           ? err.message
           : "Failed to load configurations. Check backend logs.",
       );
-      // Mock data for development if Wails is not available (e.g. in browser)
-      if (
-        String(err).includes("window.go") ||
-        String(err).includes("is not a function")
-      ) {
-        console.warn("Wails runtime not found. Using mock data.");
-        // Optional: Set mock data here if we want to test UI without backend
-      }
     } finally {
       setLoading(false);
     }
   }, []);
 
   const readConfig = async (path: string): Promise<string> => {
+    if (isBrowserDemoMode()) {
+      return readDemoConfig(path);
+    }
     try {
       return await ReadConfig(path);
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        return readDemoConfig(path);
+      }
       console.error("Failed to read config:", err);
       throw err;
     }
   };
 
   const saveConfig = async (path: string, content: string): Promise<void> => {
+    if (isBrowserDemoMode()) {
+      saveDemoConfig(path, content);
+      return;
+    }
     try {
       await SaveConfig(path, content);
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        saveDemoConfig(path, content);
+        return;
+      }
       console.error("Failed to save config:", err);
       throw err;
     }
   };
 
   const deleteConfig = async (path: string): Promise<void> => {
+    if (isBrowserDemoMode()) {
+      deleteDemoConfig(path);
+      await fetchConfigs();
+      return;
+    }
     try {
       await DeleteConfig(path);
       await fetchConfigs(); // Refresh list after delete
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        deleteDemoConfig(path);
+        await fetchConfigs();
+        return;
+      }
       console.error("Failed to delete config:", err);
       throw err;
     }
@@ -96,6 +130,10 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchConfigs();
+
+    if (isBrowserDemoMode()) {
+      return;
+    }
 
     const debouncedRefresh = debounce(() => {
       toast.info("Configuration changed on disk. Refreshing…");
