@@ -15,6 +15,11 @@ import {
   SetSecret,
 } from "../../wailsjs/go/main/App";
 import type { workflows } from "../../wailsjs/go/models";
+import {
+  getDemoWorkflowTemplates,
+  isBrowserDemoMode,
+  isWailsUnavailableError,
+} from "../mocks/browserDemoData";
 import "./Workflows.css";
 
 export default function Workflows() {
@@ -29,10 +34,18 @@ export default function Workflows() {
   const generatedContent = selected?.content ?? "";
 
   const loadTemplates = useCallback(async () => {
+    if (isBrowserDemoMode()) {
+      setTemplates(getDemoWorkflowTemplates());
+      return;
+    }
     try {
       const data = await ListWorkflowTemplates();
       setTemplates(data);
-    } catch (_err) {
+    } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        setTemplates(getDemoWorkflowTemplates());
+        return;
+      }
       toast.error("Failed to load workflow templates");
     }
   }, []);
@@ -61,9 +74,17 @@ export default function Workflows() {
     if (!selected) return;
     if (!filename || !generatedContent) return;
     try {
+      if (isBrowserDemoMode()) {
+        toast.success(`Demo mode: would save .github/workflows/${filename}`);
+        return;
+      }
       await SaveWorkflow(filename, generatedContent);
       toast.success(`Saved to .github/workflows/${filename}`);
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        toast.success(`Demo mode: would save .github/workflows/${filename}`);
+        return;
+      }
       toast.error(`Failed to save workflow: ${err}`);
     }
   };
@@ -75,10 +96,20 @@ export default function Workflows() {
       return;
     }
     try {
+      if (isBrowserDemoMode()) {
+        toast.success(`Demo mode: secret ${secretName} captured locally`);
+        setSecretValues((prev) => ({ ...prev, [secretName]: "" }));
+        return;
+      }
       await SetSecret(secretName, value);
       toast.success(`Secret ${secretName} set successfully!`);
       setSecretValues((prev) => ({ ...prev, [secretName]: "" }));
     } catch (err) {
+      if (isWailsUnavailableError(err)) {
+        toast.success(`Demo mode: secret ${secretName} captured locally`);
+        setSecretValues((prev) => ({ ...prev, [secretName]: "" }));
+        return;
+      }
       toast.error(`Failed to set secret: ${err}`);
     }
   };

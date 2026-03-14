@@ -2,6 +2,34 @@
 
 EasyConfig is a centralized dashboard for managing configuration files for various AI agents (Claude Code, Gemini CLI, Codex, etc.). It simplifies the process of finding, editing, and extending these agents with new capabilities like MCP servers.
 
+## 📸 Application Screenshots
+
+These screenshots show the current desktop UI using representative demo data in browser mode.
+
+### Main Dashboard
+
+![EasyConfig main dashboard](docs/assets/screenshots/main-dashboard.png)
+
+### Config Editor
+
+![EasyConfig config editor](docs/assets/screenshots/config-editor.png)
+
+### Health Dashboard
+
+![EasyConfig health dashboard](docs/assets/screenshots/health-dashboard.png)
+
+### Marketplace
+
+![EasyConfig marketplace](docs/assets/screenshots/marketplace.png)
+
+### Workflow Gallery
+
+![EasyConfig workflow gallery](docs/assets/screenshots/workflow-gallery.png)
+
+### Workflow Detail
+
+![EasyConfig workflow detail](docs/assets/screenshots/workflow-detail.png)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -50,6 +78,7 @@ EasyConfig is a centralized dashboard for managing configuration files for vario
 ## 🤝 Contributing
 
 See `TASKS.md` for the current backlog and project status.
+For a deep architectural, security, and production-readiness audit of the codebase, see [docs/REPOSITORY_REVIEW.md](docs/REPOSITORY_REVIEW.md).
 
 ### Adding a New Provider
 

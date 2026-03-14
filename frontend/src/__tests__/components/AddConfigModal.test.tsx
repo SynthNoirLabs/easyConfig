@@ -1,24 +1,30 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import React from "react";
-import { expect, test, vi } from "vitest";
+import { beforeEach, expect, type Mock, test, vi } from "vitest";
 import AddConfigModal from "../../../src/components/AddConfigModal";
 import { useConfig } from "../../../src/context/ConfigContext";
 
 // Mock hooks and Wails bridge
 vi.mock("../../../src/context/ConfigContext");
-window.go = {
-  main: {
-    App: {
-      CreateConfig: vi.fn(),
-    },
-  },
-};
+const mockedUseConfig = vi.mocked(useConfig);
 
 const mockOnClose = vi.fn();
 const mockOnSuccess = vi.fn();
 
+beforeEach(() => {
+  window.go = {
+    main: {
+      App: {
+        CreateConfig: vi.fn(),
+      },
+    },
+  } as Window["go"];
+  mockedUseConfig.mockReset();
+});
+
 test("AddConfigModal renders when open", () => {
-  useConfig.mockReturnValue({ configs: [] });
+  mockedUseConfig.mockReturnValue({ configs: [] } as unknown as ReturnType<
+    typeof useConfig
+  >);
   render(
     <AddConfigModal
       isOpen={true}
@@ -30,8 +36,10 @@ test("AddConfigModal renders when open", () => {
 });
 
 test("AddConfigModal handles form submission", async () => {
-  useConfig.mockReturnValue({ configs: [] });
-  window.go.main.App.CreateConfig.mockResolvedValue(undefined);
+  mockedUseConfig.mockReturnValue({ configs: [] } as unknown as ReturnType<
+    typeof useConfig
+  >);
+  (window.go?.main?.App?.CreateConfig as Mock).mockResolvedValue(undefined);
 
   render(
     <AddConfigModal
@@ -43,7 +51,7 @@ test("AddConfigModal handles form submission", async () => {
 
   fireEvent.click(screen.getByText("Create"));
 
-  expect(window.go.main.App.CreateConfig).toHaveBeenCalledWith(
+  expect(window.go?.main?.App?.CreateConfig).toHaveBeenCalledWith(
     "Claude Code",
     "global",
     "",
